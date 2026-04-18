@@ -78,8 +78,7 @@ body{font-family:'DM Sans',sans-serif;background:#080c14;min-height:100vh;overfl
 .sb-badge.g{background:rgba(45,190,108,.18);color:#2dbe6c;border:1px solid rgba(45,190,108,.35)}
 
 /* ── PLAYER ── */
-.player-wrap{position:absolute;bottom:52px;left:50%;transform:translateX(-50%);z-index:10}
-.player-svg{width:66px;height:106px;filter:drop-shadow(0 6px 18px rgba(232,98,42,.6))}
+/* player-wrap & player-svg now handled by .player-flipper rules above */
 
 .ball{position:absolute;width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 33% 30%,#ffb347,#c45b10);border:1.5px solid #7a3500;z-index:15;pointer-events:none;display:none;box-shadow:0 2px 8px rgba(0,0,0,.5)}
 .flash{position:absolute;top:46%;left:50%;transform:translate(-50%,-50%);font-family:'Bebas Neue',sans-serif;font-size:38px;pointer-events:none;opacity:0;z-index:50;white-space:nowrap;letter-spacing:2px}
@@ -365,6 +364,60 @@ body{font-family:'DM Sans',sans-serif;background:#080c14;min-height:100vh;overfl
 }
 .copy-btn:active{opacity:.85}
 
+
+/* ═══════════════════════════════════════
+   PLAYER FLIP ANIMATION
+   ═══════════════════════════════════════ */
+.player-wrap{
+  position:absolute;bottom:52px;left:50%;
+  transform:translateX(-50%);z-index:10;
+  perspective:400px;
+}
+.player-flipper{
+  position:relative;width:68px;height:108px;
+  transform-style:preserve-3d;
+  transition:transform 0s; /* JS controls timing */
+}
+.player-face{
+  position:absolute;top:0;left:0;
+  width:68px;height:108px;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+}
+.player-back{
+  transform:rotateY(0deg);
+  filter:drop-shadow(0 6px 18px rgba(232,98,42,.55));
+}
+.player-front{
+  transform:rotateY(180deg);
+  filter:drop-shadow(0 6px 20px rgba(232,98,42,.8));
+}
+/* When .celebrating class added, flip to front */
+.player-flipper.celebrating{
+  transform:rotateY(180deg);
+}
+/* Throwing arm raise on back SVG */
+.player-flipper.throwing #armBackR{
+  transform-origin:61px 36px;
+  transform:rotate(-70deg);
+}
+
+/* Siii flash — special gold burst */
+.siii-flash{
+  position:absolute;
+  top:38%;left:50%;
+  transform:translate(-50%,-50%) scale(0.5);
+  font-family:'Bebas Neue',sans-serif;
+  font-size:52px;
+  color:#fbbf24;
+  text-shadow:0 0 30px rgba(251,191,36,.9),0 0 60px rgba(251,191,36,.5);
+  pointer-events:none;
+  opacity:0;
+  z-index:51;
+  white-space:nowrap;
+  letter-spacing:4px;
+}
+
 /* ═══════════════════════════════════════════════════
    RESPONSIVE — iPhone SE · iPhone · iPhone Pro Max
                 iPad · iPad Pro
@@ -375,7 +428,8 @@ body{font-family:'DM Sans',sans-serif;background:#080c14;min-height:100vh;overfl
   .stadium{height:280px}
   .hoop-wrap{top:42px}
   .player-wrap{bottom:42px}
-  .player-svg{width:54px;height:88px}
+  .player-face{width:54px;height:88px}
+  .player-flipper{width:54px;height:88px}
   .scoreboard{gap:8px;padding:4px 10px}
   .sb-v{font-size:22px}
   .sb-div{height:28px}
@@ -396,7 +450,8 @@ body{font-family:'DM Sans',sans-serif;background:#080c14;min-height:100vh;overfl
 /* iPhone Pro Max / large phones (431–480px) */
 @media (min-width:431px) and (max-width:480px){
   .stadium{height:330px}
-  .player-svg{width:72px;height:116px}
+  .player-face{width:72px;height:116px}
+  .player-flipper{width:72px;height:116px}
   .shot-btn{padding:11px 18px;font-size:20px}
 }
 
@@ -410,7 +465,8 @@ body{font-family:'DM Sans',sans-serif;background:#080c14;min-height:100vh;overfl
   .hoop-wrap{top:64px}
   .hoop-wrap svg{width:110px;height:100px}
   .player-wrap{bottom:66px}
-  .player-svg{width:84px;height:134px}
+  .player-face{width:84px;height:134px}
+  .player-flipper{width:84px;height:134px}
   .scoreboard{gap:18px;padding:8px 22px;border-radius:14px}
   .sb-v{font-size:36px}
   .sb-l{font-size:10px}
@@ -492,7 +548,8 @@ body{font-family:'DM Sans',sans-serif;background:#080c14;min-height:100vh;overfl
   .hoop-wrap{top:72px}
   .hoop-wrap svg{width:120px;height:110px}
   .player-wrap{bottom:76px}
-  .player-svg{width:96px;height:152px}
+  .player-face{width:96px;height:152px}
+  .player-flipper{width:96px;height:152px}
   .scoreboard{padding:10px 28px;gap:22px}
   .sb-v{font-size:42px}
   .sb-div{height:54px}
@@ -506,7 +563,8 @@ body{font-family:'DM Sans',sans-serif;background:#080c14;min-height:100vh;overfl
   .court svg{height:160px}
   .hoop-wrap{top:30px}
   .player-wrap{bottom:32px}
-  .player-svg{width:50px;height:80px}
+  .player-face{width:50px;height:80px}
+  .player-flipper{width:50px;height:80px}
   .scoreboard{padding:3px 10px;gap:8px}
   .sb-v{font-size:20px}
   .sb-div{height:24px}
@@ -634,40 +692,109 @@ body{font-family:'DM Sans',sans-serif;background:#080c14;min-height:100vh;overfl
     <div class="sb-blk"><div class="sb-v gr" id="sbLeft">70</div><div class="sb-l">Left</div></div>
   </div>
 
-  <!-- PLAYER -->
+  <!-- PLAYER — 3D flip card: back (default) → front (celebration) -->
   <div class="player-wrap" id="playerWrap">
-    <svg class="player-svg" viewBox="0 0 68 108">
-      <ellipse cx="34" cy="105" rx="20" ry="4" fill="rgba(0,0,0,.5)"/>
-      <rect x="14" y="93" width="15" height="9" rx="4" fill="#0f0f0f"/>
-      <rect x="39" y="93" width="15" height="9" rx="4" fill="#0f0f0f"/>
-      <rect x="14" y="96" width="15" height="4" rx="2" fill="#e8622a" opacity=".7"/>
-      <rect x="39" y="96" width="15" height="4" rx="2" fill="#e8622a" opacity=".7"/>
-      <rect x="17" y="64" width="12" height="33" rx="6" fill="#1a3a8f"/>
-      <rect x="39" y="64" width="12" height="33" rx="6" fill="#1a3a8f"/>
-      <rect x="12" y="56" width="44" height="18" rx="8" fill="#1a3a8f"/>
-      <rect x="11" y="32" width="46" height="28" rx="9" fill="#e8622a"/>
-      <rect x="11" y="49" width="46" height="3" fill="rgba(255,255,255,.12)" rx="1"/>
-      <text x="34" y="52" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="14" fill="#fff">10</text>
-      <text x="34" y="39" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.7)">★</text>
-      <rect x="1" y="34" width="12" height="24" rx="6" fill="#c0784a" id="armL"/>
-      <rect x="55" y="34" width="12" height="24" rx="6" fill="#c0784a" id="armR"/>
-      <rect x="26" y="25" width="16" height="12" rx="6" fill="#c0784a"/>
-      <ellipse cx="34" cy="19" rx="17" ry="19" fill="#c0784a"/>
-      <ellipse cx="34" cy="5" rx="17" ry="9" fill="#111"/>
-      <rect x="17" y="5" width="34" height="8" fill="#111" rx="3"/>
-      <rect x="17" y="11" width="34" height="6" rx="3" fill="#e8622a" opacity=".9"/>
-      <ellipse cx="27" cy="19" rx="3.2" ry="3.5" fill="#fff"/>
-      <ellipse cx="41" cy="19" rx="3.2" ry="3.5" fill="#fff"/>
-      <ellipse cx="28" cy="20" rx="1.9" ry="2.1" fill="#1a0a00"/>
-      <ellipse cx="42" cy="20" rx="1.9" ry="2.1" fill="#1a0a00"/>
-      <line x1="24" y1="14" x2="31" y2="15" stroke="#1a0a00" stroke-width="2" stroke-linecap="round"/>
-      <line x1="38" y1="15" x2="45" y2="14" stroke="#1a0a00" stroke-width="2" stroke-linecap="round"/>
-      <path d="M27 27 Q34 32 41 27" fill="none" stroke="#8b4513" stroke-width="1.5" stroke-linecap="round"/>
-    </svg>
+    <div class="player-flipper" id="playerFlipper">
+
+      <!-- BACK VIEW (default — player faces hoop) -->
+      <svg class="player-face player-back" id="playerBack" viewBox="0 0 68 108">
+        <!-- shadow -->
+        <ellipse cx="34" cy="105" rx="20" ry="4" fill="rgba(0,0,0,.45)"/>
+        <!-- shoes -->
+        <rect x="14" y="93" width="15" height="9" rx="4" fill="#0f0f0f"/>
+        <rect x="39" y="93" width="15" height="9" rx="4" fill="#0f0f0f"/>
+        <rect x="14" y="95" width="15" height="4" rx="2" fill="#e8622a" opacity=".6"/>
+        <rect x="39" y="95" width="15" height="4" rx="2" fill="#e8622a" opacity=".6"/>
+        <!-- legs back view -->
+        <rect x="18" y="64" width="12" height="33" rx="6" fill="#152d70"/>
+        <rect x="38" y="64" width="12" height="33" rx="6" fill="#152d70"/>
+        <!-- shorts back -->
+        <rect x="13" y="56" width="42" height="18" rx="8" fill="#152d70"/>
+        <!-- jersey BACK — number on back -->
+        <rect x="11" y="32" width="46" height="28" rx="9" fill="#c94f1e"/>
+        <rect x="11" y="49" width="46" height="3" fill="rgba(0,0,0,.12)" rx="1"/>
+        <text x="34" y="52" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="13" fill="rgba(255,255,255,.9)">10</text>
+        <!-- arms back — both at sides -->
+        <rect x="1" y="34" width="11" height="22" rx="5" fill="#a8623a" id="armBackL"/>
+        <rect x="56" y="34" width="11" height="22" rx="5" fill="#a8623a" id="armBackR"/>
+        <!-- neck back -->
+        <rect x="28" y="26" width="12" height="10" rx="5" fill="#a8623a"/>
+        <!-- head back — no face, just shape + hair -->
+        <ellipse cx="34" cy="19" rx="16" ry="18" fill="#a8623a"/>
+        <!-- hair back -->
+        <ellipse cx="34" cy="4" rx="16" ry="8" fill="#111"/>
+        <rect x="18" y="4" width="32" height="10" fill="#111" rx="3"/>
+        <!-- headband back -->
+        <rect x="18" y="13" width="32" height="5" rx="2" fill="#e8622a" opacity=".85"/>
+        <!-- ear left -->
+        <ellipse cx="18" cy="21" rx="3" ry="4" fill="#a8623a"/>
+        <!-- ear right -->
+        <ellipse cx="50" cy="21" rx="3" ry="4" fill="#a8623a"/>
+      </svg>
+
+      <!-- FRONT VIEW (celebration — shown after goal) -->
+      <svg class="player-face player-front" id="playerFront" viewBox="0 0 68 108">
+        <!-- shadow -->
+        <ellipse cx="34" cy="105" rx="22" ry="4" fill="rgba(0,0,0,.45)"/>
+        <!-- shoes -->
+        <rect x="13" y="93" width="15" height="9" rx="4" fill="#0f0f0f"/>
+        <rect x="40" y="93" width="15" height="9" rx="4" fill="#0f0f0f"/>
+        <rect x="13" y="95" width="15" height="4" rx="2" fill="#e8622a" opacity=".7"/>
+        <rect x="40" y="95" width="15" height="4" rx="2" fill="#e8622a" opacity=".7"/>
+        <!-- legs celebration — slightly spread -->
+        <rect x="15" y="64" width="13" height="33" rx="6" fill="#1a3a8f" transform="rotate(-4,21,80)"/>
+        <rect x="40" y="64" width="13" height="33" rx="6" fill="#1a3a8f" transform="rotate(4,47,80)"/>
+        <!-- shorts -->
+        <rect x="11" y="56" width="46" height="18" rx="8" fill="#1a3a8f"/>
+        <!-- jersey front -->
+        <rect x="10" y="32" width="48" height="28" rx="9" fill="#e8622a"/>
+        <rect x="10" y="49" width="48" height="3" fill="rgba(255,255,255,.12)" rx="1"/>
+        <text x="34" y="52" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="14" fill="#fff">10</text>
+        <text x="34" y="40" text-anchor="middle" font-size="11" fill="rgba(255,255,255,.8)">★</text>
+        <!-- arms RAISED in celebration (both up) -->
+        <rect x="-2" y="18" width="13" height="24" rx="6" fill="#c0784a" transform="rotate(40,5,30)"/>
+        <rect x="57" y="18" width="13" height="24" rx="6" fill="#c0784a" transform="rotate(-40,63,30)"/>
+        <!-- fists raised (hands) -->
+        <ellipse cx="0" cy="19" rx="6" ry="5" fill="#c0784a"/>
+        <ellipse cx="68" cy="19" rx="6" ry="5" fill="#c0784a"/>
+        <!-- neck -->
+        <rect x="27" y="25" width="14" height="12" rx="6" fill="#c0784a"/>
+        <!-- head -->
+        <ellipse cx="34" cy="19" rx="17" ry="19" fill="#c0784a"/>
+        <!-- hair -->
+        <ellipse cx="34" cy="4" rx="17" ry="9" fill="#111"/>
+        <rect x="17" y="4" width="34" height="9" fill="#111" rx="3"/>
+        <!-- headband -->
+        <rect x="17" y="11" width="34" height="6" rx="3" fill="#e8622a" opacity=".9"/>
+        <!-- eyes — wide open excited -->
+        <ellipse cx="26" cy="20" rx="4" ry="4.5" fill="#fff"/>
+        <ellipse cx="42" cy="20" rx="4" ry="4.5" fill="#fff"/>
+        <ellipse cx="27" cy="21" rx="2.2" ry="2.5" fill="#1a0a00"/>
+        <ellipse cx="43" cy="21" rx="2.2" ry="2.5" fill="#1a0a00"/>
+        <!-- gleam in eyes -->
+        <ellipse cx="26" cy="19" rx="1" ry="1" fill="#fff"/>
+        <ellipse cx="42" cy="19" rx="1" ry="1" fill="#fff"/>
+        <!-- raised eyebrows excited -->
+        <path d="M22 14 Q26 11 30 13" fill="none" stroke="#1a0a00" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M38 13 Q42 11 46 14" fill="none" stroke="#1a0a00" stroke-width="1.8" stroke-linecap="round"/>
+        <!-- BIG celebration smile -->
+        <path d="M23 28 Q34 37 45 28" fill="#8b3a00" stroke="none"/>
+        <path d="M23 28 Q34 37 45 28" fill="none" stroke="#5c2200" stroke-width="1" stroke-linecap="round"/>
+        <!-- teeth -->
+        <path d="M26 28 Q34 34 42 28" fill="#fff"/>
+        <!-- tongue -->
+        <ellipse cx="34" cy="33" rx="4" ry="2.5" fill="#e05050"/>
+      </svg>
+
+    </div>
   </div>
+
+  <!-- CONFETTI CANVAS (layered above court, below overlays) -->
+  <canvas id="confettiCanvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:12;"></canvas>
 
   <div class="ball" id="ball"></div>
   <div class="flash" id="flash"></div>
+  <div class="siii-flash" id="siiiFlash">Siii! 🙌</div>
 
   <div class="shot-btns">
     <button class="shot-btn one"   id="btn1" onclick="initShot(1)"><span class="bdg">+1</span>📦 1 BOX</button>
@@ -970,11 +1097,19 @@ function fireShot(sectorId){
   save();
 }
 
-/* ── ANIMATION — picker opens AFTER ball drops through net ── */
+/* ── ANIMATION SEQUENCE ──
+   Phase 1: Player back to camera, raises arm, throws
+   Phase 2: Ball arcs to hoop, drops through net
+   Phase 3: Player SPINS to front (3D flip)
+   Phase 4: "Siii! 🙌" flash + confetti burst
+   Phase 5: Sector picker slides up
+   Phase 6: Player spins back to back view
+── */
 function animShot(pts){
   shooting=true;
   ['btn1','btn3','btn6'].forEach(id=>document.getElementById(id).disabled=true);
 
+  const flipper=document.getElementById('playerFlipper');
   const st=document.getElementById('stadium');
   const pw=document.getElementById('playerWrap');
   const hp=document.getElementById('hoopWrap');
@@ -983,53 +1118,134 @@ function animShot(pts){
   const pwR=pw.getBoundingClientRect();
   const hpR=hp.getBoundingClientRect();
 
-  const sx=pwR.left-stR.left+54, sy=pwR.top-stR.top+26;
-  const ex=hpR.left-stR.left+hpR.width/2-10, ey=hpR.top-stR.top+46;
+  /* Ball starts from player's right shoulder (back view) */
+  const sx=pwR.left-stR.left+52, sy=pwR.top-stR.top+22;
+  const ex=hpR.left-stR.left+hpR.width/2-10, ey=hpR.top-stR.top+44;
 
-  ball.style.cssText=`display:block;left:${sx}px;top:${sy}px;transition:none`;
-  document.getElementById('armR').setAttribute('transform','rotate(-65,61,38)');
+  /* Phase 1a: raise arm on back SVG */
+  flipper.classList.add('throwing');
 
-  const dur=pts===6?860:pts===3?670:460;
-  const arc=pts===6?-162:pts===3?-112:-68;
+  ball.style.cssText=`display:block;left:${sx}px;top:${sy}px;transition:none;opacity:1`;
+
+  const dur=pts===6?860:pts===3?680:480;
+  const arc=pts===6?-165:pts===3?-115:-72;
   const t0=performance.now();
 
-  /* Phase 1: ball flies to hoop */
+  /* Phase 1b: ball flies */
   (function frame(now){
     const t=Math.min((now-t0)/dur,1);
     const e=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
     ball.style.left=((1-e)*sx+e*ex)+'px';
     ball.style.top=((1-e)*sy+e*ey+Math.sin(t*Math.PI)*arc)+'px';
-    ball.style.transform=`rotate(${t*360}deg)`;
+    ball.style.transform=`rotate(${t*400}deg)`;
     if(t<1){requestAnimationFrame(frame);return;}
 
-    /* Ball reached hoop — show flash */
-    const msgs={
-      1:['📦 LOGGED!','BOX IN! ✓','CONFIRMED!'],
-      3:['NICE SHOT! 🎯','SWISH! ✨','MONEY! 💰'],
-      6:['DEEP THREE! 🔥','FROM DOWNTOWN! 💥','HEAT CHECK! 🔥']
-    };
-    const arr=msgs[pts];
-    showFlash(arr[Math.floor(Math.random()*arr.length)], pts===6);
-
     /* Phase 2: ball drops through net */
-    ball.style.transition='top .28s ease-in, opacity .28s .1s';
-    ball.style.top=(ey+40)+'px';
+    ball.style.transition='top .3s cubic-bezier(.4,0,1,1), opacity .25s .12s';
+    ball.style.top=(ey+42)+'px';
     ball.style.opacity='0';
 
-    /* Phase 3: AFTER ball finishes falling → open picker */
+    /* Phase 3: after 180ms (mid-drop) → player SPINS to front */
     setTimeout(()=>{
-      ball.style.display='none';
-      ball.style.opacity='1';
-      ball.style.transition='';
-      document.getElementById('armR').removeAttribute('transform');
-      shooting=false;
-      ['btn1','btn3','btn6'].forEach(id=>document.getElementById(id).disabled=false);
+      flipper.classList.remove('throwing');
+      /* Smooth 3D flip over 400ms */
+      flipper.style.transition='transform 0.4s cubic-bezier(.4,0,.2,1)';
+      flipper.classList.add('celebrating');
 
-      /* NOW show the sector picker */
-      openPicker(pts);
-    }, 420); /* 420ms = ball drop (280ms) + small pause (140ms) */
+      /* Phase 4: after spin completes → Siii! + confetti */
+      setTimeout(()=>{
+        showSiii();
+        launchConfetti();
 
+        /* Phase 5: after Siii moment → open picker */
+        setTimeout(()=>{
+          ball.style.display='none';
+          ball.style.opacity='1';
+          ball.style.transition='';
+          shooting=false;
+          ['btn1','btn3','btn6'].forEach(id=>document.getElementById(id).disabled=false);
+          openPicker(pts);
+
+          /* Phase 6: after picker shown, spin player back (delay so they see the front) */
+          setTimeout(()=>{
+            flipper.style.transition='transform 0.35s cubic-bezier(.4,0,.2,1)';
+            flipper.classList.remove('celebrating');
+          }, 800);
+        }, 700);
+      }, 420);
+    }, 180);
   })(performance.now());
+}
+
+/* Siii! celebration flash */
+function showSiii(){
+  const f=document.getElementById('siiiFlash');
+  f.style.transition='none';
+  f.style.opacity='1';
+  f.style.transform='translate(-50%,-50%) scale(1)';
+  setTimeout(()=>{
+    f.style.transition='all 0.8s cubic-bezier(.4,0,.2,1)';
+    f.style.opacity='0';
+    f.style.transform='translate(-50%,-90%) scale(0.7)';
+  },900);
+}
+
+/* Confetti burst */
+function launchConfetti(){
+  const canvas=document.getElementById('confettiCanvas');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  canvas.width=canvas.offsetWidth;
+  canvas.height=canvas.offsetHeight;
+  const cx=canvas.width/2, cy=canvas.height*0.35;
+  const colors=['#e8622a','#fbbf24','#2dbe6c','#3b82f6','#a855f7','#ec4899','#fff'];
+  const particles=[];
+  for(let i=0;i<80;i++){
+    const angle=(Math.random()*Math.PI*2);
+    const speed=3+Math.random()*6;
+    particles.push({
+      x:cx, y:cy,
+      vx:Math.cos(angle)*speed,
+      vy:Math.sin(angle)*speed - 3,
+      size:4+Math.random()*5,
+      color:colors[Math.floor(Math.random()*colors.length)],
+      alpha:1, rot:Math.random()*360,
+      rotV:(Math.random()-0.5)*8,
+      shape:Math.random()>0.5?'rect':'circle'
+    });
+  }
+  let startT=null;
+  function drawConfetti(ts){
+    if(!startT)startT=ts;
+    const elapsed=(ts-startT)/1000;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    let alive=false;
+    particles.forEach(p=>{
+      p.vy+=0.18; // gravity
+      p.x+=p.vx; p.y+=p.vy;
+      p.rot+=p.rotV;
+      p.alpha=Math.max(0,1-elapsed/1.8);
+      if(p.alpha>0){
+        alive=true;
+        ctx.save();
+        ctx.globalAlpha=p.alpha;
+        ctx.translate(p.x,p.y);
+        ctx.rotate(p.rot*Math.PI/180);
+        ctx.fillStyle=p.color;
+        if(p.shape==='rect'){
+          ctx.fillRect(-p.size/2,-p.size/4,p.size,p.size/2);
+        } else {
+          ctx.beginPath();
+          ctx.arc(0,0,p.size/2,0,Math.PI*2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+    });
+    if(alive&&elapsed<2) requestAnimationFrame(drawConfetti);
+    else ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+  requestAnimationFrame(drawConfetti);
 }
 
 function showFlash(msg,big){
