@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover"/>
+<title>Court Planner — Target Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#080c14;min-height:100vh;overflow-x:hidden;color:#fff;
+  /* iPhone safe area — Dynamic Island, notch, home bar */
+  padding-top:env(safe-area-inset-top);
+  padding-left:env(safe-area-inset-left);
+  padding-right:env(safe-area-inset-right);
+}
+
+/* ═══════════════════════════════════════
+   STADIUM — NBA hardwood court background
+   ═══════════════════════════════════════ */
+.stadium{
+  position:relative;width:100%;height:340px;overflow:hidden;
+  /* Rich hardwood base */
+  background:
+    /* subtle vignette overlay */
+    radial-gradient(ellipse 80% 60% at 50% 110%, rgba(0,0,0,.55) 0%, transparent 70%),
+    /* top arena darkness */
+    linear-gradient(180deg, rgba(5,3,18,.95) 0%, rgba(10,6,30,.7) 22%, transparent 42%),
+    /* hardwood planks — fine horizontal grain */
+    repeating-linear-gradient(
+      180deg,
+      rgba(0,0,0,.0) 0px, rgba(0,0,0,.0) 17px,
+      rgba(0,0,0,.12) 17px, rgba(0,0,0,.12) 18px
+    ),
+    /* hardwood color gradient — lighter near center, darker edges */
+    radial-gradient(ellipse 100% 80% at 50% 100%, #c8752a 0%, #a85e20 35%, #7a3f0e 70%, #5c2d08 100%);
+}
+
+/* Arena atmosphere glow from court lights */
+.stadium::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 70% 40% at 50% 85%, rgba(220,140,50,.18) 0%, transparent 65%);
+  pointer-events:none;z-index:1;
+}
+
+.crowd-row{position:absolute;width:100%;display:flex;justify-content:center;gap:3px;z-index:2}
+.crowd-row:nth-child(1){top:4px;opacity:.3}
+.crowd-row:nth-child(2){top:16px;opacity:.42}
+.crowd-row:nth-child(3){top:28px;opacity:.55}
+.crowd-dot{width:7px;height:9px;border-radius:50% 50% 40% 40%;animation:bob 1.8s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+
+/* Arena spotlights */
+.spotlight{position:absolute;top:0;border-radius:0 0 70px 70px;pointer-events:none;z-index:2}
+.spl{width:90px;height:240px;left:10px;background:linear-gradient(180deg,rgba(255,230,100,.1),transparent);transform:rotate(-18deg)}
+.spc{width:150px;height:260px;left:50%;transform:translateX(-50%);background:linear-gradient(180deg,rgba(255,245,200,.12),transparent)}
+.spr{width:90px;height:240px;right:10px;background:linear-gradient(180deg,rgba(255,230,100,.1),transparent);transform:rotate(18deg)}
+
+/* ── NBA COURT SURFACE (SVG layer) ── */
+.court{position:absolute;bottom:0;left:0;right:0;height:230px;z-index:3}
+.court svg{width:100%;height:230px}
+
+.hoop-wrap{position:absolute;top:50px;left:50%;transform:translateX(-50%);z-index:6}
+
+/* ── SCOREBOARD ── */
+.scoreboard{
+  position:absolute;top:6px;left:50%;transform:translateX(-50%);
+  background:rgba(3,3,12,.93);border:2px solid #e8622a;border-radius:10px;
+  padding:5px 14px;display:flex;gap:12px;align-items:center;z-index:20;
+  box-shadow:0 0 28px rgba(232,98,42,.35),inset 0 1px 0 rgba(255,255,255,.06)
+}
+.sb-blk{text-align:center;min-width:40px}
+.sb-v{font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1}
+.sb-v.or{color:#e8622a}.sb-v.gr{color:#2dbe6c}.sb-v.wh{color:#fff}.sb-v.rd{color:#ef4444}
+.sb-l{font-size:8px;color:rgba(255,255,255,.32);letter-spacing:1px;text-transform:uppercase;margin-top:1px}
+.sb-div{width:1px;height:36px;background:rgba(255,255,255,.12)}
+.sb-badge{font-family:'Bebas Neue',sans-serif;font-size:10px;padding:2px 7px;border-radius:4px;margin-top:3px;display:inline-block}
+.sb-badge.w{background:rgba(232,98,42,.18);color:#e8622a;border:1px solid rgba(232,98,42,.35)}
+.sb-badge.g{background:rgba(45,190,108,.18);color:#2dbe6c;border:1px solid rgba(45,190,108,.35)}
+
+/* ── PLAYER ── */
+.player-wrap{position:absolute;bottom:52px;left:50%;transform:translateX(-50%);z-index:10}
+.player-svg{width:66px;height:106px;filter:drop-shadow(0 6px 18px rgba(232,98,42,.6))}
+
+.ball{position:absolute;width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 33% 30%,#ffb347,#c45b10);border:1.5px solid #7a3500;z-index:15;pointer-events:none;display:none;box-shadow:0 2px 8px rgba(0,0,0,.5)}
+.flash{position:absolute;top:46%;left:50%;transform:translate(-50%,-50%);font-family:'Bebas Neue',sans-serif;font-size:38px;pointer-events:none;opacity:0;z-index:50;white-space:nowrap;letter-spacing:2px}
+
+/* ── SHOT BUTTONS ── */
+.shot-btns{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:30;flex-wrap:nowrap;max-width:calc(100% - 16px)}
+.shot-btn{padding:9px 14px;border:none;border-radius:10px;font-family:'Bebas Neue',sans-serif;font-size:18px;cursor:pointer;letter-spacing:1px;transition:transform .1s;position:relative;white-space:nowrap;min-height:44px;-webkit-tap-highlight-color:transparent}
+.shot-btn:disabled{opacity:.4;cursor:not-allowed}
+.shot-btn.one{background:linear-gradient(135deg,#334155,#1e293b);color:#fff;box-shadow:0 4px 14px rgba(0,0,0,.5)}
+.shot-btn.three{background:linear-gradient(135deg,#2563eb,#1e40af);color:#fff;box-shadow:0 4px 14px rgba(37,99,235,.4)}
+.shot-btn.six{background:linear-gradient(135deg,#e8622a,#b84a1a);color:#fff;box-shadow:0 4px 14px rgba(232,98,42,.45)}
+.shot-btn:not(:disabled):active{transform:scale(.93)}
+.shot-btn .bdg{position:absolute;top:-3px;right:-3px;background:#fff;color:#000;font-family:'Syne',sans-serif;font-weight:800;font-size:8px;border-radius:99px;padding:1px 4px}
+
+/* ── SECTOR PICKER (slides up AFTER ball animation) ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:100;display:none;align-items:flex-end;justify-content:center}
+.overlay.show{display:flex;animation:fadeIn .18s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.picker{
+  background:#fff;border-radius:24px 24px 0 0;
+  padding:8px 16px 36px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;
+  animation:slideUp .25s cubic-bezier(.4,0,.2,1);
+  box-shadow:0 -4px 28px rgba(0,0,0,.13);
+}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.picker-handle{width:40px;height:4px;border-radius:99px;background:#E7E2DA;margin:12px auto 18px;}
+.picker-title{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:#1C1917;margin-bottom:3px}
+.picker-sub{font-size:12px;color:#A8A29E;margin-bottom:14px}
+.picker-badge{display:inline-flex;align-items:center;padding:5px 13px;border-radius:99px;font-family:'Bebas Neue',sans-serif;font-size:16px;margin-bottom:14px}
+.picker-badge.one{background:#F1F5F9;color:#475569;border:1px solid #CBD5E1}
+.picker-badge.three{background:#EFF6FF;color:#1D4ED8;border:1px solid #BFDBFE}
+.picker-badge.six{background:#FFF7ED;color:#C2410C;border:1px solid #FED7AA}
+.sec-opt{display:flex;align-items:center;gap:10px;padding:12px 13px;border-radius:12px;border:1px solid #EDE8E0;background:#FAFAF9;margin-bottom:8px;cursor:pointer;transition:background .15s;-webkit-tap-highlight-color:transparent}
+.sec-opt:active{background:#F0EDE8}
+.sec-opt-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.sec-opt-info{flex:1}
+.sec-opt-name{font-size:14px;font-weight:600;color:#1C1917}
+.sec-opt-sub{font-size:11px;color:#A8A29E;margin-top:2px}
+.picker-cancel{width:100%;background:#F5F2EE;border:1px solid #E7E2DA;border-radius:12px;padding:12px;font-size:13px;font-weight:600;color:#78716C;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:6px}
+
+/* ── CONFIRM DIALOG ── */
+.conf-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:110;display:none;align-items:center;justify-content:center;padding:20px}
+.conf-overlay.show{display:flex}
+.conf-box{background:#fff;border-radius:20px;padding:28px 22px;width:100%;max-width:320px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.18)}
+.conf-title{font-family:'Syne',sans-serif;font-weight:800;font-size:17px;color:#1C1917;margin-bottom:8px}
+.conf-sub{font-size:13px;color:#A8A29E;margin-bottom:22px;line-height:1.5}
+.conf-btns{display:flex;gap:10px}
+.conf-btn{flex:1;padding:12px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;border:none}
+.conf-btn.cancel{background:#F5F2EE;color:#78716C;border:1px solid #E7E2DA}
+.conf-btn.danger{background:#ef4444;color:#fff;box-shadow:0 2px 8px rgba(239,68,68,.3)}
+
+/* ═══════════════════════════════════════════
+   PANEL — Light, warm, premium surface
+   Warm off-white page · crisp white cards
+   Ink-dark text · orange accents
+   ═══════════════════════════════════════════ */
+
+/* Smooth bridge from dark stadium to light panel */
+.stadium-bridge{
+  height:28px;
+  background:linear-gradient(180deg,rgba(8,12,20,0) 0%,#F5F2EE 100%);
+  margin-top:-2px;
+}
+
+.panel{
+  background:#F5F2EE;   /* warm off-white — not clinical, not flat */
+  padding:0 14px 60px;
+  color:#1C1917;        /* warm ink, not pure black */
+}
+
+/* ── TABS ── */
+.tabs{
+  display:flex;gap:4px;
+  background:#E8E3DB;
+  border-radius:12px;padding:4px;
+  margin-bottom:18px;
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.08);
+}
+.tab{
+  flex:1;text-align:center;padding:9px 4px;border-radius:9px;
+  font-size:12px;font-weight:600;cursor:pointer;
+  color:#78716C;transition:all .2s;
+  font-family:'DM Sans',sans-serif;-webkit-tap-highlight-color:transparent;
+}
+.tab.active{
+  background:#fff;color:#1C1917;
+  box-shadow:0 1px 4px rgba(0,0,0,.12),0 0 0 .5px rgba(0,0,0,.06);
+}
+.tab-pane{display:none}
+.tab-pane.active{display:block}
+
+/* ── Section label ── */
+.panel-section-label{
+  font-size:10px;font-weight:700;letter-spacing:1.2px;
+  text-transform:uppercase;color:#A8A29E;
+  margin-bottom:8px;margin-top:4px;
+}
+
+/* ── Input rows ── */
+.input-row{display:flex;align-items:center;gap:9px;margin-bottom:10px}
+.input-row label{
+  font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  color:#A8A29E;white-space:nowrap;min-width:44px;
+}
+.itext{
+  height:44px;border:1.5px solid #E7E2DA;border-radius:10px;
+  padding:0 13px;font-size:13px;font-weight:500;
+  color:#1C1917;background:#fff;outline:none;
+  font-family:'DM Sans',sans-serif;transition:border-color .2s,box-shadow .2s;width:100%;
+  box-shadow:0 1px 2px rgba(0,0,0,.05);
+}
+.itext:focus{border-color:#e8622a;box-shadow:0 0 0 3px rgba(232,98,42,.1)}
+.inum{
+  height:44px;border:1.5px solid #E7E2DA;border-radius:10px;
+  padding:0 13px;font-size:18px;font-family:'Bebas Neue',sans-serif;
+  letter-spacing:1px;color:#1C1917;background:#fff;outline:none;
+  transition:border-color .2s,box-shadow .2s;flex:1;
+  -moz-appearance:textfield;box-shadow:0 1px 2px rgba(0,0,0,.05);
+}
+.inum:focus{border-color:#e8622a;box-shadow:0 0 0 3px rgba(232,98,42,.1)}
+.inum::-webkit-outer-spin-button,.inum::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+
+/* ── Sector section header ── */
+.sec-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.sec-title{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:#1C1917}
+.add-btn{
+  background:#e8622a;color:#fff;border:none;border-radius:9px;
+  padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;
+  font-family:'DM Sans',sans-serif;
+  box-shadow:0 2px 8px rgba(232,98,42,.3);transition:opacity .15s;
+  min-height:44px;-webkit-tap-highlight-color:transparent;
+}
+.add-btn:active{opacity:.85}
+
+/* ── Sector cards ── */
+.sec-card{
+  background:#fff;border-radius:12px;
+  border:1px solid #EDE8E0;
+  padding:10px 12px;margin-bottom:8px;
+  display:flex;align-items:center;gap:9px;
+  animation:fadeUp .2s ease;
+  box-shadow:0 1px 3px rgba(0,0,0,.06);
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.s-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.s-name{flex:1;min-width:0}
+.s-inp{
+  border:none;background:transparent;font-size:13px;font-weight:500;
+  color:#1C1917;font-family:'DM Sans',sans-serif;width:100%;outline:none;height:24px;padding:0;
+}
+.s-inp::placeholder{color:#C4BCB4}
+
+/* ── QTY input ── */
+.s-qty-input{
+  width:60px;height:44px;
+  border:1.5px solid #E7E2DA;border-radius:9px;
+  background:#F9F7F4;color:#1C1917;
+  font-family:'Bebas Neue',sans-serif;font-size:18px;
+  text-align:center;outline:none;-moz-appearance:textfield;
+  transition:border-color .2s,box-shadow .2s;flex-shrink:0;
+}
+.s-qty-input::-webkit-outer-spin-button,
+.s-qty-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.s-qty-input:focus{border-color:#e8622a;box-shadow:0 0 0 3px rgba(232,98,42,.1)}
+
+.del-btn{
+  width:36px;height:36px;border-radius:8px;border:1px solid #FECDD3;
+  background:#FFF1F2;cursor:pointer;color:#FB7185;
+  display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;
+}
+.del-btn:active{background:#FFE4E6}
+
+/* ── TOTAL ROW ── */
+.total-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:11px 14px;border-radius:12px;
+  border:1.5px solid #FDDCC9;
+  background:linear-gradient(135deg,#FFF6F2,#FFF0E8);
+  margin-top:4px;margin-bottom:12px;
+  box-shadow:0 1px 4px rgba(232,98,42,.08);
+}
+.total-label{font-size:11px;font-weight:700;color:#A8A29E;letter-spacing:.8px;text-transform:uppercase}
+.total-value{font-family:'Bebas Neue',sans-serif;font-size:22px;color:#e8622a;line-height:1}
+.total-of{font-size:11px;color:#C4BCB4;margin-left:5px}
+.total-status{font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;margin-left:8px}
+.total-status.ok{background:#DCFCE7;color:#16A34A}
+.total-status.warn{background:#FFF3E0;color:#E65100}
+.total-status.over{background:#FFE4E6;color:#E11D48}
+
+.hint{
+  text-align:center;padding:20px;color:#C4BCB4;font-size:12px;
+  background:#FAF8F5;border-radius:12px;
+  border:1.5px dashed #E8E3DB;line-height:1.7;
+}
+
+/* ── ACTUALS — dual progress ── */
+.dual-prog{
+  background:#fff;border-radius:14px;border:1px solid #EDE8E0;
+  padding:16px;margin-bottom:14px;
+  box-shadow:0 1px 4px rgba(0,0,0,.06);
+}
+.dp-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.dp-lbl{font-size:11px;font-weight:700;color:#A8A29E;display:flex;align-items:center;gap:7px;letter-spacing:.5px}
+.dp-lbl span{width:8px;height:8px;border-radius:50%;display:inline-block}
+.dp-val{font-family:'Bebas Neue',sans-serif;font-size:15px;color:#1C1917}
+.prog-track{background:#F0EDE8;border-radius:99px;height:8px;overflow:hidden;margin-bottom:12px}
+.prog-fill{height:100%;border-radius:99px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+
+/* ── Pace cards ── */
+.pace-row{display:flex;gap:8px;margin-bottom:14px}
+.pace-card{
+  flex:1;background:#fff;border-radius:12px;
+  border:1px solid #EDE8E0;padding:12px 8px;text-align:center;
+  box-shadow:0 1px 3px rgba(0,0,0,.05);
+}
+.pace-v{font-family:'Bebas Neue',sans-serif;font-size:22px;line-height:1;color:#1C1917}
+.pace-l{font-size:9px;color:#A8A29E;margin-top:3px;letter-spacing:.6px;text-transform:uppercase}
+.pace-s{font-size:10px;font-weight:700;margin-top:5px;padding:3px 8px;border-radius:99px;display:inline-block}
+.pace-s.ahead{background:#DCFCE7;color:#16A34A}
+.pace-s.behind{background:#FFE4E6;color:#E11D48}
+.pace-s.on{background:#FFF3E0;color:#E65100}
+
+/* ── Sector actual cards ── */
+.sa-title{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:#1C1917;margin-bottom:10px}
+.sa-card{
+  background:#fff;border-radius:12px;border:1px solid #EDE8E0;
+  padding:12px 13px;margin-bottom:9px;
+  box-shadow:0 1px 3px rgba(0,0,0,.05);
+}
+.sa-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.sa-name{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:#1C1917}
+.sa-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.sa-nums{font-family:'Bebas Neue',sans-serif;font-size:14px;color:#A8A29E}
+.sa-nums b{color:#1C1917;font-weight:400}
+.sa-bar{position:relative;height:6px;border-radius:99px;background:#F0EDE8;overflow:hidden;margin-bottom:5px}
+.sa-bar-fc{position:absolute;top:0;left:0;height:100%;border-radius:99px;opacity:.25}
+.sa-bar-ac{position:absolute;top:0;left:0;height:100%;border-radius:99px;transition:width .4s}
+.sa-foot{display:flex;justify-content:space-between}
+.sa-lbl{font-size:10px;color:#C4BCB4;font-weight:500}
+.sa-lbl.ok{color:#16A34A}.sa-lbl.warn{color:#E65100}.sa-lbl.over{color:#E11D48}
+
+/* ── Shot log ── */
+.log-head{display:flex;justify-content:space-between;align-items:center;margin-top:16px;margin-bottom:10px}
+.log-title{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:#1C1917}
+.reset-btn{
+  background:#FFF1F2;border:1px solid #FECDD3;border-radius:8px;
+  padding:5px 12px;font-size:11px;font-weight:700;color:#FB7185;
+  cursor:pointer;font-family:'DM Sans',sans-serif;
+}
+.reset-btn:active{background:#FFE4E6}
+
+.shot-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;background:#fff;border-radius:11px;
+  border:1px solid #EDE8E0;margin-bottom:7px;
+  animation:fadeUp .2s ease;box-shadow:0 1px 3px rgba(0,0,0,.05);
+}
+.shot-pill{font-family:'Bebas Neue',sans-serif;font-size:13px;padding:4px 10px;border-radius:99px;flex-shrink:0;min-width:44px;text-align:center}
+.shot-pill.one{background:#F1F5F9;color:#475569;border:1px solid #CBD5E1}
+.shot-pill.three{background:#EFF6FF;color:#1D4ED8;border:1px solid #BFDBFE}
+.shot-pill.six{background:#FFF7ED;color:#C2410C;border:1px solid #FED7AA}
+.shot-info{flex:1;min-width:0}
+.shot-sec{font-size:13px;font-weight:600;color:#1C1917;display:flex;align-items:center;gap:6px}
+.shot-time{font-size:10px;color:#A8A29E;margin-top:2px}
+.undo-btn{
+  background:#F5F2EE;border:1px solid #E7E2DA;border-radius:7px;
+  padding:5px 10px;font-size:11px;font-weight:600;color:#78716C;
+  cursor:pointer;font-family:'DM Sans',sans-serif;flex-shrink:0;
+}
+.undo-btn:active{background:#EDE8E0}
+
+.no-shots{
+  text-align:center;padding:24px;color:#C4BCB4;font-size:12px;
+  line-height:1.8;background:#FAF8F5;border-radius:12px;
+  border:1.5px dashed #E8E3DB;
+}
+.copy-btn{
+  width:100%;background:#1C1917;border:none;border-radius:12px;
+  padding:13px;font-size:13px;font-weight:600;color:#fff;
+  cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:16px;
+  letter-spacing:.3px;transition:opacity .15s;
+  box-shadow:0 2px 8px rgba(0,0,0,.18);
+}
+.copy-btn:active{opacity:.85}
+
+/* ═══════════════════════════════════════════════════
+   RESPONSIVE — iPhone SE · iPhone · iPhone Pro Max
+                iPad · iPad Pro
+   ═══════════════════════════════════════════════════ */
+
+/* iPhone SE / small phones (≤375px) */
+@media (max-width:375px){
+  .stadium{height:280px}
+  .hoop-wrap{top:42px}
+  .player-wrap{bottom:42px}
+  .player-svg{width:54px;height:88px}
+  .scoreboard{gap:8px;padding:4px 10px}
+  .sb-v{font-size:22px}
+  .sb-div{height:28px}
+  .shot-btns{gap:5px;bottom:6px}
+  .shot-btn{padding:8px 10px;font-size:15px}
+  .flash{font-size:28px}
+  .panel{padding-left:12px;padding-right:12px}
+  .tabs{margin-bottom:14px}
+  .sa-card,.sec-card,.shot-item{padding:9px 10px}
+  .pace-v{font-size:18px}
+}
+
+/* iPhone standard (376–430px) — already designed for this, just tune */
+@media (min-width:376px) and (max-width:430px){
+  .stadium{height:310px}
+}
+
+/* iPhone Pro Max / large phones (431–480px) */
+@media (min-width:431px) and (max-width:480px){
+  .stadium{height:330px}
+  .player-svg{width:72px;height:116px}
+  .shot-btn{padding:11px 18px;font-size:20px}
+}
+
+/* iPad portrait (768px+) */
+@media (min-width:768px){
+  body{max-width:768px;margin:0 auto;background:#F5F2EE}
+
+  .stadium{height:420px;border-radius:0 0 24px 24px;overflow:hidden}
+  .court svg{height:280px}
+  .court{height:280px}
+  .hoop-wrap{top:64px}
+  .hoop-wrap svg{width:110px;height:100px}
+  .player-wrap{bottom:66px}
+  .player-svg{width:84px;height:134px}
+  .scoreboard{gap:18px;padding:8px 22px;border-radius:14px}
+  .sb-v{font-size:36px}
+  .sb-l{font-size:10px}
+  .sb-div{height:46px}
+  .sb-badge{font-size:13px;padding:3px 10px}
+  .flash{font-size:52px}
+
+  .shot-btns{gap:12px;bottom:14px}
+  .shot-btn{padding:13px 24px;font-size:24px;border-radius:14px}
+  .shot-btn .bdg{font-size:10px;padding:2px 6px}
+
+  /* Panel — two-column grid on iPad */
+  .stadium-bridge{height:0}
+  .panel{
+    padding:24px 28px 80px;
+    background:#F5F2EE;
+  }
+  .tabs{
+    max-width:480px;margin-left:auto;margin-right:auto;
+    margin-bottom:22px;
+  }
+
+  /* iPad: wider inputs and cards, no complex grid needed — single column is clean */
+  #tab-setup{max-width:680px;margin:0 auto}
+  #tab-actuals{max-width:680px;margin:0 auto}
+
+  .itext{height:50px;font-size:15px}
+  .inum{height:50px;font-size:22px}
+
+  .sec-card{padding:12px 14px}
+  .s-inp{font-size:15px}
+  .s-qty-input{width:70px;height:44px;font-size:22px}
+  .add-btn{padding:10px 18px;font-size:14px;border-radius:11px}
+
+  .sa-card,.shot-item,.sa-card{padding:14px 16px}
+  .sa-title,.log-title,.sec-title{font-size:16px}
+  .sa-nums{font-size:16px}
+
+  .pace-v{font-size:26px}
+  .pace-l{font-size:11px}
+  .pace-card{padding:14px 10px}
+
+  .dual-prog{padding:18px}
+  .dp-val{font-size:17px}
+
+  .shot-pill{font-size:14px;padding:5px 12px;min-width:52px}
+  .shot-sec{font-size:14px}
+  .shot-time{font-size:11px}
+
+  .total-value{font-size:26px}
+  .total-of{font-size:13px}
+  .total-status{font-size:13px;padding:4px 12px}
+
+  .picker{max-width:560px;border-radius:28px 28px 0 0;padding:10px 24px 48px}
+  .picker-title{font-size:22px}
+  .sec-opt{padding:14px 16px;border-radius:14px}
+  .sec-opt-name{font-size:16px}
+  .sec-opt-sub{font-size:12px}
+  .picker-cancel{padding:14px;font-size:15px;border-radius:14px}
+
+  .conf-box{max-width:400px;padding:34px 28px;border-radius:24px}
+  .conf-title{font-size:20px}
+  .conf-sub{font-size:14px}
+  .conf-btn{padding:14px;font-size:14px;border-radius:14px}
+
+  .copy-btn{padding:16px;font-size:15px;border-radius:14px}
+  .reset-btn{padding:7px 16px;font-size:12px}
+
+  .no-shots{padding:32px;font-size:14px}
+  .hint{padding:24px;font-size:14px}
+}
+
+/* iPad Pro / large tablets (1024px+) */
+@media (min-width:1024px){
+  body{max-width:900px}
+  .stadium{height:460px;border-radius:0 0 28px 28px}
+  .court{height:310px}
+  .court svg{height:310px}
+  .hoop-wrap{top:72px}
+  .hoop-wrap svg{width:120px;height:110px}
+  .player-wrap{bottom:76px}
+  .player-svg{width:96px;height:152px}
+  .scoreboard{padding:10px 28px;gap:22px}
+  .sb-v{font-size:42px}
+  .sb-div{height:54px}
+  .shot-btn{padding:14px 28px;font-size:26px}
+}
+
+/* iPhone landscape (height < 500px, width > 500px) */
+@media (max-height:500px) and (orientation:landscape){
+  .stadium{height:220px}
+  .court{height:160px}
+  .court svg{height:160px}
+  .hoop-wrap{top:30px}
+  .player-wrap{bottom:32px}
+  .player-svg{width:50px;height:80px}
+  .scoreboard{padding:3px 10px;gap:8px}
+  .sb-v{font-size:20px}
+  .sb-div{height:24px}
+  .shot-btns{bottom:5px;gap:6px}
+  .shot-btn{padding:7px 12px;font-size:15px}
+  .flash{font-size:26px}
+}
+
+/* Safe area for home bar at bottom — panel last child */
+.panel{
+  padding-bottom:calc(50px + env(safe-area-inset-bottom));
+}
+
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     STADIUM with NBA hardwood court
+     ══════════════════════════════════════ -->
+<div class="stadium" id="stadium">
+  <div class="crowd-row" id="cr1"></div>
+  <div class="crowd-row" id="cr2"></div>
+  <div class="crowd-row" id="cr3"></div>
+  <div class="spotlight spl"></div>
+  <div class="spotlight spc"></div>
+  <div class="spotlight spr"></div>
+
+  <!-- NBA COURT SVG — official markings, muted opacity -->
+  <div class="court">
+    <svg viewBox="0 0 400 230" preserveAspectRatio="xMidYMax meet">
+      <!-- Court surface sheen -->
+      <rect width="400" height="230" fill="rgba(180,90,20,.08)" rx="0"/>
+
+      <!-- ── OFFICIAL COURT LINES (all at reduced opacity for readability) ── -->
+      <!-- Baseline -->
+      <line x1="0" y1="225" x2="400" y2="225" stroke="rgba(255,255,255,.5)" stroke-width="2.5"/>
+
+      <!-- Sidelines -->
+      <line x1="2" y1="0" x2="2" y2="230" stroke="rgba(255,255,255,.25)" stroke-width="1.5"/>
+      <line x1="398" y1="0" x2="398" y2="230" stroke="rgba(255,255,255,.25)" stroke-width="1.5"/>
+
+      <!-- Half-court line -->
+      <line x1="0" y1="200" x2="400" y2="200" stroke="rgba(255,255,255,.22)" stroke-width="1.5"/>
+
+      <!-- Center circle at half-court -->
+      <ellipse cx="200" cy="200" rx="42" ry="11" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="1.5"/>
+
+      <!-- ── PAINT / KEY (lane) ── -->
+      <!-- Lane box -->
+      <rect x="140" y="74" width="120" height="151" fill="rgba(30,58,138,.25)" stroke="rgba(255,255,255,.35)" stroke-width="2"/>
+      <!-- Lane inner dashes -->
+      <line x1="140" y1="118" x2="260" y2="118" stroke="rgba(255,255,255,.15)" stroke-width="1" stroke-dasharray="4 4"/>
+      <line x1="140" y1="150" x2="260" y2="150" stroke="rgba(255,255,255,.15)" stroke-width="1" stroke-dasharray="4 4"/>
+      <line x1="140" y1="182" x2="260" y2="182" stroke="rgba(255,255,255,.15)" stroke-width="1" stroke-dasharray="4 4"/>
+
+      <!-- Lane hash marks left -->
+      <line x1="118" y1="118" x2="140" y2="118" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/>
+      <line x1="118" y1="140" x2="140" y2="140" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/>
+      <line x1="118" y1="162" x2="140" y2="162" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/>
+      <line x1="118" y1="184" x2="140" y2="184" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/>
+      <!-- Lane hash marks right -->
+      <line x1="260" y1="118" x2="282" y2="118" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/>
+      <line x1="260" y1="140" x2="282" y2="140" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/>
+      <line x1="260" y1="162" x2="282" y2="162" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/>
+      <line x1="260" y1="184" x2="282" y2="184" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/>
+
+      <!-- Free-throw circle (full) -->
+      <ellipse cx="200" cy="74" rx="46" ry="12" fill="none" stroke="rgba(255,255,255,.32)" stroke-width="1.8"/>
+      <!-- Free-throw circle top half (restricted half inside lane) -->
+      <path d="M154 74 A46 12 0 0 1 246 74" fill="none" stroke="rgba(255,255,255,.32)" stroke-width="1.8" stroke-dasharray="5 4"/>
+
+      <!-- ── THREE-POINT ARC ── -->
+      <!-- NBA 3pt arc: corners + arc -->
+      <!-- Corner 3pt lines (straight sections) -->
+      <line x1="30" y1="130" x2="30" y2="225" stroke="rgba(255,255,255,.38)" stroke-width="2"/>
+      <line x1="370" y1="130" x2="370" y2="225" stroke="rgba(255,255,255,.38)" stroke-width="2"/>
+      <!-- Main arc connecting corners -->
+      <path d="M30 130 Q200 -14 370 130" fill="none" stroke="rgba(255,255,255,.38)" stroke-width="2"/>
+
+      <!-- ── RESTRICTED AREA ARC ── -->
+      <path d="M172 225 A28 10 0 0 1 228 225" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
+
+      <!-- ── 6-PT SHOT ZONE INDICATOR (custom, branded orange) ── -->
+      <path d="M4 100 Q200 -30 396 100" fill="none" stroke="rgba(232,98,42,.45)" stroke-width="2" stroke-dasharray="8 5"/>
+
+      <!-- Wood plank texture lines (very subtle) -->
+      <line x1="0" y1="30" x2="400" y2="30" stroke="rgba(0,0,0,.1)" stroke-width="1"/>
+      <line x1="0" y1="55" x2="400" y2="55" stroke="rgba(0,0,0,.1)" stroke-width="1"/>
+      <line x1="0" y1="80" x2="400" y2="80" stroke="rgba(0,0,0,.1)" stroke-width="1"/>
+      <line x1="0" y1="105" x2="400" y2="105" stroke="rgba(0,0,0,.1)" stroke-width="1"/>
+      <line x1="0" y1="130" x2="400" y2="130" stroke="rgba(0,0,0,.1)" stroke-width="1"/>
+      <line x1="0" y1="155" x2="400" y2="155" stroke="rgba(0,0,0,.1)" stroke-width="1"/>
+      <line x1="0" y1="180" x2="400" y2="180" stroke="rgba(0,0,0,.1)" stroke-width="1"/>
+
+      <!-- Zone labels -->
+      <text x="65" y="222" font-family="Bebas Neue,sans-serif" font-size="9" fill="rgba(255,255,255,.35)" text-anchor="middle">3 PT</text>
+      <text x="200" y="222" font-family="Bebas Neue,sans-serif" font-size="9" fill="rgba(255,255,255,.25)" text-anchor="middle">KEY</text>
+      <text x="25" y="112" font-family="Bebas Neue,sans-serif" font-size="9" fill="rgba(232,98,42,.55)" text-anchor="middle">6PT</text>
+    </svg>
+  </div>
+
+  <!-- HOOP -->
+  <div class="hoop-wrap" id="hoopWrap">
+    <svg viewBox="0 0 90 82" width="88" height="82">
+      <rect x="18" y="0" width="54" height="28" rx="3" fill="#e8e8e8" stroke="#aaa" stroke-width="1.5"/>
+      <rect x="26" y="5" width="38" height="18" rx="2" fill="none" stroke="#e8622a" stroke-width="1.5"/>
+      <rect x="43" y="28" width="5" height="18" fill="#555"/>
+      <ellipse cx="45" cy="50" rx="18" ry="4.5" fill="none" stroke="#e8622a" stroke-width="3"/>
+      <line x1="29" y1="52" x2="33" y2="68" stroke="rgba(255,255,255,.42)" stroke-width=".9"/>
+      <line x1="36" y1="52" x2="38" y2="70" stroke="rgba(255,255,255,.42)" stroke-width=".9"/>
+      <line x1="43" y1="52" x2="43" y2="71" stroke="rgba(255,255,255,.42)" stroke-width=".9"/>
+      <line x1="50" y1="52" x2="49" y2="70" stroke="rgba(255,255,255,.42)" stroke-width=".9"/>
+      <line x1="57" y1="52" x2="55" y2="68" stroke="rgba(255,255,255,.42)" stroke-width=".9"/>
+      <path d="M33 68 Q38 72 43 71 Q48 72 55 68" fill="none" stroke="rgba(255,255,255,.35)" stroke-width=".9"/>
+    </svg>
+  </div>
+
+  <!-- SCOREBOARD -->
+  <div class="scoreboard">
+    <div class="sb-blk"><div class="sb-v or" id="sbActual">0</div><div class="sb-l">Actual</div></div>
+    <div class="sb-div"></div>
+    <div class="sb-blk"><div class="sb-v wh" id="sbTarget">70</div><div class="sb-l">Target</div><div class="sb-badge w" id="sbPct">0%</div></div>
+    <div class="sb-div"></div>
+    <div class="sb-blk"><div class="sb-v gr" id="sbLeft">70</div><div class="sb-l">Left</div></div>
+  </div>
+
+  <!-- PLAYER -->
+  <div class="player-wrap" id="playerWrap">
+    <svg class="player-svg" viewBox="0 0 68 108">
+      <ellipse cx="34" cy="105" rx="20" ry="4" fill="rgba(0,0,0,.5)"/>
+      <rect x="14" y="93" width="15" height="9" rx="4" fill="#0f0f0f"/>
+      <rect x="39" y="93" width="15" height="9" rx="4" fill="#0f0f0f"/>
+      <rect x="14" y="96" width="15" height="4" rx="2" fill="#e8622a" opacity=".7"/>
+      <rect x="39" y="96" width="15" height="4" rx="2" fill="#e8622a" opacity=".7"/>
+      <rect x="17" y="64" width="12" height="33" rx="6" fill="#1a3a8f"/>
+      <rect x="39" y="64" width="12" height="33" rx="6" fill="#1a3a8f"/>
+      <rect x="12" y="56" width="44" height="18" rx="8" fill="#1a3a8f"/>
+      <rect x="11" y="32" width="46" height="28" rx="9" fill="#e8622a"/>
+      <rect x="11" y="49" width="46" height="3" fill="rgba(255,255,255,.12)" rx="1"/>
+      <text x="34" y="52" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="14" fill="#fff">10</text>
+      <text x="34" y="39" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.7)">★</text>
+      <rect x="1" y="34" width="12" height="24" rx="6" fill="#c0784a" id="armL"/>
+      <rect x="55" y="34" width="12" height="24" rx="6" fill="#c0784a" id="armR"/>
+      <rect x="26" y="25" width="16" height="12" rx="6" fill="#c0784a"/>
+      <ellipse cx="34" cy="19" rx="17" ry="19" fill="#c0784a"/>
+      <ellipse cx="34" cy="5" rx="17" ry="9" fill="#111"/>
+      <rect x="17" y="5" width="34" height="8" fill="#111" rx="3"/>
+      <rect x="17" y="11" width="34" height="6" rx="3" fill="#e8622a" opacity=".9"/>
+      <ellipse cx="27" cy="19" rx="3.2" ry="3.5" fill="#fff"/>
+      <ellipse cx="41" cy="19" rx="3.2" ry="3.5" fill="#fff"/>
+      <ellipse cx="28" cy="20" rx="1.9" ry="2.1" fill="#1a0a00"/>
+      <ellipse cx="42" cy="20" rx="1.9" ry="2.1" fill="#1a0a00"/>
+      <line x1="24" y1="14" x2="31" y2="15" stroke="#1a0a00" stroke-width="2" stroke-linecap="round"/>
+      <line x1="38" y1="15" x2="45" y2="14" stroke="#1a0a00" stroke-width="2" stroke-linecap="round"/>
+      <path d="M27 27 Q34 32 41 27" fill="none" stroke="#8b4513" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <div class="ball" id="ball"></div>
+  <div class="flash" id="flash"></div>
+
+  <div class="shot-btns">
+    <button class="shot-btn one"   id="btn1" onclick="initShot(1)"><span class="bdg">+1</span>📦 1 BOX</button>
+    <button class="shot-btn three" id="btn3" onclick="initShot(3)"><span class="bdg">+3</span>🏀 3 PT</button>
+    <button class="shot-btn six"   id="btn6" onclick="initShot(6)"><span class="bdg">+6</span>🔥 6 PT</button>
+  </div>
+</div>
+
+<!-- ══ SECTOR PICKER (appears AFTER ball animation) ══ -->
+<div class="overlay" id="pickerOverlay">
+  <div class="picker">
+    <div class="picker-handle"></div>
+    <div class="picker-title">📍 Tag Your Sector</div>
+    <div class="picker-sub">Which sector did this come from?</div>
+    <div class="picker-badge" id="pickerBadge"></div>
+    <div id="pickerOptions"></div>
+    <button class="picker-cancel" onclick="closePicker()">Cancel</button>
+  </div>
+</div>
+
+<!-- ══ CONFIRM ══ -->
+<div class="conf-overlay" id="confOverlay">
+  <div class="conf-box">
+    <div class="conf-title" id="confTitle">Reset all shots?</div>
+    <div class="conf-sub" id="confSub">This will clear your full shot history. Your sector forecast stays intact.</div>
+    <div class="conf-btns">
+      <button class="conf-btn cancel" onclick="closeConf()">Cancel</button>
+      <button class="conf-btn danger" id="confOk">Reset</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bridge: dark stadium fades into light panel -->
+<div class="stadium-bridge"></div>
+
+<!-- ══════════════════════════════════════
+     PANEL — Light warm surface
+     ══════════════════════════════════════ -->
+<div class="panel" style="padding-top:16px">
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('setup')">📋 Setup</div>
+    <div class="tab" onclick="switchTab('actuals')">🏀 Actuals</div>
+  </div>
+
+  <!-- ── SETUP TAB ── -->
+  <div class="tab-pane active" id="tab-setup">
+    <div class="input-row">
+      <label>Rep</label>
+      <input type="text" class="itext" id="repName" placeholder="Your name…" maxlength="30" oninput="save()"/>
+    </div>
+    <div class="input-row">
+      <label>Target</label>
+      <input type="number" class="inum" id="targetInput" value="70" min="1" max="9999" oninput="save()"/>
+    </div>
+
+    <div class="sec-head">
+      <div class="sec-title">Sector Forecast Plan</div>
+      <button class="add-btn" onclick="addSector()">+ Add Sector</button>
+    </div>
+
+    <div id="sectorList">
+      <div class="hint">Add sectors to build your forecast<br>e.g. Azhar Domiat · Students · Retail</div>
+    </div>
+
+    <!-- LIVE TOTAL ROW -->
+    <div class="total-row" id="totalRow" style="display:none">
+      <div class="total-label">Total Forecast</div>
+      <div style="display:flex;align-items:baseline">
+        <div class="total-value" id="totalValue">0</div>
+        <div class="total-of" id="totalOf">/ 70 boxes</div>
+        <div class="total-status warn" id="totalStatus">0%</div>
+      </div>
+    </div>
+
+    <button class="copy-btn" onclick="copyReport()">📋 Copy Monthly Report</button>
+  </div>
+
+  <!-- ── ACTUALS TAB ── -->
+  <div class="tab-pane" id="tab-actuals">
+    <div class="dual-prog">
+      <div class="dp-row">
+        <div class="dp-lbl"><span style="background:rgba(255,255,255,.28)"></span>Forecast</div>
+        <div class="dp-val" id="dpFc" style="color:rgba(255,255,255,.45)">0 / 70</div>
+      </div>
+      <div class="prog-track"><div class="prog-fill" id="pfFc" style="width:0%;background:rgba(255,255,255,.22)"></div></div>
+      <div class="dp-row">
+        <div class="dp-lbl"><span style="background:#e8622a"></span>Actual</div>
+        <div class="dp-val" id="dpAc" style="color:#e8622a">0 / 70</div>
+      </div>
+      <div class="prog-track"><div class="prog-fill" id="pfAc" style="width:0%;background:#e8622a"></div></div>
+    </div>
+
+    <div class="pace-row">
+      <div class="pace-card">
+        <div class="pace-v" id="pDay" style="color:#fff">—</div>
+        <div class="pace-l">DAY / MONTH</div>
+      </div>
+      <div class="pace-card">
+        <div class="pace-v" id="pMth" style="color:rgba(255,255,255,.5)">—%</div>
+        <div class="pace-l">MONTH GONE</div>
+      </div>
+      <div class="pace-card">
+        <div class="pace-v" id="pAch" style="color:#e8622a">0%</div>
+        <div class="pace-l">TARGET HIT</div>
+        <div class="pace-s on" id="pStatus">On Track</div>
+      </div>
+    </div>
+
+    <div class="sa-title">Forecast vs Actual — By Sector</div>
+    <div id="sectorActuals"><div class="hint">Add sectors in Setup tab first</div></div>
+
+    <div class="log-head">
+      <div class="log-title">Shot Log</div>
+      <button class="reset-btn" onclick="doReset()">↺ Reset Shots</button>
+    </div>
+    <div id="shotLog"><div class="no-shots">No shots logged yet.<br>Tap a shot button above to log actual boxes.</div></div>
+  </div>
+</div>
+
+<script>
+/* ── CROWD ── */
+['cr1','cr2','cr3'].forEach((id,i)=>{
+  const r=document.getElementById(id);
+  const cols=['#e8622a','rgba(255,255,255,.2)','#3b82f6','#f59e0b','#a855f7'];
+  for(let j=0;j<28-i*4;j++){
+    const d=document.createElement('div');
+    d.className='crowd-dot';
+    d.style.background=cols[j%cols.length];
+    d.style.animationDelay=(Math.random()*2.5)+'s';
+    r.appendChild(d);
+  }
+});
+
+/* ── STATE ── */
+const COLORS=['#e8622a','#3b82f6','#2dbe6c','#a855f7','#ec4899','#f59e0b','#06b6d4','#ef4444','#14b8a6'];
+let state={repName:'',target:70,sectors:[],shots:[]};
+let nextSectorId=1;
+let shooting=false;
+let pendingPts=0;
+let activeTab='setup';
+
+/* ── PERSIST ── */
+function save(){
+  state.repName=document.getElementById('repName').value;
+  state.target=parseInt(document.getElementById('targetInput').value)||70;
+  localStorage.setItem('crt_v4',JSON.stringify({state,nextSectorId}));
+  updateScoreboard();
+  updateTotalRow();
+  if(activeTab==='actuals') renderActuals();
+}
+
+function load(){
+  try{
+    const raw=localStorage.getItem('crt_v4');
+    if(raw){
+      const d=JSON.parse(raw);
+      state=d.state||state;
+      nextSectorId=d.nextSectorId||1;
+      document.getElementById('repName').value=state.repName||'';
+      document.getElementById('targetInput').value=state.target||70;
+    }
+  }catch(e){}
+  renderSectors();
+  updateScoreboard();
+  updateTotalRow();
+}
+
+/* ── TABS ── */
+function switchTab(t){
+  activeTab=t;
+  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',['setup','actuals'][i]===t));
+  document.querySelectorAll('.tab-pane').forEach(el=>el.classList.toggle('active',el.id==='tab-'+t));
+  if(t==='actuals') renderActuals();
+}
+
+/* ── SECTORS ── */
+function addSector(){
+  const color=COLORS[state.sectors.length%COLORS.length];
+  state.sectors.push({id:nextSectorId++,name:'',qty:0,color});
+  renderSectors();
+  save();
+  setTimeout(()=>{
+    const ins=document.querySelectorAll('.s-inp');
+    if(ins.length) ins[ins.length-1].focus();
+  },50);
+}
+
+function removeSector(id){
+  if(!confirm('Remove this sector?'))return;
+  state.sectors=state.sectors.filter(s=>s.id!==id);
+  renderSectors();
+  save();
+}
+
+/* Called by each sector's qty <input> oninput */
+function changeQtyInput(id, val){
+  const s=state.sectors.find(s=>s.id===id);
+  if(!s)return;
+  s.qty=Math.max(0,parseInt(val)||0);
+  save();
+}
+
+function changeName(id,v){
+  const s=state.sectors.find(s=>s.id===id);
+  if(s){s.name=v;save();}
+}
+
+function renderSectors(){
+  const el=document.getElementById('sectorList');
+  if(!state.sectors.length){
+    el.innerHTML='<div class="hint">Add sectors to build your forecast<br>e.g. Azhar Domiat · Students · Retail</div>';
+    document.getElementById('totalRow').style.display='none';
+    return;
+  }
+  el.innerHTML=state.sectors.map(s=>`
+    <div class="sec-card">
+      <div class="s-dot" style="background:${s.color}"></div>
+      <div class="s-name">
+        <input class="s-inp" type="text" placeholder="e.g. Azhar Domiat"
+          value="${s.name}" oninput="changeName(${s.id},this.value)" maxlength="40"/>
+      </div>
+      <input
+        class="s-qty-input"
+        type="number"
+        min="0" max="9999"
+        value="${s.qty}"
+        oninput="changeQtyInput(${s.id}, this.value)"
+        placeholder="0"
+      />
+      <button class="del-btn" onclick="removeSector(${s.id})">✕</button>
+    </div>`).join('');
+
+  document.getElementById('totalRow').style.display=state.sectors.length?'flex':'none';
+  updateTotalRow();
+}
+
+/* ── LIVE TOTAL ROW ── */
+function updateTotalRow(){
+  const target=state.target;
+  const total=state.sectors.reduce((a,s)=>a+s.qty,0);
+  const pct=target>0?Math.round(total/target*100):0;
+  document.getElementById('totalValue').textContent=total;
+  document.getElementById('totalOf').textContent='/ '+target+' boxes';
+  const st=document.getElementById('totalStatus');
+  st.textContent=pct+'%';
+  if(pct>100){st.className='total-status over';}
+  else if(pct===100){st.className='total-status ok';}
+  else{st.className='total-status warn';}
+  if(state.sectors.length) document.getElementById('totalRow').style.display='flex';
+}
+
+/* ── SHOT FLOW ──
+   Change vs previous version:
+   initShot() now only starts the ANIMATION.
+   The picker opens AFTER the ball falls through the net.
+   fireShot() is called from the picker selection. ── */
+function initShot(pts){
+  if(shooting)return;
+  if(!state.sectors.length){alert('Add at least one sector in Setup first.');return;}
+  const actual=state.shots.reduce((a,s)=>a+s.pts,0);
+  if(actual>=state.target){showFlash('🏆 TARGET HIT!',true);return;}
+  pendingPts=pts;
+  /* ← Animate FIRST, picker opens when animation completes */
+  animShot(pts);
+}
+
+function openPicker(pts){
+  const badge=document.getElementById('pickerBadge');
+  badge.textContent=pts===1?'📦 +1 BOX':pts===3?'🏀 +3 PT SHOT':'🔥 +6 PT SHOT';
+  badge.className='picker-badge '+(pts===1?'one':pts===3?'three':'six');
+  document.getElementById('pickerOptions').innerHTML=state.sectors.map(s=>{
+    const sAct=state.shots.filter(sh=>sh.sectorId===s.id).reduce((a,sh)=>a+sh.pts,0);
+    const left=Math.max(0,s.qty-sAct);
+    return `<div class="sec-opt" onclick="fireShot(${s.id})">
+      <div class="sec-opt-dot" style="background:${s.color}"></div>
+      <div class="sec-opt-info">
+        <div class="sec-opt-name">${s.name||'Unnamed Sector'}</div>
+        <div class="sec-opt-sub">Forecast ${s.qty} boxes · Actual ${sAct} · ${left} left</div>
+      </div>
+      <span style="color:rgba(255,255,255,.25);font-size:18px">›</span>
+    </div>`;
+  }).join('');
+  document.getElementById('pickerOverlay').classList.add('show');
+}
+
+function closePicker(){document.getElementById('pickerOverlay').classList.remove('show');}
+
+function fireShot(sectorId){
+  closePicker();
+  const sector=state.sectors.find(s=>s.id===sectorId);
+  if(!sector)return;
+  state.shots.push({
+    id:Date.now(),
+    pts:pendingPts,
+    sectorId,
+    sectorName:sector.name||'Unnamed',
+    sectorColor:sector.color,
+    time:new Date().toISOString()
+  });
+  save();
+}
+
+/* ── ANIMATION — picker opens AFTER ball drops through net ── */
+function animShot(pts){
+  shooting=true;
+  ['btn1','btn3','btn6'].forEach(id=>document.getElementById(id).disabled=true);
+
+  const st=document.getElementById('stadium');
+  const pw=document.getElementById('playerWrap');
+  const hp=document.getElementById('hoopWrap');
+  const ball=document.getElementById('ball');
+  const stR=st.getBoundingClientRect();
+  const pwR=pw.getBoundingClientRect();
+  const hpR=hp.getBoundingClientRect();
+
+  const sx=pwR.left-stR.left+54, sy=pwR.top-stR.top+26;
+  const ex=hpR.left-stR.left+hpR.width/2-10, ey=hpR.top-stR.top+46;
+
+  ball.style.cssText=`display:block;left:${sx}px;top:${sy}px;transition:none`;
+  document.getElementById('armR').setAttribute('transform','rotate(-65,61,38)');
+
+  const dur=pts===6?860:pts===3?670:460;
+  const arc=pts===6?-162:pts===3?-112:-68;
+  const t0=performance.now();
+
+  /* Phase 1: ball flies to hoop */
+  (function frame(now){
+    const t=Math.min((now-t0)/dur,1);
+    const e=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+    ball.style.left=((1-e)*sx+e*ex)+'px';
+    ball.style.top=((1-e)*sy+e*ey+Math.sin(t*Math.PI)*arc)+'px';
+    ball.style.transform=`rotate(${t*360}deg)`;
+    if(t<1){requestAnimationFrame(frame);return;}
+
+    /* Ball reached hoop — show flash */
+    const msgs={
+      1:['📦 LOGGED!','BOX IN! ✓','CONFIRMED!'],
+      3:['NICE SHOT! 🎯','SWISH! ✨','MONEY! 💰'],
+      6:['DEEP THREE! 🔥','FROM DOWNTOWN! 💥','HEAT CHECK! 🔥']
+    };
+    const arr=msgs[pts];
+    showFlash(arr[Math.floor(Math.random()*arr.length)], pts===6);
+
+    /* Phase 2: ball drops through net */
+    ball.style.transition='top .28s ease-in, opacity .28s .1s';
+    ball.style.top=(ey+40)+'px';
+    ball.style.opacity='0';
+
+    /* Phase 3: AFTER ball finishes falling → open picker */
+    setTimeout(()=>{
+      ball.style.display='none';
+      ball.style.opacity='1';
+      ball.style.transition='';
+      document.getElementById('armR').removeAttribute('transform');
+      shooting=false;
+      ['btn1','btn3','btn6'].forEach(id=>document.getElementById(id).disabled=false);
+
+      /* NOW show the sector picker */
+      openPicker(pts);
+    }, 420); /* 420ms = ball drop (280ms) + small pause (140ms) */
+
+  })(performance.now());
+}
+
+function showFlash(msg,big){
+  const f=document.getElementById('flash');
+  f.textContent=msg;
+  f.style.fontSize=big?'38px':'32px';
+  f.style.color=big?'#fbbf24':'#fff';
+  f.style.textShadow=big?'0 0 40px rgba(251,191,36,.9)':'0 0 24px rgba(255,255,255,.7)';
+  f.style.transition='none';
+  f.style.opacity='1';
+  f.style.transform='translate(-50%,-50%) scale(1.12)';
+  setTimeout(()=>{
+    f.style.transition='all .65s ease';
+    f.style.opacity='0';
+    f.style.transform='translate(-50%,-72%) scale(.84)';
+  },920);
+}
+
+function undoShot(id){
+  state.shots=state.shots.filter(s=>s.id!==id);
+  save();renderActuals();
+}
+
+function doReset(){
+  document.getElementById('confTitle').textContent='Reset all shots?';
+  document.getElementById('confSub').textContent='This clears your full shot history. Sector forecast stays intact.';
+  document.getElementById('confOk').onclick=()=>{state.shots=[];save();renderActuals();closeConf();};
+  document.getElementById('confOverlay').classList.add('show');
+}
+function closeConf(){document.getElementById('confOverlay').classList.remove('show');}
+
+/* ── SCOREBOARD ── */
+function updateScoreboard(){
+  const target=state.target;
+  const actual=state.shots.reduce((a,s)=>a+s.pts,0);
+  const left=Math.max(0,target-actual);
+  const pct=target>0?Math.min(Math.round(actual/target*100),100):0;
+  document.getElementById('sbActual').textContent=actual;
+  document.getElementById('sbTarget').textContent=target;
+  const le=document.getElementById('sbLeft');
+  le.textContent=left;
+  le.className='sb-v '+(left===0?'gr':actual>target?'rd':'gr');
+  const pb=document.getElementById('sbPct');
+  pb.textContent=pct+'%';
+  pb.className='sb-badge '+(pct>=100?'g':'w');
+}
+
+/* ── ACTUALS TAB ── */
+function renderActuals(){
+  const target=state.target;
+  const actual=state.shots.reduce((a,s)=>a+s.pts,0);
+  const forecast=state.sectors.reduce((a,s)=>a+s.qty,0);
+  const pctAc=target>0?Math.min(Math.round(actual/target*100),100):0;
+  const pctFc=target>0?Math.min(Math.round(forecast/target*100),100):0;
+
+  document.getElementById('dpFc').textContent=forecast+' / '+target;
+  document.getElementById('dpAc').textContent=actual+' / '+target;
+  document.getElementById('pfFc').style.width=pctFc+'%';
+  const pa=document.getElementById('pfAc');
+  pa.style.width=pctAc+'%';
+  pa.style.background=actual>=target?'#2dbe6c':'#e8622a';
+
+  const now=new Date();
+  const day=now.getDate();
+  const dim=new Date(now.getFullYear(),now.getMonth()+1,0).getDate();
+  const mthPct=Math.round(day/dim*100);
+  document.getElementById('pDay').textContent=day+'/'+dim;
+  document.getElementById('pMth').textContent=mthPct+'%';
+  document.getElementById('pAch').textContent=pctAc+'%';
+  const ps=document.getElementById('pStatus');
+  const diff=pctAc-mthPct;
+  if(diff>=0){ps.textContent='Ahead 🟢';ps.className='pace-s ahead';}
+  else if(diff>=-10){ps.textContent='On Track';ps.className='pace-s on';}
+  else{ps.textContent='Behind 🔴';ps.className='pace-s behind';}
+
+  const sa=document.getElementById('sectorActuals');
+  if(!state.sectors.length){
+    sa.innerHTML='<div class="hint">Add sectors in Setup tab first</div>';
+  } else {
+    sa.innerHTML=state.sectors.map(s=>{
+      const sAct=state.shots.filter(sh=>sh.sectorId===s.id).reduce((a,sh)=>a+sh.pts,0);
+      const pctSAc=s.qty>0?Math.min(Math.round(sAct/s.qty*100),100):sAct>0?999:0;
+      const barFc=target>0?Math.min(Math.round(s.qty/target*100),100):0;
+      const barAc=target>0?Math.min(Math.round(sAct/target*100),100):0;
+      const over=sAct>s.qty&&s.qty>0;
+      const done=sAct>=s.qty&&s.qty>0;
+      return `<div class="sa-card">
+        <div class="sa-top">
+          <div class="sa-name"><div class="sa-dot" style="background:${s.color}"></div>${s.name||'Unnamed'}</div>
+          <div class="sa-nums"><b>${sAct}</b> / ${s.qty} boxes</div>
+        </div>
+        <div class="sa-bar">
+          <div class="sa-bar-fc" style="width:${barFc}%;background:${s.color}"></div>
+          <div class="sa-bar-ac" style="width:${barAc}%;background:${s.color}"></div>
+        </div>
+        <div class="sa-foot">
+          <div class="sa-lbl">Forecast: ${s.qty} boxes</div>
+          <div class="sa-lbl ${done?'ok':over?'over':'warn'}">${done?'✓ Complete':over?'Over forecast':pctSAc+'% of forecast'}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  const sl=document.getElementById('shotLog');
+  if(!state.shots.length){
+    sl.innerHTML='<div class="no-shots">No shots logged yet.<br>Tap a shot button above to log actual boxes.</div>';
+    return;
+  }
+  sl.innerHTML=[...state.shots].reverse().map(sh=>{
+    const d=new Date(sh.time);
+    const ts=d.toLocaleDateString('en-GB',{day:'numeric',month:'short'})+' · '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    const cls=sh.pts===1?'one':sh.pts===3?'three':'six';
+    const lbl=sh.pts===1?'+1 Box':sh.pts===3?'+3 PT':'+6 PT';
+    return `<div class="shot-item">
+      <div class="shot-pill ${cls}">${lbl}</div>
+      <div class="shot-info">
+        <div class="shot-sec">
+          <span style="width:7px;height:7px;border-radius:50%;background:${sh.sectorColor};display:inline-block;flex-shrink:0"></span>
+          ${sh.sectorName}
+        </div>
+        <div class="shot-time">${ts}</div>
+      </div>
+      <button class="undo-btn" onclick="undoShot(${sh.id})">Undo</button>
+    </div>`;
+  }).join('');
+}
+
+function copyReport(){
+  const target=state.target;
+  const actual=state.shots.reduce((a,s)=>a+s.pts,0);
+  const forecast=state.sectors.reduce((a,s)=>a+s.qty,0);
+  const rep=state.repName||'Rep';
+  const now=new Date();
+  let txt=`🏀 ${rep} — Monthly Target Report\n${now.toLocaleDateString('en-GB',{month:'long',year:'numeric'})}\n\n`;
+  txt+=`Target: ${target} boxes\nForecast: ${forecast} (${target>0?Math.round(forecast/target*100):0}%)\nActual: ${actual} (${target>0?Math.round(actual/target*100):0}%)\n\n📍 By Sector:\n`;
+  state.sectors.forEach(s=>{
+    const sAct=state.shots.filter(sh=>sh.sectorId===s.id).reduce((a,sh)=>a+sh.pts,0);
+    txt+=`• ${s.name||'Unnamed'}: Forecast ${s.qty} | Actual ${sAct}\n`;
+  });
+  txt+=`\nRemaining: ${Math.max(0,target-actual)} boxes`;
+  navigator.clipboard?.writeText(txt).catch(()=>{});
+  const btn=document.querySelector('.copy-btn');
+  btn.textContent='✅ Copied!';
+  setTimeout(()=>btn.textContent='📋 Copy Monthly Report',2200);
+}
+
+load();
+</script>
+</body>
+</html>
