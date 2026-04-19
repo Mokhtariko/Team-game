@@ -4,587 +4,718 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover"/>
 <title>Court Planner — Target Tracker</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,700;1,800;1,900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet"/>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'DM Sans',sans-serif;background:#080c14;min-height:100vh;overflow-x:hidden;color:#fff;
-  /* iPhone safe area — Dynamic Island, notch, home bar */
+/* ═══════════════════════════════════════════════════
+   DESIGN TOKENS — EA Sports FC / Premium HUD
+   ═══════════════════════════════════════════════════ */
+:root{
+  --neon:#FF5C1A;           /* electric orange */
+  --neon-glow:rgba(255,92,26,.45);
+  --neon-dim:rgba(255,92,26,.15);
+  --neon2:#FFB020;          /* gold accent */
+  --green:#00E676;
+  --green-dim:rgba(0,230,118,.15);
+  --red:#FF3D57;
+  --blue:#2979FF;
+  --bg:#0B0D12;             /* deep charcoal */
+  --bg2:#12151C;
+  --bg3:#1A1E28;
+  --glass:rgba(255,255,255,.04);
+  --glass-border:rgba(255,255,255,.09);
+  --glass-strong:rgba(255,255,255,.07);
+  --text:#FFFFFF;
+  --text2:rgba(255,255,255,.55);
+  --text3:rgba(255,255,255,.28);
+  --font:'Barlow Condensed',sans-serif;
+  --font-body:'Barlow',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{background:var(--bg)}
+body{
+  font-family:var(--font-body);
+  background:var(--bg);
+  min-height:100vh;
+  overflow-x:hidden;
+  color:var(--text);
   padding-top:env(safe-area-inset-top);
   padding-left:env(safe-area-inset-left);
   padding-right:env(safe-area-inset-right);
 }
 
-/* ═══════════════════════════════════════
-   STADIUM — NBA hardwood court background
-   ═══════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════
+   STADIUM — NBA Hardwood + Arena Dark
+   ═══════════════════════════════════════════════════ */
 .stadium{
   position:relative;width:100%;height:340px;overflow:hidden;
-  /* Rich hardwood base */
   background:
-    /* subtle vignette overlay */
-    radial-gradient(ellipse 80% 60% at 50% 110%, rgba(0,0,0,.55) 0%, transparent 70%),
-    /* top arena darkness */
-    linear-gradient(180deg, rgba(5,3,18,.95) 0%, rgba(10,6,30,.7) 22%, transparent 42%),
-    /* hardwood planks — fine horizontal grain */
-    repeating-linear-gradient(
-      180deg,
-      rgba(0,0,0,.0) 0px, rgba(0,0,0,.0) 17px,
-      rgba(0,0,0,.12) 17px, rgba(0,0,0,.12) 18px
-    ),
-    /* hardwood color gradient — lighter near center, darker edges */
-    radial-gradient(ellipse 100% 80% at 50% 100%, #c8752a 0%, #a85e20 35%, #7a3f0e 70%, #5c2d08 100%);
+    radial-gradient(ellipse 90% 55% at 50% 110%, rgba(0,0,0,.7) 0%, transparent 65%),
+    linear-gradient(180deg,rgba(5,3,18,.98) 0%,rgba(8,6,22,.8) 18%,transparent 40%),
+    repeating-linear-gradient(180deg,rgba(0,0,0,0) 0,rgba(0,0,0,0) 16px,rgba(0,0,0,.14) 16px,rgba(0,0,0,.14) 17px),
+    radial-gradient(ellipse 110% 90% at 50% 100%,#c8752a 0%,#a05020 30%,#6e350a 65%,#4a1f04 100%);
 }
-
-/* Arena atmosphere glow from court lights */
 .stadium::before{
-  content:'';position:absolute;inset:0;
-  background:radial-gradient(ellipse 70% 40% at 50% 85%, rgba(220,140,50,.18) 0%, transparent 65%);
-  pointer-events:none;z-index:1;
+  content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(ellipse 60% 35% at 50% 88%,rgba(255,92,26,.12) 0%,transparent 70%);
 }
 
+/* Crowd */
 .crowd-row{position:absolute;width:100%;display:flex;justify-content:center;gap:3px;z-index:2}
-.crowd-row:nth-child(1){top:4px;opacity:.3}
-.crowd-row:nth-child(2){top:16px;opacity:.42}
-.crowd-row:nth-child(3){top:28px;opacity:.55}
+.crowd-row:nth-child(1){top:3px;opacity:.25}
+.crowd-row:nth-child(2){top:15px;opacity:.38}
+.crowd-row:nth-child(3){top:27px;opacity:.5}
 .crowd-dot{width:7px;height:9px;border-radius:50% 50% 40% 40%;animation:bob 1.8s ease-in-out infinite}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 
 /* Arena spotlights */
-.spotlight{position:absolute;top:0;border-radius:0 0 70px 70px;pointer-events:none;z-index:2}
-.spl{width:90px;height:240px;left:10px;background:linear-gradient(180deg,rgba(255,230,100,.1),transparent);transform:rotate(-18deg)}
-.spc{width:150px;height:260px;left:50%;transform:translateX(-50%);background:linear-gradient(180deg,rgba(255,245,200,.12),transparent)}
-.spr{width:90px;height:240px;right:10px;background:linear-gradient(180deg,rgba(255,230,100,.1),transparent);transform:rotate(18deg)}
+.spotlight{position:absolute;top:0;border-radius:0 0 60px 60px;pointer-events:none;z-index:2}
+.spl{width:80px;height:220px;left:8px;background:linear-gradient(180deg,rgba(255,230,120,.08),transparent);transform:rotate(-18deg)}
+.spc{width:140px;height:240px;left:50%;transform:translateX(-50%);background:linear-gradient(180deg,rgba(255,245,200,.1),transparent)}
+.spr{width:80px;height:220px;right:8px;background:linear-gradient(180deg,rgba(255,230,120,.08),transparent);transform:rotate(18deg)}
 
-/* ── NBA COURT SURFACE (SVG layer) ── */
+/* Court SVG */
 .court{position:absolute;bottom:0;left:0;right:0;height:230px;z-index:3}
 .court svg{width:100%;height:230px}
 
+/* Hoop */
 .hoop-wrap{position:absolute;top:50px;left:50%;transform:translateX(-50%);z-index:6}
 
-/* ── SCOREBOARD ── */
-.scoreboard{
+/* ═══════════════════════════════════════════════════
+   SCOREBOARD HUD — Slanted edges + Power Meter
+   ═══════════════════════════════════════════════════ */
+.hud{
   position:absolute;top:6px;left:50%;transform:translateX(-50%);
-  background:rgba(3,3,12,.93);border:2px solid #e8622a;border-radius:10px;
-  padding:5px 14px;display:flex;gap:12px;align-items:center;z-index:20;
-  box-shadow:0 0 28px rgba(232,98,42,.35),inset 0 1px 0 rgba(255,255,255,.06)
+  z-index:22;width:calc(100% - 20px);max-width:380px;
 }
-.sb-blk{text-align:center;min-width:40px}
-.sb-v{font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1}
-.sb-v.or{color:#e8622a}.sb-v.gr{color:#2dbe6c}.sb-v.wh{color:#fff}.sb-v.rd{color:#ef4444}
-.sb-l{font-size:8px;color:rgba(255,255,255,.32);letter-spacing:1px;text-transform:uppercase;margin-top:1px}
-.sb-div{width:1px;height:36px;background:rgba(255,255,255,.12)}
-.sb-badge{font-family:'Bebas Neue',sans-serif;font-size:10px;padding:2px 7px;border-radius:4px;margin-top:3px;display:inline-block}
-.sb-badge.w{background:rgba(232,98,42,.18);color:#e8622a;border:1px solid rgba(232,98,42,.35)}
-.sb-badge.g{background:rgba(45,190,108,.18);color:#2dbe6c;border:1px solid rgba(45,190,108,.35)}
+.hud-inner{
+  position:relative;
+  background:rgba(8,10,18,.88);
+  border:1px solid rgba(255,92,26,.5);
+  border-radius:4px;
+  padding:8px 14px 6px;
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  box-shadow:0 0 0 1px rgba(255,92,26,.15),0 0 24px rgba(255,92,26,.2),inset 0 1px 0 rgba(255,255,255,.06);
+  /* slanted left corner clip */
+  clip-path:polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+}
+.hud-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.hud-stat{text-align:center;min-width:52px}
+.hud-num{
+  font-family:var(--font);font-style:italic;font-weight:900;
+  font-size:34px;line-height:1;letter-spacing:-1px;
+}
+.hud-num.or{color:var(--neon)}
+.hud-num.gr{color:var(--green)}
+.hud-num.rd{color:var(--red)}
+.hud-num.wh{color:#fff}
+.hud-label{
+  font-family:var(--font);font-size:9px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--text3);margin-top:1px;
+}
+.hud-divider{width:1px;height:40px;background:rgba(255,255,255,.1);flex-shrink:0}
+.hud-center{flex:1;text-align:center}
+.hud-pct-badge{
+  font-family:var(--font);font-style:italic;font-size:11px;font-weight:800;
+  padding:2px 8px;border-radius:2px;display:inline-block;margin-bottom:3px;
+  background:var(--neon-dim);color:var(--neon);border:1px solid rgba(255,92,26,.4);
+}
+.hud-pct-badge.done{background:var(--green-dim);color:var(--green);border-color:rgba(0,230,118,.4)}
 
-/* ── PLAYER ── */
-/* player-wrap & player-svg now handled by .player-flipper rules above */
+/* Power meter bar */
+.power-meter{
+  position:relative;height:4px;
+  background:rgba(255,255,255,.08);
+  border-radius:0;overflow:hidden;
+  margin-top:6px;
+}
+.power-fill{
+  height:100%;border-radius:0;
+  background:linear-gradient(90deg,var(--neon),var(--neon2));
+  box-shadow:0 0 8px var(--neon-glow);
+  transition:width .6s cubic-bezier(.23,1,.32,1);
+  position:relative;
+}
+.power-fill::after{
+  content:'';position:absolute;right:0;top:0;bottom:0;width:3px;
+  background:#fff;opacity:.8;
+  box-shadow:0 0 6px #fff;
+}
+.power-fill.done{background:linear-gradient(90deg,var(--green),#69F0AE)}
+.power-fill.over{background:linear-gradient(90deg,var(--red),#FF8A80)}
 
-.ball{position:absolute;width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 33% 30%,#ffb347,#c45b10);border:1.5px solid #7a3500;z-index:15;pointer-events:none;display:none;box-shadow:0 2px 8px rgba(0,0,0,.5)}
-.flash{position:absolute;top:46%;left:50%;transform:translate(-50%,-50%);font-family:'Bebas Neue',sans-serif;font-size:38px;pointer-events:none;opacity:0;z-index:50;white-space:nowrap;letter-spacing:2px}
+/* ═══════════════════════════════════════════════════
+   PLAYER — 3D Flip Card
+   ═══════════════════════════════════════════════════ */
+.player-wrap{
+  position:absolute;bottom:50px;left:50%;
+  transform:translateX(-50%);z-index:10;
+  perspective:500px;
+}
+.player-flipper{
+  position:relative;width:72px;height:112px;
+  transform-style:preserve-3d;
+}
+.player-face{
+  position:absolute;top:0;left:0;width:72px;height:112px;
+  backface-visibility:hidden;-webkit-backface-visibility:hidden;
+}
+.player-back{
+  transform:rotateY(0deg);
+  filter:drop-shadow(0 8px 20px rgba(255,92,26,.5));
+}
+.player-front{
+  transform:rotateY(180deg);
+  filter:drop-shadow(0 8px 24px rgba(255,92,26,.85));
+}
+.player-flipper.celebrating{transform:rotateY(180deg)}
 
-/* ── SHOT BUTTONS ── */
-.shot-btns{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:30;flex-wrap:nowrap;max-width:calc(100% - 16px)}
-.shot-btn{padding:9px 14px;border:none;border-radius:10px;font-family:'Bebas Neue',sans-serif;font-size:18px;cursor:pointer;letter-spacing:1px;transition:transform .1s;position:relative;white-space:nowrap;min-height:44px;-webkit-tap-highlight-color:transparent}
-.shot-btn:disabled{opacity:.4;cursor:not-allowed}
-.shot-btn.one{background:linear-gradient(135deg,#334155,#1e293b);color:#fff;box-shadow:0 4px 14px rgba(0,0,0,.5)}
-.shot-btn.three{background:linear-gradient(135deg,#2563eb,#1e40af);color:#fff;box-shadow:0 4px 14px rgba(37,99,235,.4)}
-.shot-btn.six{background:linear-gradient(135deg,#e8622a,#b84a1a);color:#fff;box-shadow:0 4px 14px rgba(232,98,42,.45)}
-.shot-btn:not(:disabled):active{transform:scale(.93)}
-.shot-btn .bdg{position:absolute;top:-3px;right:-3px;background:#fff;color:#000;font-family:'Syne',sans-serif;font-weight:800;font-size:8px;border-radius:99px;padding:1px 4px}
+/* ═══════════════════════════════════════════════════
+   BALL + FLASH + SIII
+   ═══════════════════════════════════════════════════ */
+.ball{
+  position:absolute;width:22px;height:22px;border-radius:50%;
+  background:radial-gradient(circle at 33% 28%,#ffb347,#c45b10);
+  border:1.5px solid #7a3500;z-index:16;pointer-events:none;display:none;
+  box-shadow:0 2px 10px rgba(0,0,0,.6);
+}
+.flash{
+  position:absolute;top:44%;left:50%;
+  transform:translate(-50%,-50%);
+  font-family:var(--font);font-style:italic;font-weight:900;font-size:40px;
+  letter-spacing:2px;pointer-events:none;opacity:0;z-index:50;white-space:nowrap;
+}
+.siii-flash{
+  position:absolute;top:36%;left:50%;
+  transform:translate(-50%,-50%) scale(.6);
+  font-family:var(--font);font-style:italic;font-weight:900;font-size:58px;
+  color:var(--neon2);letter-spacing:4px;
+  text-shadow:0 0 30px rgba(255,176,32,.9),0 0 70px rgba(255,176,32,.4);
+  pointer-events:none;opacity:0;z-index:52;white-space:nowrap;
+}
 
-/* ── SECTOR PICKER (slides up AFTER ball animation) ── */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:100;display:none;align-items:flex-end;justify-content:center}
-.overlay.show{display:flex;animation:fadeIn .18s ease}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+/* ═══════════════════════════════════════════════════
+   CONSOLE SHOT BUTTONS — Tactile + Glossy
+   ═══════════════════════════════════════════════════ */
+.shot-btns{
+  position:absolute;bottom:9px;left:50%;
+  transform:translateX(-50%);display:flex;gap:8px;z-index:30;
+  max-width:calc(100% - 16px);
+}
+.shot-btn{
+  position:relative;padding:0 16px;height:46px;
+  border:none;border-radius:6px;
+  font-family:var(--font);font-style:italic;font-weight:800;
+  font-size:18px;letter-spacing:.5px;cursor:pointer;
+  white-space:nowrap;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  transition:transform .08s cubic-bezier(.23,1,.32,1),
+             box-shadow .08s cubic-bezier(.23,1,.32,1);
+  overflow:hidden;
+  min-height:44px;
+}
+/* glossy top shine */
+.shot-btn::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:50%;
+  background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,0));
+  border-radius:6px 6px 0 0;pointer-events:none;
+}
+.shot-btn:disabled{opacity:.35;cursor:not-allowed}
+.shot-btn:not(:disabled):active{
+  transform:scale(.93) translateY(1px);
+}
+.shot-btn.one{
+  background:linear-gradient(160deg,#2A3040,#1A1E28);
+  box-shadow:0 4px 0 #10131A,0 6px 18px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.12);
+  color:rgba(255,255,255,.8);
+  border:1px solid rgba(255,255,255,.12);
+}
+.shot-btn.one:not(:disabled):active{box-shadow:0 1px 0 #10131A,0 2px 8px rgba(0,0,0,.5)}
+.shot-btn.three{
+  background:linear-gradient(160deg,#1A35B0,#0F2080);
+  box-shadow:0 4px 0 #08104A,0 6px 18px rgba(41,121,255,.35),inset 0 1px 0 rgba(255,255,255,.15);
+  color:#fff;border:1px solid rgba(41,121,255,.4);
+}
+.shot-btn.three:not(:disabled):active{box-shadow:0 1px 0 #08104A,0 2px 8px rgba(41,121,255,.35)}
+.shot-btn.six{
+  background:linear-gradient(160deg,#CC3D0A,#8A2200);
+  box-shadow:0 4px 0 #500E00,0 6px 20px var(--neon-glow),inset 0 1px 0 rgba(255,255,255,.18);
+  color:#fff;border:1px solid rgba(255,92,26,.5);
+}
+.shot-btn.six:not(:disabled):active{box-shadow:0 1px 0 #500E00,0 2px 10px var(--neon-glow)}
+.shot-btn .bdg{
+  position:absolute;top:-4px;right:-4px;
+  background:var(--neon);color:#fff;
+  font-family:var(--font);font-style:normal;font-weight:800;font-size:9px;
+  border-radius:3px;padding:1px 4px;letter-spacing:0;
+  box-shadow:0 0 8px var(--neon-glow);
+}
+.shot-btn.three .bdg{background:var(--blue);box-shadow:0 0 8px rgba(41,121,255,.5)}
+.shot-btn.one .bdg{background:#4A5568}
+
+/* ═══════════════════════════════════════════════════
+   SECTOR PICKER — Slide-up Sheet (Dark Glass)
+   ═══════════════════════════════════════════════════ */
+.overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.65);
+  z-index:100;display:none;align-items:flex-end;justify-content:center;
+}
+.overlay.show{display:flex;animation:fadeScrim .2s ease}
+@keyframes fadeScrim{from{opacity:0}to{opacity:1}}
 .picker{
-  background:#fff;border-radius:24px 24px 0 0;
-  padding:8px 16px 36px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;
-  animation:slideUp .25s cubic-bezier(.4,0,.2,1);
-  box-shadow:0 -4px 28px rgba(0,0,0,.13);
+  background:rgba(14,17,26,.95);
+  border-radius:18px 18px 0 0;
+  border-top:1px solid rgba(255,92,26,.35);
+  border-left:1px solid var(--glass-border);
+  border-right:1px solid var(--glass-border);
+  padding:8px 16px calc(24px + env(safe-area-inset-bottom));
+  width:100%;max-width:480px;max-height:88vh;overflow-y:auto;
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  box-shadow:0 -8px 40px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.04);
+  /* starts hidden — JS triggers slide */
+  transform:translateY(100%);opacity:0;
+  transition:transform 0s,opacity 0s;
 }
-@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.picker-handle{width:40px;height:4px;border-radius:99px;background:#E7E2DA;margin:12px auto 18px;}
-.picker-title{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:#1C1917;margin-bottom:3px}
-.picker-sub{font-size:12px;color:#A8A29E;margin-bottom:14px}
-.picker-badge{display:inline-flex;align-items:center;padding:5px 13px;border-radius:99px;font-family:'Bebas Neue',sans-serif;font-size:16px;margin-bottom:14px}
-.picker-badge.one{background:#F1F5F9;color:#475569;border:1px solid #CBD5E1}
-.picker-badge.three{background:#EFF6FF;color:#1D4ED8;border:1px solid #BFDBFE}
-.picker-badge.six{background:#FFF7ED;color:#C2410C;border:1px solid #FED7AA}
-.sec-opt{display:flex;align-items:center;gap:10px;padding:12px 13px;border-radius:12px;border:1px solid #EDE8E0;background:#FAFAF9;margin-bottom:8px;cursor:pointer;transition:background .15s;-webkit-tap-highlight-color:transparent}
-.sec-opt:active{background:#F0EDE8}
-.sec-opt-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.sec-opt-info{flex:1}
-.sec-opt-name{font-size:14px;font-weight:600;color:#1C1917}
-.sec-opt-sub{font-size:11px;color:#A8A29E;margin-top:2px}
-.picker-cancel{width:100%;background:#F5F2EE;border:1px solid #E7E2DA;border-radius:12px;padding:12px;font-size:13px;font-weight:600;color:#78716C;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:6px}
+.picker.slide-in{
+  transform:translateY(0);opacity:1;
+  transition:transform .5s cubic-bezier(.23,1,.32,1),opacity .4s ease;
+}
+.picker-handle{width:36px;height:4px;border-radius:99px;background:rgba(255,255,255,.15);margin:10px auto 16px}
+.picker-title{
+  font-family:var(--font);font-style:italic;font-weight:900;
+  font-size:22px;letter-spacing:.5px;color:#fff;margin-bottom:2px;
+}
+.picker-sub{font-size:12px;color:var(--text2);margin-bottom:12px}
+.picker-badge{
+  display:inline-flex;align-items:center;padding:4px 12px;
+  border-radius:4px;font-family:var(--font);font-style:italic;
+  font-weight:800;font-size:15px;margin-bottom:14px;letter-spacing:.5px;
+}
+.picker-badge.one{background:rgba(255,255,255,.06);color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.1)}
+.picker-badge.three{background:rgba(41,121,255,.15);color:#82B1FF;border:1px solid rgba(41,121,255,.35)}
+.picker-badge.six{background:var(--neon-dim);color:var(--neon);border:1px solid rgba(255,92,26,.4)}
 
-/* ── CONFIRM DIALOG ── */
-.conf-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:110;display:none;align-items:center;justify-content:center;padding:20px}
+/* ── Sector options — Broadcast Lower-Third style ── */
+.sec-opt{
+  display:flex;align-items:center;gap:0;
+  margin-bottom:8px;cursor:pointer;
+  border-radius:4px;overflow:hidden;
+  border:1px solid rgba(255,255,255,.07);
+  transition:border-color .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.sec-opt:active{border-color:var(--neon)}
+.sec-opt-left{
+  display:flex;align-items:center;gap:10px;
+  flex:1;padding:11px 13px;
+  background:rgba(255,255,255,.04);
+}
+.sec-opt-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.sec-opt-name{font-family:var(--font);font-weight:700;font-size:15px;color:#fff}
+.sec-opt-sub{font-size:10px;color:var(--text3);margin-top:2px;letter-spacing:.3px}
+.sec-opt-right{
+  padding:0 14px;
+  background:rgba(255,92,26,.12);
+  border-left:1px solid rgba(255,92,26,.25);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-width:52px;height:100%;align-self:stretch;
+}
+.sec-opt-left-val{font-family:var(--font);font-style:italic;font-weight:900;font-size:22px;color:var(--neon);line-height:1}
+.sec-opt-left-lbl{font-size:9px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-top:1px}
+
+.picker-cancel{
+  width:100%;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+  border-radius:6px;padding:13px;font-size:13px;font-weight:600;
+  color:var(--text2);cursor:pointer;font-family:var(--font-body);margin-top:8px;
+  transition:background .15s;
+}
+.picker-cancel:active{background:rgba(255,255,255,.09)}
+
+/* ── CONFIRM ── */
+.conf-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.7);
+  z-index:110;display:none;align-items:center;justify-content:center;padding:20px;
+}
 .conf-overlay.show{display:flex}
-.conf-box{background:#fff;border-radius:20px;padding:28px 22px;width:100%;max-width:320px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.18)}
-.conf-title{font-family:'Syne',sans-serif;font-weight:800;font-size:17px;color:#1C1917;margin-bottom:8px}
-.conf-sub{font-size:13px;color:#A8A29E;margin-bottom:22px;line-height:1.5}
+.conf-box{
+  background:rgba(14,17,26,.98);border-radius:12px;
+  border:1px solid rgba(255,92,26,.3);
+  padding:28px 22px;width:100%;max-width:320px;text-align:center;
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  box-shadow:0 0 40px rgba(0,0,0,.6);
+}
+.conf-title{font-family:var(--font);font-style:italic;font-weight:900;font-size:20px;color:#fff;margin-bottom:8px}
+.conf-sub{font-size:13px;color:var(--text2);margin-bottom:22px;line-height:1.5}
 .conf-btns{display:flex;gap:10px}
-.conf-btn{flex:1;padding:12px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;border:none}
-.conf-btn.cancel{background:#F5F2EE;color:#78716C;border:1px solid #E7E2DA}
-.conf-btn.danger{background:#ef4444;color:#fff;box-shadow:0 2px 8px rgba(239,68,68,.3)}
+.conf-btn{flex:1;padding:13px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body);border:none}
+.conf-btn.cancel{background:rgba(255,255,255,.07);color:var(--text2);border:1px solid rgba(255,255,255,.1)}
+.conf-btn.danger{background:var(--red);color:#fff;box-shadow:0 0 16px rgba(255,61,87,.35)}
 
-/* ═══════════════════════════════════════════
-   PANEL — Light, warm, premium surface
-   Warm off-white page · crisp white cards
-   Ink-dark text · orange accents
-   ═══════════════════════════════════════════ */
-
-/* Smooth bridge from dark stadium to light panel */
+/* ═══════════════════════════════════════════════════
+   PANEL — Dark Glassmorphism
+   ═══════════════════════════════════════════════════ */
 .stadium-bridge{
-  height:28px;
-  background:linear-gradient(180deg,rgba(8,12,20,0) 0%,#F5F2EE 100%);
-  margin-top:-2px;
+  height:22px;
+  background:linear-gradient(180deg,transparent,var(--bg2));
 }
-
 .panel{
-  background:#F5F2EE;   /* warm off-white — not clinical, not flat */
-  padding:0 14px 60px;
-  color:#1C1917;        /* warm ink, not pure black */
+  background:var(--bg2);
+  padding:16px 14px calc(50px + env(safe-area-inset-bottom));
 }
 
-/* ── TABS ── */
+/* ── Tabs ── */
 .tabs{
-  display:flex;gap:4px;
-  background:#E8E3DB;
-  border-radius:12px;padding:4px;
-  margin-bottom:18px;
-  box-shadow:inset 0 1px 3px rgba(0,0,0,.08);
+  display:flex;gap:3px;
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--glass-border);
+  border-radius:6px;padding:3px;margin-bottom:18px;
 }
 .tab{
-  flex:1;text-align:center;padding:9px 4px;border-radius:9px;
-  font-size:12px;font-weight:600;cursor:pointer;
-  color:#78716C;transition:all .2s;
-  font-family:'DM Sans',sans-serif;-webkit-tap-highlight-color:transparent;
+  flex:1;text-align:center;padding:9px 4px;border-radius:4px;
+  font-family:var(--font);font-style:italic;font-weight:700;font-size:14px;
+  letter-spacing:.5px;cursor:pointer;color:var(--text3);
+  transition:all .2s cubic-bezier(.23,1,.32,1);
+  text-transform:uppercase;
 }
 .tab.active{
-  background:#fff;color:#1C1917;
-  box-shadow:0 1px 4px rgba(0,0,0,.12),0 0 0 .5px rgba(0,0,0,.06);
+  background:var(--neon);color:#fff;
+  box-shadow:0 0 12px var(--neon-glow);
 }
 .tab-pane{display:none}
 .tab-pane.active{display:block}
 
-/* ── Section label ── */
-.panel-section-label{
-  font-size:10px;font-weight:700;letter-spacing:1.2px;
-  text-transform:uppercase;color:#A8A29E;
-  margin-bottom:8px;margin-top:4px;
+/* ── PLAYER CARD — Rep info container ── */
+.player-card{
+  position:relative;overflow:hidden;
+  background:linear-gradient(135deg,rgba(255,92,26,.08) 0%,rgba(255,176,32,.04) 50%,rgba(255,255,255,.03) 100%);
+  border:1px solid rgba(255,92,26,.25);
+  border-radius:8px;padding:14px 16px;margin-bottom:14px;
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
 }
+/* progress-reactive glow border */
+.player-card::before{
+  content:'';position:absolute;inset:-1px;
+  border-radius:9px;
+  background:linear-gradient(135deg,var(--neon),var(--neon2),transparent,transparent);
+  z-index:-1;opacity:.4;
+  transition:opacity .4s;
+}
+.player-card.full::before{opacity:1;animation:glowPulse 1.5s ease-in-out infinite}
+@keyframes glowPulse{0%,100%{opacity:.6}50%{opacity:1}}
+.pc-row{display:flex;align-items:center;gap:14px}
+.pc-avatar{
+  width:44px;height:44px;border-radius:50%;
+  background:linear-gradient(135deg,var(--neon),var(--neon2));
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font);font-style:italic;font-weight:900;font-size:20px;color:#fff;
+  flex-shrink:0;box-shadow:0 0 14px var(--neon-glow);
+}
+.pc-info{flex:1;min-width:0}
+.pc-name-input{
+  font-family:var(--font);font-style:italic;font-weight:900;font-size:20px;
+  color:#fff;background:transparent;border:none;outline:none;
+  width:100%;letter-spacing:.5px;
+}
+.pc-name-input::placeholder{color:var(--text3);font-weight:700}
+.pc-sub{font-size:11px;color:var(--text3);margin-top:2px;letter-spacing:.5px;text-transform:uppercase}
+.pc-target-row{display:flex;align-items:center;gap:10px;margin-top:10px}
+.pc-target-label{font-family:var(--font);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);white-space:nowrap}
+.pc-target-input{
+  font-family:var(--font);font-style:italic;font-weight:900;font-size:22px;
+  color:var(--neon);background:rgba(255,92,26,.07);
+  border:1px solid rgba(255,92,26,.25);border-radius:4px;
+  padding:4px 10px;outline:none;width:90px;text-align:center;
+  -moz-appearance:textfield;transition:border-color .2s,box-shadow .2s;
+}
+.pc-target-input::-webkit-outer-spin-button,.pc-target-input::-webkit-inner-spin-button{-webkit-appearance:none}
+.pc-target-input:focus{border-color:var(--neon);box-shadow:0 0 0 3px var(--neon-dim)}
+.pc-target-unit{font-family:var(--font);font-size:12px;color:var(--text3);letter-spacing:1px;text-transform:uppercase}
 
-/* ── Input rows ── */
-.input-row{display:flex;align-items:center;gap:9px;margin-bottom:10px}
-.input-row label{
-  font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
-  color:#A8A29E;white-space:nowrap;min-width:44px;
-}
-.itext{
-  height:44px;border:1.5px solid #E7E2DA;border-radius:10px;
-  padding:0 13px;font-size:13px;font-weight:500;
-  color:#1C1917;background:#fff;outline:none;
-  font-family:'DM Sans',sans-serif;transition:border-color .2s,box-shadow .2s;width:100%;
-  box-shadow:0 1px 2px rgba(0,0,0,.05);
-}
-.itext:focus{border-color:#e8622a;box-shadow:0 0 0 3px rgba(232,98,42,.1)}
-.inum{
-  height:44px;border:1.5px solid #E7E2DA;border-radius:10px;
-  padding:0 13px;font-size:18px;font-family:'Bebas Neue',sans-serif;
-  letter-spacing:1px;color:#1C1917;background:#fff;outline:none;
-  transition:border-color .2s,box-shadow .2s;flex:1;
-  -moz-appearance:textfield;box-shadow:0 1px 2px rgba(0,0,0,.05);
-}
-.inum:focus{border-color:#e8622a;box-shadow:0 0 0 3px rgba(232,98,42,.1)}
-.inum::-webkit-outer-spin-button,.inum::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-
-/* ── Sector section header ── */
+/* ── Section header ── */
 .sec-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.sec-title{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:#1C1917}
+.sec-title{
+  font-family:var(--font);font-style:italic;font-weight:800;
+  font-size:16px;letter-spacing:.5px;color:#fff;text-transform:uppercase;
+}
 .add-btn{
-  background:#e8622a;color:#fff;border:none;border-radius:9px;
-  padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;
-  font-family:'DM Sans',sans-serif;
-  box-shadow:0 2px 8px rgba(232,98,42,.3);transition:opacity .15s;
-  min-height:44px;-webkit-tap-highlight-color:transparent;
+  background:var(--neon);color:#fff;border:none;border-radius:4px;
+  padding:9px 14px;font-family:var(--font);font-style:italic;font-weight:800;
+  font-size:13px;letter-spacing:.5px;cursor:pointer;text-transform:uppercase;
+  box-shadow:0 0 12px var(--neon-glow);transition:opacity .15s,transform .1s;
+  min-height:40px;
 }
-.add-btn:active{opacity:.85}
+.add-btn:active{opacity:.85;transform:scale(.96)}
 
-/* ── Sector cards ── */
+/* ── Sector Card — glass ── */
 .sec-card{
-  background:#fff;border-radius:12px;
-  border:1px solid #EDE8E0;
-  padding:10px 12px;margin-bottom:8px;
-  display:flex;align-items:center;gap:9px;
-  animation:fadeUp .2s ease;
-  box-shadow:0 1px 3px rgba(0,0,0,.06);
+  background:var(--glass-strong);border-radius:6px;
+  border:1px solid var(--glass-border);
+  padding:10px 12px;margin-bottom:7px;
+  display:flex;align-items:center;gap:8px;
+  animation:fadeUp .25s cubic-bezier(.23,1,.32,1);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
 }
-@keyframes fadeUp{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
-.s-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+@keyframes fadeUp{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+.s-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;box-shadow:0 0 6px currentColor}
 .s-name{flex:1;min-width:0}
 .s-inp{
-  border:none;background:transparent;font-size:13px;font-weight:500;
-  color:#1C1917;font-family:'DM Sans',sans-serif;width:100%;outline:none;height:24px;padding:0;
+  border:none;background:transparent;
+  font-family:var(--font);font-weight:600;font-size:14px;color:#fff;
+  width:100%;outline:none;height:22px;padding:0;letter-spacing:.3px;
 }
-.s-inp::placeholder{color:#C4BCB4}
-
-/* ── QTY input ── */
+.s-inp::placeholder{color:var(--text3)}
 .s-qty-input{
-  width:60px;height:44px;
-  border:1.5px solid #E7E2DA;border-radius:9px;
-  background:#F9F7F4;color:#1C1917;
-  font-family:'Bebas Neue',sans-serif;font-size:18px;
-  text-align:center;outline:none;-moz-appearance:textfield;
-  transition:border-color .2s,box-shadow .2s;flex-shrink:0;
+  width:58px;height:40px;
+  border:1px solid rgba(255,92,26,.25);border-radius:4px;
+  background:rgba(255,92,26,.08);
+  color:var(--neon);font-family:var(--font);font-style:italic;font-weight:900;
+  font-size:20px;text-align:center;outline:none;
+  -moz-appearance:textfield;flex-shrink:0;
+  transition:border-color .2s,box-shadow .2s;min-height:44px;
 }
-.s-qty-input::-webkit-outer-spin-button,
-.s-qty-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-.s-qty-input:focus{border-color:#e8622a;box-shadow:0 0 0 3px rgba(232,98,42,.1)}
-
+.s-qty-input::-webkit-outer-spin-button,.s-qty-input::-webkit-inner-spin-button{-webkit-appearance:none}
+.s-qty-input:focus{border-color:var(--neon);box-shadow:0 0 0 2px var(--neon-dim)}
 .del-btn{
-  width:36px;height:36px;border-radius:8px;border:1px solid #FECDD3;
-  background:#FFF1F2;cursor:pointer;color:#FB7185;
+  width:36px;height:36px;border-radius:4px;border:1px solid rgba(255,61,87,.2);
+  background:rgba(255,61,87,.08);cursor:pointer;color:var(--red);
   display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;
+  transition:background .15s;min-height:44px;width:44px;
 }
-.del-btn:active{background:#FFE4E6}
+.del-btn:active{background:rgba(255,61,87,.2)}
 
-/* ── TOTAL ROW ── */
+/* ── TOTAL ROW — broadcast lower-third ── */
 .total-row{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:11px 14px;border-radius:12px;
-  border:1.5px solid #FDDCC9;
-  background:linear-gradient(135deg,#FFF6F2,#FFF0E8);
-  margin-top:4px;margin-bottom:12px;
-  box-shadow:0 1px 4px rgba(232,98,42,.08);
+  display:flex;align-items:stretch;
+  border-radius:4px;overflow:hidden;
+  border:1px solid rgba(255,92,26,.3);
+  margin-top:4px;margin-bottom:14px;
+  display:none;
 }
-.total-label{font-size:11px;font-weight:700;color:#A8A29E;letter-spacing:.8px;text-transform:uppercase}
-.total-value{font-family:'Bebas Neue',sans-serif;font-size:22px;color:#e8622a;line-height:1}
-.total-of{font-size:11px;color:#C4BCB4;margin-left:5px}
-.total-status{font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;margin-left:8px}
-.total-status.ok{background:#DCFCE7;color:#16A34A}
-.total-status.warn{background:#FFF3E0;color:#E65100}
-.total-status.over{background:#FFE4E6;color:#E11D48}
+.total-left{
+  flex:1;padding:10px 13px;
+  background:rgba(255,92,26,.05);
+  display:flex;align-items:center;gap:10px;
+}
+.total-label{
+  font-family:var(--font);font-size:11px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--text3);
+}
+.total-right{
+  padding:0 14px;background:rgba(255,92,26,.15);
+  border-left:1px solid rgba(255,92,26,.3);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-width:80px;
+}
+.total-value{
+  font-family:var(--font);font-style:italic;font-weight:900;
+  font-size:26px;color:var(--neon);line-height:1;
+}
+.total-of{font-size:10px;color:var(--text3);margin-top:1px;letter-spacing:.5px}
+.total-status{
+  font-family:var(--font);font-style:italic;font-weight:800;
+  font-size:12px;padding:2px 8px;border-radius:3px;margin-left:8px;letter-spacing:.5px;
+}
+.total-status.ok{background:var(--green-dim);color:var(--green)}
+.total-status.warn{background:var(--neon-dim);color:var(--neon)}
+.total-status.over{background:rgba(255,61,87,.15);color:var(--red)}
 
 .hint{
-  text-align:center;padding:20px;color:#C4BCB4;font-size:12px;
-  background:#FAF8F5;border-radius:12px;
-  border:1.5px dashed #E8E3DB;line-height:1.7;
+  text-align:center;padding:20px;color:var(--text3);font-size:12px;
+  background:var(--glass);border-radius:6px;
+  border:1px dashed rgba(255,255,255,.08);line-height:1.7;
 }
 
-/* ── ACTUALS — dual progress ── */
+/* ── ACTUALS TAB ── */
+
+/* Dual progress — glass card */
 .dual-prog{
-  background:#fff;border-radius:14px;border:1px solid #EDE8E0;
-  padding:16px;margin-bottom:14px;
-  box-shadow:0 1px 4px rgba(0,0,0,.06);
+  background:var(--glass-strong);border:1px solid var(--glass-border);
+  border-radius:8px;padding:14px;margin-bottom:12px;
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
 }
-.dp-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-.dp-lbl{font-size:11px;font-weight:700;color:#A8A29E;display:flex;align-items:center;gap:7px;letter-spacing:.5px}
-.dp-lbl span{width:8px;height:8px;border-radius:50%;display:inline-block}
-.dp-val{font-family:'Bebas Neue',sans-serif;font-size:15px;color:#1C1917}
-.prog-track{background:#F0EDE8;border-radius:99px;height:8px;overflow:hidden;margin-bottom:12px}
-.prog-fill{height:100%;border-radius:99px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.dp-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.dp-lbl{
+  font-family:var(--font);font-size:11px;font-weight:700;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--text3);display:flex;align-items:center;gap:7px;
+}
+.dp-lbl span{width:7px;height:7px;border-radius:50%;display:inline-block}
+.dp-val{font-family:var(--font);font-style:italic;font-weight:800;font-size:16px;color:#fff}
+.prog-track{background:rgba(255,255,255,.06);border-radius:0;height:6px;overflow:hidden;margin-bottom:12px}
+.prog-fill{height:100%;transition:width .5s cubic-bezier(.23,1,.32,1)}
 
-/* ── Pace cards ── */
-.pace-row{display:flex;gap:8px;margin-bottom:14px}
+/* Pace cards */
+.pace-row{display:flex;gap:8px;margin-bottom:12px}
 .pace-card{
-  flex:1;background:#fff;border-radius:12px;
-  border:1px solid #EDE8E0;padding:12px 8px;text-align:center;
-  box-shadow:0 1px 3px rgba(0,0,0,.05);
+  flex:1;background:var(--glass-strong);border:1px solid var(--glass-border);
+  border-radius:6px;padding:10px 8px;text-align:center;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
 }
-.pace-v{font-family:'Bebas Neue',sans-serif;font-size:22px;line-height:1;color:#1C1917}
-.pace-l{font-size:9px;color:#A8A29E;margin-top:3px;letter-spacing:.6px;text-transform:uppercase}
-.pace-s{font-size:10px;font-weight:700;margin-top:5px;padding:3px 8px;border-radius:99px;display:inline-block}
-.pace-s.ahead{background:#DCFCE7;color:#16A34A}
-.pace-s.behind{background:#FFE4E6;color:#E11D48}
-.pace-s.on{background:#FFF3E0;color:#E65100}
+.pace-v{
+  font-family:var(--font);font-style:italic;font-weight:900;
+  font-size:22px;line-height:1;color:#fff;
+}
+.pace-l{
+  font-family:var(--font);font-size:9px;letter-spacing:1.5px;
+  color:var(--text3);margin-top:3px;text-transform:uppercase;
+}
+.pace-s{
+  font-family:var(--font);font-style:italic;font-weight:800;
+  font-size:10px;margin-top:4px;padding:2px 7px;border-radius:2px;display:inline-block;
+  letter-spacing:.5px;
+}
+.pace-s.ahead{background:var(--green-dim);color:var(--green)}
+.pace-s.behind{background:rgba(255,61,87,.12);color:var(--red)}
+.pace-s.on{background:var(--neon-dim);color:var(--neon)}
 
-/* ── Sector actual cards ── */
-.sa-title{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:#1C1917;margin-bottom:10px}
+/* Sector actuals — Broadcast Lower-Third */
+.sa-title{
+  font-family:var(--font);font-style:italic;font-weight:800;font-size:16px;
+  text-transform:uppercase;letter-spacing:.5px;color:#fff;margin-bottom:10px;
+}
 .sa-card{
-  background:#fff;border-radius:12px;border:1px solid #EDE8E0;
-  padding:12px 13px;margin-bottom:9px;
-  box-shadow:0 1px 3px rgba(0,0,0,.05);
+  display:flex;align-items:stretch;border-radius:4px;overflow:hidden;
+  border:1px solid var(--glass-border);margin-bottom:8px;
 }
-.sa-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.sa-name{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:#1C1917}
-.sa-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.sa-nums{font-family:'Bebas Neue',sans-serif;font-size:14px;color:#A8A29E}
-.sa-nums b{color:#1C1917;font-weight:400}
-.sa-bar{position:relative;height:6px;border-radius:99px;background:#F0EDE8;overflow:hidden;margin-bottom:5px}
-.sa-bar-fc{position:absolute;top:0;left:0;height:100%;border-radius:99px;opacity:.25}
-.sa-bar-ac{position:absolute;top:0;left:0;height:100%;border-radius:99px;transition:width .4s}
+.sa-card-left{
+  flex:1;padding:10px 12px;
+  background:var(--glass-strong);
+}
+.sa-card-right{
+  padding:0 14px;
+  background:rgba(255,255,255,.04);
+  border-left:1px solid var(--glass-border);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-width:62px;
+}
+.sa-name{display:flex;align-items:center;gap:7px;font-family:var(--font);font-weight:700;font-size:14px;color:#fff;margin-bottom:6px}
+.sa-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.sa-bar{position:relative;height:5px;background:rgba(255,255,255,.06);overflow:hidden;margin-bottom:4px;border-radius:0}
+.sa-bar-fc{position:absolute;top:0;left:0;height:100%;opacity:.25}
+.sa-bar-ac{position:absolute;top:0;left:0;height:100%;transition:width .4s cubic-bezier(.23,1,.32,1)}
 .sa-foot{display:flex;justify-content:space-between}
-.sa-lbl{font-size:10px;color:#C4BCB4;font-weight:500}
-.sa-lbl.ok{color:#16A34A}.sa-lbl.warn{color:#E65100}.sa-lbl.over{color:#E11D48}
-
-/* ── Shot log ── */
-.log-head{display:flex;justify-content:space-between;align-items:center;margin-top:16px;margin-bottom:10px}
-.log-title{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:#1C1917}
-.reset-btn{
-  background:#FFF1F2;border:1px solid #FECDD3;border-radius:8px;
-  padding:5px 12px;font-size:11px;font-weight:700;color:#FB7185;
-  cursor:pointer;font-family:'DM Sans',sans-serif;
+.sa-lbl{font-size:10px;color:var(--text3);letter-spacing:.3px}
+.sa-lbl.ok{color:var(--green)}.sa-lbl.warn{color:var(--neon)}.sa-lbl.over{color:var(--red)}
+.sa-actual{
+  font-family:var(--font);font-style:italic;font-weight:900;
+  font-size:24px;color:var(--neon);line-height:1;
 }
-.reset-btn:active{background:#FFE4E6}
+.sa-forecast{font-size:10px;color:var(--text3);letter-spacing:.5px;margin-top:1px}
+
+/* Shot log */
+.log-head{display:flex;justify-content:space-between;align-items:center;margin-top:14px;margin-bottom:10px}
+.log-title{font-family:var(--font);font-style:italic;font-weight:800;font-size:16px;text-transform:uppercase;color:#fff}
+.reset-btn{
+  background:rgba(255,61,87,.1);border:1px solid rgba(255,61,87,.25);
+  border-radius:4px;padding:6px 12px;font-size:11px;font-weight:700;
+  color:var(--red);cursor:pointer;font-family:var(--font);letter-spacing:.5px;
+}
+.reset-btn:active{background:rgba(255,61,87,.2)}
 
 .shot-item{
-  display:flex;align-items:center;gap:10px;
-  padding:10px 12px;background:#fff;border-radius:11px;
-  border:1px solid #EDE8E0;margin-bottom:7px;
-  animation:fadeUp .2s ease;box-shadow:0 1px 3px rgba(0,0,0,.05);
+  display:flex;align-items:stretch;border-radius:4px;overflow:hidden;
+  border:1px solid var(--glass-border);margin-bottom:7px;
+  animation:fadeUp .2s cubic-bezier(.23,1,.32,1);
 }
-.shot-pill{font-family:'Bebas Neue',sans-serif;font-size:13px;padding:4px 10px;border-radius:99px;flex-shrink:0;min-width:44px;text-align:center}
-.shot-pill.one{background:#F1F5F9;color:#475569;border:1px solid #CBD5E1}
-.shot-pill.three{background:#EFF6FF;color:#1D4ED8;border:1px solid #BFDBFE}
-.shot-pill.six{background:#FFF7ED;color:#C2410C;border:1px solid #FED7AA}
+.shot-item-left{
+  flex:1;display:flex;align-items:center;gap:10px;padding:10px 12px;
+  background:var(--glass-strong);
+}
+.shot-pill{
+  font-family:var(--font);font-style:italic;font-weight:900;
+  font-size:13px;padding:4px 9px;border-radius:3px;flex-shrink:0;min-width:46px;text-align:center;
+  letter-spacing:.5px;
+}
+.shot-pill.one{background:rgba(255,255,255,.07);color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.12)}
+.shot-pill.three{background:rgba(41,121,255,.15);color:#82B1FF;border:1px solid rgba(41,121,255,.3)}
+.shot-pill.six{background:var(--neon-dim);color:var(--neon);border:1px solid rgba(255,92,26,.35)}
 .shot-info{flex:1;min-width:0}
-.shot-sec{font-size:13px;font-weight:600;color:#1C1917;display:flex;align-items:center;gap:6px}
-.shot-time{font-size:10px;color:#A8A29E;margin-top:2px}
+.shot-sec{font-family:var(--font);font-weight:700;font-size:14px;color:#fff;display:flex;align-items:center;gap:6px}
+.shot-time{font-size:10px;color:var(--text3);margin-top:2px;letter-spacing:.3px}
 .undo-btn{
-  background:#F5F2EE;border:1px solid #E7E2DA;border-radius:7px;
-  padding:5px 10px;font-size:11px;font-weight:600;color:#78716C;
-  cursor:pointer;font-family:'DM Sans',sans-serif;flex-shrink:0;
+  padding:0 14px;background:rgba(255,255,255,.04);border:none;
+  border-left:1px solid var(--glass-border);
+  font-size:11px;font-weight:700;color:var(--text3);cursor:pointer;
+  font-family:var(--font);letter-spacing:.5px;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .15s;min-width:52px;
 }
-.undo-btn:active{background:#EDE8E0}
+.undo-btn:active{background:rgba(255,255,255,.08);color:#fff}
 
 .no-shots{
-  text-align:center;padding:24px;color:#C4BCB4;font-size:12px;
-  line-height:1.8;background:#FAF8F5;border-radius:12px;
-  border:1.5px dashed #E8E3DB;
+  text-align:center;padding:24px;color:var(--text3);font-size:12px;
+  line-height:1.8;background:var(--glass);border-radius:6px;
+  border:1px dashed rgba(255,255,255,.08);
 }
 .copy-btn{
-  width:100%;background:#1C1917;border:none;border-radius:12px;
-  padding:13px;font-size:13px;font-weight:600;color:#fff;
-  cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:16px;
-  letter-spacing:.3px;transition:opacity .15s;
-  box-shadow:0 2px 8px rgba(0,0,0,.18);
+  width:100%;
+  background:linear-gradient(135deg,rgba(255,92,26,.2),rgba(255,176,32,.1));
+  border:1px solid rgba(255,92,26,.35);border-radius:6px;
+  padding:14px;font-family:var(--font);font-style:italic;font-weight:800;
+  font-size:15px;letter-spacing:.5px;color:var(--neon);cursor:pointer;
+  margin-top:16px;text-transform:uppercase;
+  transition:background .2s,box-shadow .2s;
+  box-shadow:0 0 12px rgba(255,92,26,.08);
 }
-.copy-btn:active{opacity:.85}
-
-
-/* ═══════════════════════════════════════
-   PLAYER FLIP ANIMATION
-   ═══════════════════════════════════════ */
-.player-wrap{
-  position:absolute;bottom:52px;left:50%;
-  transform:translateX(-50%);z-index:10;
-  perspective:400px;
-}
-.player-flipper{
-  position:relative;width:68px;height:108px;
-  transform-style:preserve-3d;
-  transition:transform 0s; /* JS controls timing */
-}
-.player-face{
-  position:absolute;top:0;left:0;
-  width:68px;height:108px;
-  backface-visibility:hidden;
-  -webkit-backface-visibility:hidden;
-}
-.player-back{
-  transform:rotateY(0deg);
-  filter:drop-shadow(0 6px 18px rgba(232,98,42,.55));
-}
-.player-front{
-  transform:rotateY(180deg);
-  filter:drop-shadow(0 6px 20px rgba(232,98,42,.8));
-}
-/* When .celebrating class added, flip to front */
-.player-flipper.celebrating{
-  transform:rotateY(180deg);
-}
-/* Throwing arm raise on back SVG */
-.player-flipper.throwing #armBackR{
-  transform-origin:61px 36px;
-  transform:rotate(-70deg);
-}
-
-/* Siii flash — special gold burst */
-.siii-flash{
-  position:absolute;
-  top:38%;left:50%;
-  transform:translate(-50%,-50%) scale(0.5);
-  font-family:'Bebas Neue',sans-serif;
-  font-size:52px;
-  color:#fbbf24;
-  text-shadow:0 0 30px rgba(251,191,36,.9),0 0 60px rgba(251,191,36,.5);
-  pointer-events:none;
-  opacity:0;
-  z-index:51;
-  white-space:nowrap;
-  letter-spacing:4px;
-}
+.copy-btn:active{background:rgba(255,92,26,.25);box-shadow:0 0 20px var(--neon-glow)}
 
 /* ═══════════════════════════════════════════════════
-   RESPONSIVE — iPhone SE · iPhone · iPhone Pro Max
-                iPad · iPad Pro
+   RESPONSIVE
    ═══════════════════════════════════════════════════ */
-
-/* iPhone SE / small phones (≤375px) */
-@media (max-width:375px){
-  .stadium{height:280px}
+@media(max-width:375px){
+  .stadium{height:282px}
   .hoop-wrap{top:42px}
   .player-wrap{bottom:42px}
-  .player-face{width:54px;height:88px}
-  .player-flipper{width:54px;height:88px}
-  .scoreboard{gap:8px;padding:4px 10px}
-  .sb-v{font-size:22px}
-  .sb-div{height:28px}
-  .shot-btns{gap:5px;bottom:6px}
-  .shot-btn{padding:8px 10px;font-size:15px}
-  .flash{font-size:28px}
+  .player-face,.player-flipper{width:56px;height:90px}
+  .hud-num{font-size:26px}
+  .shot-btn{padding:0 10px;font-size:15px}
   .panel{padding-left:12px;padding-right:12px}
-  .tabs{margin-bottom:14px}
-  .sa-card,.sec-card,.shot-item{padding:9px 10px}
-  .pace-v{font-size:18px}
 }
-
-/* iPhone standard (376–430px) — already designed for this, just tune */
-@media (min-width:376px) and (max-width:430px){
-  .stadium{height:310px}
+@media(min-width:376px) and (max-width:430px){.stadium{height:316px}}
+@media(min-width:431px) and (max-width:480px){
+  .stadium{height:332px}
+  .player-face,.player-flipper{width:76px;height:118px}
+  .shot-btn{font-size:20px}
 }
-
-/* iPhone Pro Max / large phones (431–480px) */
-@media (min-width:431px) and (max-width:480px){
-  .stadium{height:330px}
-  .player-face{width:72px;height:116px}
-  .player-flipper{width:72px;height:116px}
-  .shot-btn{padding:11px 18px;font-size:20px}
-}
-
-/* iPad portrait (768px+) */
-@media (min-width:768px){
-  body{max-width:768px;margin:0 auto;background:#F5F2EE}
-
-  .stadium{height:420px;border-radius:0 0 24px 24px;overflow:hidden}
-  .court svg{height:280px}
-  .court{height:280px}
+@media(min-width:768px){
+  body{max-width:780px;margin:0 auto}
+  .stadium{height:420px;border-radius:0 0 20px 20px}
+  .court svg,.court{height:280px}
   .hoop-wrap{top:64px}
-  .hoop-wrap svg{width:110px;height:100px}
-  .player-wrap{bottom:66px}
-  .player-face{width:84px;height:134px}
-  .player-flipper{width:84px;height:134px}
-  .scoreboard{gap:18px;padding:8px 22px;border-radius:14px}
-  .sb-v{font-size:36px}
-  .sb-l{font-size:10px}
-  .sb-div{height:46px}
-  .sb-badge{font-size:13px;padding:3px 10px}
-  .flash{font-size:52px}
-
-  .shot-btns{gap:12px;bottom:14px}
-  .shot-btn{padding:13px 24px;font-size:24px;border-radius:14px}
-  .shot-btn .bdg{font-size:10px;padding:2px 6px}
-
-  /* Panel — two-column grid on iPad */
-  .stadium-bridge{height:0}
-  .panel{
-    padding:24px 28px 80px;
-    background:#F5F2EE;
-  }
-  .tabs{
-    max-width:480px;margin-left:auto;margin-right:auto;
-    margin-bottom:22px;
-  }
-
-  /* iPad: wider inputs and cards, no complex grid needed — single column is clean */
-  #tab-setup{max-width:680px;margin:0 auto}
-  #tab-actuals{max-width:680px;margin:0 auto}
-
-  .itext{height:50px;font-size:15px}
-  .inum{height:50px;font-size:22px}
-
-  .sec-card{padding:12px 14px}
-  .s-inp{font-size:15px}
-  .s-qty-input{width:70px;height:44px;font-size:22px}
-  .add-btn{padding:10px 18px;font-size:14px;border-radius:11px}
-
-  .sa-card,.shot-item,.sa-card{padding:14px 16px}
-  .sa-title,.log-title,.sec-title{font-size:16px}
-  .sa-nums{font-size:16px}
-
-  .pace-v{font-size:26px}
-  .pace-l{font-size:11px}
-  .pace-card{padding:14px 10px}
-
-  .dual-prog{padding:18px}
-  .dp-val{font-size:17px}
-
-  .shot-pill{font-size:14px;padding:5px 12px;min-width:52px}
-  .shot-sec{font-size:14px}
-  .shot-time{font-size:11px}
-
-  .total-value{font-size:26px}
-  .total-of{font-size:13px}
-  .total-status{font-size:13px;padding:4px 12px}
-
-  .picker{max-width:560px;border-radius:28px 28px 0 0;padding:10px 24px 48px}
-  .picker-title{font-size:22px}
-  .sec-opt{padding:14px 16px;border-radius:14px}
-  .sec-opt-name{font-size:16px}
-  .sec-opt-sub{font-size:12px}
-  .picker-cancel{padding:14px;font-size:15px;border-radius:14px}
-
-  .conf-box{max-width:400px;padding:34px 28px;border-radius:24px}
-  .conf-title{font-size:20px}
-  .conf-sub{font-size:14px}
-  .conf-btn{padding:14px;font-size:14px;border-radius:14px}
-
-  .copy-btn{padding:16px;font-size:15px;border-radius:14px}
-  .reset-btn{padding:7px 16px;font-size:12px}
-
-  .no-shots{padding:32px;font-size:14px}
-  .hint{padding:24px;font-size:14px}
+  .hoop-wrap svg{width:110px;height:102px}
+  .player-wrap{bottom:64px}
+  .player-face,.player-flipper{width:86px;height:136px}
+  .hud-num{font-size:42px}
+  .shot-btn{height:54px;font-size:24px}
+  .panel{padding:24px 28px calc(80px + env(safe-area-inset-bottom))}
+  #tab-setup,#tab-actuals{max-width:680px;margin:0 auto}
+  .sa-actual{font-size:28px}
 }
-
-/* iPad Pro / large tablets (1024px+) */
-@media (min-width:1024px){
+@media(min-width:1024px){
   body{max-width:900px}
-  .stadium{height:460px;border-radius:0 0 28px 28px}
-  .court{height:310px}
-  .court svg{height:310px}
+  .stadium{height:460px}
+  .court svg,.court{height:310px}
   .hoop-wrap{top:72px}
-  .hoop-wrap svg{width:120px;height:110px}
   .player-wrap{bottom:76px}
-  .player-face{width:96px;height:152px}
-  .player-flipper{width:96px;height:152px}
-  .scoreboard{padding:10px 28px;gap:22px}
-  .sb-v{font-size:42px}
-  .sb-div{height:54px}
-  .shot-btn{padding:14px 28px;font-size:26px}
+  .player-face,.player-flipper{width:98px;height:154px}
+  .hud-num{font-size:48px}
 }
-
-/* iPhone landscape (height < 500px, width > 500px) */
-@media (max-height:500px) and (orientation:landscape){
+@media(max-height:500px) and (orientation:landscape){
   .stadium{height:220px}
-  .court{height:160px}
-  .court svg{height:160px}
-  .hoop-wrap{top:30px}
-  .player-wrap{bottom:32px}
-  .player-face{width:50px;height:80px}
-  .player-flipper{width:50px;height:80px}
-  .scoreboard{padding:3px 10px;gap:8px}
-  .sb-v{font-size:20px}
-  .sb-div{height:24px}
-  .shot-btns{bottom:5px;gap:6px}
-  .shot-btn{padding:7px 12px;font-size:15px}
-  .flash{font-size:26px}
+  .court svg,.court{height:160px}
+  .hoop-wrap{top:28px}
+  .player-wrap{bottom:30px}
+  .player-face,.player-flipper{width:50px;height:80px}
+  .hud-num{font-size:22px}
+  .shot-btn{height:38px;font-size:15px;padding:0 10px}
 }
-
-/* Safe area for home bar at bottom — panel last child */
-.panel{
-  padding-bottom:calc(50px + env(safe-area-inset-bottom));
-}
-
 </style>
 </head>
 <body>
 
-<!-- ══════════════════════════════════════
-     STADIUM with NBA hardwood court
-     ══════════════════════════════════════ -->
+<!-- ══════════════════════════════════════════════════
+     STADIUM
+     ══════════════════════════════════════════════════ -->
 <div class="stadium" id="stadium">
   <div class="crowd-row" id="cr1"></div>
   <div class="crowd-row" id="cr2"></div>
@@ -593,209 +724,163 @@ body{font-family:'DM Sans',sans-serif;background:#080c14;min-height:100vh;overfl
   <div class="spotlight spc"></div>
   <div class="spotlight spr"></div>
 
-  <!-- NBA COURT SVG — official markings, muted opacity -->
+  <!-- NBA COURT -->
   <div class="court">
     <svg viewBox="0 0 400 230" preserveAspectRatio="xMidYMax meet">
-      <!-- Court surface sheen -->
-      <rect width="400" height="230" fill="rgba(180,90,20,.08)" rx="0"/>
-
-      <!-- ── OFFICIAL COURT LINES (all at reduced opacity for readability) ── -->
-      <!-- Baseline -->
+      <rect width="400" height="230" fill="rgba(170,80,15,.07)"/>
       <line x1="0" y1="225" x2="400" y2="225" stroke="rgba(255,255,255,.5)" stroke-width="2.5"/>
-
-      <!-- Sidelines -->
-      <line x1="2" y1="0" x2="2" y2="230" stroke="rgba(255,255,255,.25)" stroke-width="1.5"/>
-      <line x1="398" y1="0" x2="398" y2="230" stroke="rgba(255,255,255,.25)" stroke-width="1.5"/>
-
-      <!-- Half-court line -->
-      <line x1="0" y1="200" x2="400" y2="200" stroke="rgba(255,255,255,.22)" stroke-width="1.5"/>
-
-      <!-- Center circle at half-court -->
-      <ellipse cx="200" cy="200" rx="42" ry="11" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="1.5"/>
-
-      <!-- ── PAINT / KEY (lane) ── -->
-      <!-- Lane box -->
-      <rect x="140" y="74" width="120" height="151" fill="rgba(30,58,138,.25)" stroke="rgba(255,255,255,.35)" stroke-width="2"/>
-      <!-- Lane inner dashes -->
-      <line x1="140" y1="118" x2="260" y2="118" stroke="rgba(255,255,255,.15)" stroke-width="1" stroke-dasharray="4 4"/>
-      <line x1="140" y1="150" x2="260" y2="150" stroke="rgba(255,255,255,.15)" stroke-width="1" stroke-dasharray="4 4"/>
-      <line x1="140" y1="182" x2="260" y2="182" stroke="rgba(255,255,255,.15)" stroke-width="1" stroke-dasharray="4 4"/>
-
-      <!-- Lane hash marks left -->
-      <line x1="118" y1="118" x2="140" y2="118" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/>
-      <line x1="118" y1="140" x2="140" y2="140" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/>
-      <line x1="118" y1="162" x2="140" y2="162" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/>
-      <line x1="118" y1="184" x2="140" y2="184" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/>
-      <!-- Lane hash marks right -->
-      <line x1="260" y1="118" x2="282" y2="118" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/>
-      <line x1="260" y1="140" x2="282" y2="140" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/>
-      <line x1="260" y1="162" x2="282" y2="162" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/>
-      <line x1="260" y1="184" x2="282" y2="184" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/>
-
-      <!-- Free-throw circle (full) -->
-      <ellipse cx="200" cy="74" rx="46" ry="12" fill="none" stroke="rgba(255,255,255,.32)" stroke-width="1.8"/>
-      <!-- Free-throw circle top half (restricted half inside lane) -->
-      <path d="M154 74 A46 12 0 0 1 246 74" fill="none" stroke="rgba(255,255,255,.32)" stroke-width="1.8" stroke-dasharray="5 4"/>
-
-      <!-- ── THREE-POINT ARC ── -->
-      <!-- NBA 3pt arc: corners + arc -->
-      <!-- Corner 3pt lines (straight sections) -->
-      <line x1="30" y1="130" x2="30" y2="225" stroke="rgba(255,255,255,.38)" stroke-width="2"/>
-      <line x1="370" y1="130" x2="370" y2="225" stroke="rgba(255,255,255,.38)" stroke-width="2"/>
-      <!-- Main arc connecting corners -->
-      <path d="M30 130 Q200 -14 370 130" fill="none" stroke="rgba(255,255,255,.38)" stroke-width="2"/>
-
-      <!-- ── RESTRICTED AREA ARC ── -->
-      <path d="M172 225 A28 10 0 0 1 228 225" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
-
-      <!-- ── 6-PT SHOT ZONE INDICATOR (custom, branded orange) ── -->
-      <path d="M4 100 Q200 -30 396 100" fill="none" stroke="rgba(232,98,42,.45)" stroke-width="2" stroke-dasharray="8 5"/>
-
-      <!-- Wood plank texture lines (very subtle) -->
-      <line x1="0" y1="30" x2="400" y2="30" stroke="rgba(0,0,0,.1)" stroke-width="1"/>
-      <line x1="0" y1="55" x2="400" y2="55" stroke="rgba(0,0,0,.1)" stroke-width="1"/>
-      <line x1="0" y1="80" x2="400" y2="80" stroke="rgba(0,0,0,.1)" stroke-width="1"/>
-      <line x1="0" y1="105" x2="400" y2="105" stroke="rgba(0,0,0,.1)" stroke-width="1"/>
-      <line x1="0" y1="130" x2="400" y2="130" stroke="rgba(0,0,0,.1)" stroke-width="1"/>
-      <line x1="0" y1="155" x2="400" y2="155" stroke="rgba(0,0,0,.1)" stroke-width="1"/>
-      <line x1="0" y1="180" x2="400" y2="180" stroke="rgba(0,0,0,.1)" stroke-width="1"/>
-
-      <!-- Zone labels -->
-      <text x="65" y="222" font-family="Bebas Neue,sans-serif" font-size="9" fill="rgba(255,255,255,.35)" text-anchor="middle">3 PT</text>
-      <text x="200" y="222" font-family="Bebas Neue,sans-serif" font-size="9" fill="rgba(255,255,255,.25)" text-anchor="middle">KEY</text>
-      <text x="25" y="112" font-family="Bebas Neue,sans-serif" font-size="9" fill="rgba(232,98,42,.55)" text-anchor="middle">6PT</text>
+      <line x1="2" y1="0" x2="2" y2="230" stroke="rgba(255,255,255,.2)" stroke-width="1.5"/>
+      <line x1="398" y1="0" x2="398" y2="230" stroke="rgba(255,255,255,.2)" stroke-width="1.5"/>
+      <line x1="0" y1="200" x2="400" y2="200" stroke="rgba(255,255,255,.18)" stroke-width="1.5"/>
+      <ellipse cx="200" cy="200" rx="42" ry="11" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="1.5"/>
+      <rect x="140" y="74" width="120" height="151" fill="rgba(30,58,138,.2)" stroke="rgba(255,255,255,.3)" stroke-width="2"/>
+      <line x1="140" y1="118" x2="260" y2="118" stroke="rgba(255,255,255,.12)" stroke-width="1" stroke-dasharray="4 4"/>
+      <line x1="140" y1="150" x2="260" y2="150" stroke="rgba(255,255,255,.12)" stroke-width="1" stroke-dasharray="4 4"/>
+      <line x1="140" y1="182" x2="260" y2="182" stroke="rgba(255,255,255,.12)" stroke-width="1" stroke-dasharray="4 4"/>
+      <line x1="118" y1="118" x2="140" y2="118" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
+      <line x1="118" y1="140" x2="140" y2="140" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
+      <line x1="118" y1="162" x2="140" y2="162" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
+      <line x1="118" y1="184" x2="140" y2="184" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
+      <line x1="260" y1="118" x2="282" y2="118" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
+      <line x1="260" y1="140" x2="282" y2="140" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
+      <line x1="260" y1="162" x2="282" y2="162" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
+      <line x1="260" y1="184" x2="282" y2="184" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
+      <ellipse cx="200" cy="74" rx="46" ry="12" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="1.8"/>
+      <path d="M154 74 A46 12 0 0 1 246 74" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="1.8" stroke-dasharray="5 4"/>
+      <line x1="30" y1="130" x2="30" y2="225" stroke="rgba(255,255,255,.34)" stroke-width="2"/>
+      <line x1="370" y1="130" x2="370" y2="225" stroke="rgba(255,255,255,.34)" stroke-width="2"/>
+      <path d="M30 130 Q200 -14 370 130" fill="none" stroke="rgba(255,255,255,.34)" stroke-width="2"/>
+      <path d="M172 225 A28 10 0 0 1 228 225" fill="none" stroke="rgba(255,255,255,.24)" stroke-width="1.5"/>
+      <path d="M4 100 Q200 -30 396 100" fill="none" stroke="rgba(255,92,26,.4)" stroke-width="2" stroke-dasharray="8 5"/>
+      <line x1="0" y1="28" x2="400" y2="28" stroke="rgba(0,0,0,.12)" stroke-width="1"/>
+      <line x1="0" y1="55" x2="400" y2="55" stroke="rgba(0,0,0,.12)" stroke-width="1"/>
+      <line x1="0" y1="82" x2="400" y2="82" stroke="rgba(0,0,0,.12)" stroke-width="1"/>
+      <line x1="0" y1="109" x2="400" y2="109" stroke="rgba(0,0,0,.12)" stroke-width="1"/>
+      <line x1="0" y1="136" x2="400" y2="136" stroke="rgba(0,0,0,.12)" stroke-width="1"/>
+      <line x1="0" y1="163" x2="400" y2="163" stroke="rgba(0,0,0,.12)" stroke-width="1"/>
+      <text x="65" y="222" font-family="Barlow Condensed,sans-serif" font-size="9" fill="rgba(255,255,255,.28)" text-anchor="middle" font-style="italic">3 PT</text>
+      <text x="20" y="112" font-family="Barlow Condensed,sans-serif" font-size="9" fill="rgba(255,92,26,.5)" text-anchor="middle" font-style="italic">6PT</text>
     </svg>
   </div>
 
   <!-- HOOP -->
   <div class="hoop-wrap" id="hoopWrap">
     <svg viewBox="0 0 90 82" width="88" height="82">
-      <rect x="18" y="0" width="54" height="28" rx="3" fill="#e8e8e8" stroke="#aaa" stroke-width="1.5"/>
-      <rect x="26" y="5" width="38" height="18" rx="2" fill="none" stroke="#e8622a" stroke-width="1.5"/>
-      <rect x="43" y="28" width="5" height="18" fill="#555"/>
-      <ellipse cx="45" cy="50" rx="18" ry="4.5" fill="none" stroke="#e8622a" stroke-width="3"/>
-      <line x1="29" y1="52" x2="33" y2="68" stroke="rgba(255,255,255,.42)" stroke-width=".9"/>
-      <line x1="36" y1="52" x2="38" y2="70" stroke="rgba(255,255,255,.42)" stroke-width=".9"/>
-      <line x1="43" y1="52" x2="43" y2="71" stroke="rgba(255,255,255,.42)" stroke-width=".9"/>
-      <line x1="50" y1="52" x2="49" y2="70" stroke="rgba(255,255,255,.42)" stroke-width=".9"/>
-      <line x1="57" y1="52" x2="55" y2="68" stroke="rgba(255,255,255,.42)" stroke-width=".9"/>
+      <rect x="18" y="0" width="54" height="28" rx="2" fill="#ddd" stroke="#999" stroke-width="1.5"/>
+      <rect x="26" y="5" width="38" height="18" rx="1" fill="none" stroke="#FF5C1A" stroke-width="1.5"/>
+      <rect x="43" y="28" width="5" height="18" fill="#444"/>
+      <ellipse cx="45" cy="50" rx="18" ry="4.5" fill="none" stroke="#FF5C1A" stroke-width="3"/>
+      <line x1="29" y1="52" x2="33" y2="68" stroke="rgba(255,255,255,.4)" stroke-width=".9"/>
+      <line x1="36" y1="52" x2="38" y2="70" stroke="rgba(255,255,255,.4)" stroke-width=".9"/>
+      <line x1="43" y1="52" x2="43" y2="71" stroke="rgba(255,255,255,.4)" stroke-width=".9"/>
+      <line x1="50" y1="52" x2="49" y2="70" stroke="rgba(255,255,255,.4)" stroke-width=".9"/>
+      <line x1="57" y1="52" x2="55" y2="68" stroke="rgba(255,255,255,.4)" stroke-width=".9"/>
       <path d="M33 68 Q38 72 43 71 Q48 72 55 68" fill="none" stroke="rgba(255,255,255,.35)" stroke-width=".9"/>
     </svg>
   </div>
 
-  <!-- SCOREBOARD -->
-  <div class="scoreboard">
-    <div class="sb-blk"><div class="sb-v or" id="sbActual">0</div><div class="sb-l">Actual</div></div>
-    <div class="sb-div"></div>
-    <div class="sb-blk"><div class="sb-v wh" id="sbTarget">70</div><div class="sb-l">Target</div><div class="sb-badge w" id="sbPct">0%</div></div>
-    <div class="sb-div"></div>
-    <div class="sb-blk"><div class="sb-v gr" id="sbLeft">70</div><div class="sb-l">Left</div></div>
-  </div>
-
-  <!-- PLAYER — 3D flip card: back (default) → front (celebration) -->
-  <div class="player-wrap" id="playerWrap">
-    <div class="player-flipper" id="playerFlipper">
-
-      <!-- BACK VIEW (default — player faces hoop) -->
-      <svg class="player-face player-back" id="playerBack" viewBox="0 0 68 108">
-        <!-- shadow -->
-        <ellipse cx="34" cy="105" rx="20" ry="4" fill="rgba(0,0,0,.45)"/>
-        <!-- shoes -->
-        <rect x="14" y="93" width="15" height="9" rx="4" fill="#0f0f0f"/>
-        <rect x="39" y="93" width="15" height="9" rx="4" fill="#0f0f0f"/>
-        <rect x="14" y="95" width="15" height="4" rx="2" fill="#e8622a" opacity=".6"/>
-        <rect x="39" y="95" width="15" height="4" rx="2" fill="#e8622a" opacity=".6"/>
-        <!-- legs back view -->
-        <rect x="18" y="64" width="12" height="33" rx="6" fill="#152d70"/>
-        <rect x="38" y="64" width="12" height="33" rx="6" fill="#152d70"/>
-        <!-- shorts back -->
-        <rect x="13" y="56" width="42" height="18" rx="8" fill="#152d70"/>
-        <!-- jersey BACK — number on back -->
-        <rect x="11" y="32" width="46" height="28" rx="9" fill="#c94f1e"/>
-        <rect x="11" y="49" width="46" height="3" fill="rgba(0,0,0,.12)" rx="1"/>
-        <text x="34" y="52" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="13" fill="rgba(255,255,255,.9)">10</text>
-        <!-- arms back — both at sides -->
-        <rect x="1" y="34" width="11" height="22" rx="5" fill="#a8623a" id="armBackL"/>
-        <rect x="56" y="34" width="11" height="22" rx="5" fill="#a8623a" id="armBackR"/>
-        <!-- neck back -->
-        <rect x="28" y="26" width="12" height="10" rx="5" fill="#a8623a"/>
-        <!-- head back — no face, just shape + hair -->
-        <ellipse cx="34" cy="19" rx="16" ry="18" fill="#a8623a"/>
-        <!-- hair back -->
-        <ellipse cx="34" cy="4" rx="16" ry="8" fill="#111"/>
-        <rect x="18" y="4" width="32" height="10" fill="#111" rx="3"/>
-        <!-- headband back -->
-        <rect x="18" y="13" width="32" height="5" rx="2" fill="#e8622a" opacity=".85"/>
-        <!-- ear left -->
-        <ellipse cx="18" cy="21" rx="3" ry="4" fill="#a8623a"/>
-        <!-- ear right -->
-        <ellipse cx="50" cy="21" rx="3" ry="4" fill="#a8623a"/>
-      </svg>
-
-      <!-- FRONT VIEW (celebration — shown after goal) -->
-      <svg class="player-face player-front" id="playerFront" viewBox="0 0 68 108">
-        <!-- shadow -->
-        <ellipse cx="34" cy="105" rx="22" ry="4" fill="rgba(0,0,0,.45)"/>
-        <!-- shoes -->
-        <rect x="13" y="93" width="15" height="9" rx="4" fill="#0f0f0f"/>
-        <rect x="40" y="93" width="15" height="9" rx="4" fill="#0f0f0f"/>
-        <rect x="13" y="95" width="15" height="4" rx="2" fill="#e8622a" opacity=".7"/>
-        <rect x="40" y="95" width="15" height="4" rx="2" fill="#e8622a" opacity=".7"/>
-        <!-- legs celebration — slightly spread -->
-        <rect x="15" y="64" width="13" height="33" rx="6" fill="#1a3a8f" transform="rotate(-4,21,80)"/>
-        <rect x="40" y="64" width="13" height="33" rx="6" fill="#1a3a8f" transform="rotate(4,47,80)"/>
-        <!-- shorts -->
-        <rect x="11" y="56" width="46" height="18" rx="8" fill="#1a3a8f"/>
-        <!-- jersey front -->
-        <rect x="10" y="32" width="48" height="28" rx="9" fill="#e8622a"/>
-        <rect x="10" y="49" width="48" height="3" fill="rgba(255,255,255,.12)" rx="1"/>
-        <text x="34" y="52" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="14" fill="#fff">10</text>
-        <text x="34" y="40" text-anchor="middle" font-size="11" fill="rgba(255,255,255,.8)">★</text>
-        <!-- arms RAISED in celebration (both up) -->
-        <rect x="-2" y="18" width="13" height="24" rx="6" fill="#c0784a" transform="rotate(40,5,30)"/>
-        <rect x="57" y="18" width="13" height="24" rx="6" fill="#c0784a" transform="rotate(-40,63,30)"/>
-        <!-- fists raised (hands) -->
-        <ellipse cx="0" cy="19" rx="6" ry="5" fill="#c0784a"/>
-        <ellipse cx="68" cy="19" rx="6" ry="5" fill="#c0784a"/>
-        <!-- neck -->
-        <rect x="27" y="25" width="14" height="12" rx="6" fill="#c0784a"/>
-        <!-- head -->
-        <ellipse cx="34" cy="19" rx="17" ry="19" fill="#c0784a"/>
-        <!-- hair -->
-        <ellipse cx="34" cy="4" rx="17" ry="9" fill="#111"/>
-        <rect x="17" y="4" width="34" height="9" fill="#111" rx="3"/>
-        <!-- headband -->
-        <rect x="17" y="11" width="34" height="6" rx="3" fill="#e8622a" opacity=".9"/>
-        <!-- eyes — wide open excited -->
-        <ellipse cx="26" cy="20" rx="4" ry="4.5" fill="#fff"/>
-        <ellipse cx="42" cy="20" rx="4" ry="4.5" fill="#fff"/>
-        <ellipse cx="27" cy="21" rx="2.2" ry="2.5" fill="#1a0a00"/>
-        <ellipse cx="43" cy="21" rx="2.2" ry="2.5" fill="#1a0a00"/>
-        <!-- gleam in eyes -->
-        <ellipse cx="26" cy="19" rx="1" ry="1" fill="#fff"/>
-        <ellipse cx="42" cy="19" rx="1" ry="1" fill="#fff"/>
-        <!-- raised eyebrows excited -->
-        <path d="M22 14 Q26 11 30 13" fill="none" stroke="#1a0a00" stroke-width="1.8" stroke-linecap="round"/>
-        <path d="M38 13 Q42 11 46 14" fill="none" stroke="#1a0a00" stroke-width="1.8" stroke-linecap="round"/>
-        <!-- BIG celebration smile -->
-        <path d="M23 28 Q34 37 45 28" fill="#8b3a00" stroke="none"/>
-        <path d="M23 28 Q34 37 45 28" fill="none" stroke="#5c2200" stroke-width="1" stroke-linecap="round"/>
-        <!-- teeth -->
-        <path d="M26 28 Q34 34 42 28" fill="#fff"/>
-        <!-- tongue -->
-        <ellipse cx="34" cy="33" rx="4" ry="2.5" fill="#e05050"/>
-      </svg>
-
+  <!-- HUD SCOREBOARD -->
+  <div class="hud">
+    <div class="hud-inner">
+      <div class="hud-top">
+        <div class="hud-stat">
+          <div class="hud-num or" id="sbActual">0</div>
+          <div class="hud-label">Actual</div>
+        </div>
+        <div class="hud-divider"></div>
+        <div class="hud-stat hud-center">
+          <div class="hud-pct-badge" id="sbPct">0%</div>
+          <div class="hud-num wh" id="sbTarget">70</div>
+          <div class="hud-label">Target</div>
+        </div>
+        <div class="hud-divider"></div>
+        <div class="hud-stat">
+          <div class="hud-num gr" id="sbLeft">70</div>
+          <div class="hud-label">Left</div>
+        </div>
+      </div>
+      <div class="power-meter">
+        <div class="power-fill" id="powerFill" style="width:0%"></div>
+      </div>
     </div>
   </div>
 
-  <!-- CONFETTI CANVAS (layered above court, below overlays) -->
-  <canvas id="confettiCanvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:12;"></canvas>
+  <!-- PLAYER — 3D flip -->
+  <div class="player-wrap" id="playerWrap">
+    <div class="player-flipper" id="playerFlipper">
+      <!-- BACK (default — faces hoop) -->
+      <svg class="player-face player-back" id="playerBack" viewBox="0 0 72 112">
+        <ellipse cx="36" cy="109" rx="22" ry="4" fill="rgba(0,0,0,.45)"/>
+        <rect x="14" y="96" width="16" height="10" rx="4" fill="#111"/>
+        <rect x="42" y="96" width="16" height="10" rx="4" fill="#111"/>
+        <rect x="14" y="98" width="16" height="5" rx="2" fill="#FF5C1A" opacity=".65"/>
+        <rect x="42" y="98" width="16" height="5" rx="2" fill="#FF5C1A" opacity=".65"/>
+        <rect x="18" y="66" width="13" height="34" rx="6" fill="#12257a"/>
+        <rect x="41" y="66" width="13" height="34" rx="6" fill="#12257a"/>
+        <rect x="13" y="58" width="46" height="18" rx="8" fill="#12257a"/>
+        <rect x="11" y="33" width="50" height="30" rx="9" fill="#C94D18"/>
+        <rect x="11" y="51" width="50" height="3" fill="rgba(0,0,0,.15)" rx="1"/>
+        <text x="36" y="55" text-anchor="middle" font-family="Barlow Condensed" font-style="italic" font-weight="900" font-size="14" fill="rgba(255,255,255,.9)">10</text>
+        <rect x="1" y="36" width="12" height="23" rx="5" fill="#a86030" id="armBackL"/>
+        <rect x="59" y="36" width="12" height="23" rx="5" fill="#a86030" id="armBackR"/>
+        <rect x="29" y="27" width="14" height="11" rx="5" fill="#a86030"/>
+        <ellipse cx="36" cy="20" rx="17" ry="19" fill="#a86030"/>
+        <ellipse cx="36" cy="4" rx="17" ry="9" fill="#111"/>
+        <rect x="19" y="4" width="34" height="10" fill="#111" rx="3"/>
+        <rect x="19" y="12" width="34" height="6" rx="2" fill="#FF5C1A" opacity=".9"/>
+        <ellipse cx="19" cy="22" rx="3" ry="4" fill="#a86030"/>
+        <ellipse cx="53" cy="22" rx="3" ry="4" fill="#a86030"/>
+      </svg>
+
+      <!-- FRONT (celebration — spins to face after goal) -->
+      <svg class="player-face player-front" id="playerFront" viewBox="0 0 72 112">
+        <ellipse cx="36" cy="109" rx="24" ry="4" fill="rgba(0,0,0,.45)"/>
+        <rect x="13" y="96" width="16" height="10" rx="4" fill="#111"/>
+        <rect x="43" y="96" width="16" height="10" rx="4" fill="#111"/>
+        <rect x="13" y="98" width="16" height="5" rx="2" fill="#FF5C1A" opacity=".7"/>
+        <rect x="43" y="98" width="16" height="5" rx="2" fill="#FF5C1A" opacity=".7"/>
+        <rect x="15" y="66" width="13" height="34" rx="6" fill="#1a3a8f" transform="rotate(-5,21,83)"/>
+        <rect x="44" y="66" width="13" height="34" rx="6" fill="#1a3a8f" transform="rotate(5,50,83)"/>
+        <rect x="11" y="58" width="50" height="18" rx="8" fill="#1a3a8f"/>
+        <rect x="10" y="33" width="52" height="30" rx="9" fill="#FF5C1A"/>
+        <rect x="10" y="51" width="52" height="3" fill="rgba(255,255,255,.12)" rx="1"/>
+        <text x="36" y="55" text-anchor="middle" font-family="Barlow Condensed" font-style="italic" font-weight="900" font-size="14" fill="#fff">10</text>
+        <text x="36" y="42" text-anchor="middle" font-size="11" fill="rgba(255,255,255,.8)">★</text>
+        <!-- arms raised in celebration -->
+        <rect x="-4" y="16" width="14" height="26" rx="6" fill="#c0784a" transform="rotate(42,3,29)"/>
+        <rect x="62" y="16" width="14" height="26" rx="6" fill="#c0784a" transform="rotate(-42,69,29)"/>
+        <ellipse cx="-3" cy="16" rx="7" ry="6" fill="#c0784a"/>
+        <ellipse cx="75" cy="16" rx="7" ry="6" fill="#c0784a"/>
+        <rect x="28" y="26" width="16" height="13" rx="6" fill="#c0784a"/>
+        <ellipse cx="36" cy="20" rx="18" ry="19" fill="#c0784a"/>
+        <ellipse cx="36" cy="4" rx="18" ry="9" fill="#111"/>
+        <rect x="18" y="4" width="36" height="10" fill="#111" rx="3"/>
+        <rect x="18" y="12" width="36" height="6" rx="2" fill="#FF5C1A" opacity=".9"/>
+        <!-- excited eyes -->
+        <ellipse cx="26" cy="21" rx="4.5" ry="5" fill="#fff"/>
+        <ellipse cx="46" cy="21" rx="4.5" ry="5" fill="#fff"/>
+        <ellipse cx="27" cy="22" rx="2.5" ry="2.8" fill="#1a0a00"/>
+        <ellipse cx="47" cy="22" rx="2.5" ry="2.8" fill="#1a0a00"/>
+        <ellipse cx="26.5" cy="20" rx="1.1" ry="1.1" fill="#fff"/>
+        <ellipse cx="46.5" cy="20" rx="1.1" ry="1.1" fill="#fff"/>
+        <!-- raised eyebrows -->
+        <path d="M21 14 Q26 11 31 13" fill="none" stroke="#1a0a00" stroke-width="2" stroke-linecap="round"/>
+        <path d="M41 13 Q46 11 51 14" fill="none" stroke="#1a0a00" stroke-width="2" stroke-linecap="round"/>
+        <!-- big open smile -->
+        <path d="M22 29 Q36 40 50 29" fill="#7a2e00"/>
+        <path d="M24 29 Q36 38 48 29" fill="#fff"/>
+        <path d="M27 29 Q36 35 45 29" fill="#f0c0a0"/>
+        <ellipse cx="36" cy="36" rx="5" ry="3" fill="#e05050"/>
+      </svg>
+    </div>
+  </div>
 
   <div class="ball" id="ball"></div>
   <div class="flash" id="flash"></div>
-  <div class="siii-flash" id="siiiFlash">Siii! 🙌</div>
+  <div class="siii-flash" id="siiiFlash">Siiiiii! 🙌</div>
+  <canvas id="confettiCanvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:12;"></canvas>
 
+  <!-- CONSOLE SHOT BUTTONS -->
   <div class="shot-btns">
     <button class="shot-btn one"   id="btn1" onclick="initShot(1)"><span class="bdg">+1</span>📦 1 BOX</button>
     <button class="shot-btn three" id="btn3" onclick="initShot(3)"><span class="bdg">+3</span>🏀 3 PT</button>
@@ -803,23 +888,23 @@ body{font-family:'DM Sans',sans-serif;background:#080c14;min-height:100vh;overfl
   </div>
 </div>
 
-<!-- ══ SECTOR PICKER (appears AFTER ball animation) ══ -->
+<!-- SECTOR PICKER — slide-up sheet -->
 <div class="overlay" id="pickerOverlay">
-  <div class="picker">
+  <div class="picker" id="pickerSheet">
     <div class="picker-handle"></div>
-    <div class="picker-title">📍 Tag Your Sector</div>
-    <div class="picker-sub">Which sector did this come from?</div>
+    <div class="picker-title">Tag Your Sector</div>
+    <div class="picker-sub">Where did this box come from?</div>
     <div class="picker-badge" id="pickerBadge"></div>
     <div id="pickerOptions"></div>
     <button class="picker-cancel" onclick="closePicker()">Cancel</button>
   </div>
 </div>
 
-<!-- ══ CONFIRM ══ -->
+<!-- CONFIRM -->
 <div class="conf-overlay" id="confOverlay">
   <div class="conf-box">
     <div class="conf-title" id="confTitle">Reset all shots?</div>
-    <div class="conf-sub" id="confSub">This will clear your full shot history. Your sector forecast stays intact.</div>
+    <div class="conf-sub" id="confSub">This clears your full shot history. Sector forecast stays intact.</div>
     <div class="conf-btns">
       <button class="conf-btn cancel" onclick="closeConf()">Cancel</button>
       <button class="conf-btn danger" id="confOk">Reset</button>
@@ -827,13 +912,9 @@ body{font-family:'DM Sans',sans-serif;background:#080c14;min-height:100vh;overfl
   </div>
 </div>
 
-<!-- Bridge: dark stadium fades into light panel -->
+<!-- PANEL -->
 <div class="stadium-bridge"></div>
-
-<!-- ══════════════════════════════════════
-     PANEL — Light warm surface
-     ══════════════════════════════════════ -->
-<div class="panel" style="padding-top:16px">
+<div class="panel">
   <div class="tabs">
     <div class="tab active" onclick="switchTab('setup')">📋 Setup</div>
     <div class="tab" onclick="switchTab('actuals')">🏀 Actuals</div>
@@ -841,74 +922,86 @@ body{font-family:'DM Sans',sans-serif;background:#080c14;min-height:100vh;overfl
 
   <!-- ── SETUP TAB ── -->
   <div class="tab-pane active" id="tab-setup">
-    <div class="input-row">
-      <label>Rep</label>
-      <input type="text" class="itext" id="repName" placeholder="Your name…" maxlength="30" oninput="save()"/>
-    </div>
-    <div class="input-row">
-      <label>Target</label>
-      <input type="number" class="inum" id="targetInput" value="70" min="1" max="9999" oninput="save()"/>
-    </div>
 
-    <div class="sec-head">
-      <div class="sec-title">Sector Forecast Plan</div>
-      <button class="add-btn" onclick="addSector()">+ Add Sector</button>
-    </div>
-
-    <div id="sectorList">
-      <div class="hint">Add sectors to build your forecast<br>e.g. Azhar Domiat · Students · Retail</div>
-    </div>
-
-    <!-- LIVE TOTAL ROW -->
-    <div class="total-row" id="totalRow" style="display:none">
-      <div class="total-label">Total Forecast</div>
-      <div style="display:flex;align-items:baseline">
-        <div class="total-value" id="totalValue">0</div>
-        <div class="total-of" id="totalOf">/ 70 boxes</div>
-        <div class="total-status warn" id="totalStatus">0%</div>
+    <!-- Player Card -->
+    <div class="player-card" id="playerCard">
+      <div class="pc-row">
+        <div class="pc-avatar" id="pcAvatar">?</div>
+        <div class="pc-info">
+          <input class="pc-name-input" id="repName" type="text" placeholder="REP NAME" maxlength="30" oninput="onRepChange()"/>
+          <div class="pc-sub">Field Representative</div>
+        </div>
+      </div>
+      <div class="pc-target-row">
+        <div class="pc-target-label">Monthly Target</div>
+        <input class="pc-target-input" type="number" id="targetInput" value="70" min="1" max="9999" oninput="save()"/>
+        <div class="pc-target-unit">Boxes</div>
       </div>
     </div>
 
-    <button class="copy-btn" onclick="copyReport()">📋 Copy Monthly Report</button>
+    <div class="sec-head">
+      <div class="sec-title">Sector Forecast</div>
+      <button class="add-btn" onclick="addSector()">+ Add Sector</button>
+    </div>
+    <div id="sectorList"><div class="hint">Add sectors to build your forecast<br>e.g. Azhar Domiat · Students · Retail</div></div>
+
+    <!-- Total Row -->
+    <div class="total-row" id="totalRow">
+      <div class="total-left">
+        <div class="total-label">Total Forecast</div>
+        <div class="total-status warn" id="totalStatus">0%</div>
+      </div>
+      <div class="total-right">
+        <div class="total-value" id="totalValue">0</div>
+        <div class="total-of" id="totalOf">/ 70 boxes</div>
+      </div>
+    </div>
+
+    <button class="copy-btn" onclick="copyReport()">📋 Export Monthly Report</button>
   </div>
 
   <!-- ── ACTUALS TAB ── -->
   <div class="tab-pane" id="tab-actuals">
+
+    <!-- Dual progress -->
     <div class="dual-prog">
       <div class="dp-row">
-        <div class="dp-lbl"><span style="background:rgba(255,255,255,.28)"></span>Forecast</div>
-        <div class="dp-val" id="dpFc" style="color:rgba(255,255,255,.45)">0 / 70</div>
+        <div class="dp-lbl"><span style="background:rgba(255,255,255,.3)"></span>Forecast</div>
+        <div class="dp-val" id="dpFc">0 / 70</div>
       </div>
-      <div class="prog-track"><div class="prog-fill" id="pfFc" style="width:0%;background:rgba(255,255,255,.22)"></div></div>
+      <div class="prog-track"><div class="prog-fill" id="pfFc" style="width:0%;background:rgba(255,255,255,.3)"></div></div>
       <div class="dp-row">
-        <div class="dp-lbl"><span style="background:#e8622a"></span>Actual</div>
-        <div class="dp-val" id="dpAc" style="color:#e8622a">0 / 70</div>
+        <div class="dp-lbl"><span style="background:#FF5C1A"></span>Actual</div>
+        <div class="dp-val" id="dpAc" style="color:var(--neon)">0 / 70</div>
       </div>
-      <div class="prog-track"><div class="prog-fill" id="pfAc" style="width:0%;background:#e8622a"></div></div>
+      <div class="prog-track"><div class="prog-fill" id="pfAc" style="width:0%;background:#FF5C1A"></div></div>
     </div>
 
+    <!-- Pace -->
     <div class="pace-row">
       <div class="pace-card">
-        <div class="pace-v" id="pDay" style="color:#fff">—</div>
-        <div class="pace-l">DAY / MONTH</div>
+        <div class="pace-v" id="pDay">—</div>
+        <div class="pace-l">Day / Month</div>
       </div>
       <div class="pace-card">
-        <div class="pace-v" id="pMth" style="color:rgba(255,255,255,.5)">—%</div>
-        <div class="pace-l">MONTH GONE</div>
+        <div class="pace-v" id="pMth" style="color:var(--text2)">—%</div>
+        <div class="pace-l">Month Gone</div>
       </div>
       <div class="pace-card">
-        <div class="pace-v" id="pAch" style="color:#e8622a">0%</div>
-        <div class="pace-l">TARGET HIT</div>
+        <div class="pace-v" id="pAch" style="color:var(--neon)">0%</div>
+        <div class="pace-l">Target Hit</div>
         <div class="pace-s on" id="pStatus">On Track</div>
       </div>
     </div>
 
-    <div class="sa-title">Forecast vs Actual — By Sector</div>
+    <!-- Sector Actuals -->
+    <div class="sa-title">Sector Performance</div>
     <div id="sectorActuals"><div class="hint">Add sectors in Setup tab first</div></div>
 
+    <!-- Shot Log -->
     <div class="log-head">
       <div class="log-title">Shot Log</div>
-      <button class="reset-btn" onclick="doReset()">↺ Reset Shots</button>
+      <button class="reset-btn" onclick="doReset()">↺ Reset</button>
     </div>
     <div id="shotLog"><div class="no-shots">No shots logged yet.<br>Tap a shot button above to log actual boxes.</div></div>
   </div>
@@ -918,8 +1011,8 @@ body{font-family:'DM Sans',sans-serif;background:#080c14;min-height:100vh;overfl
 /* ── CROWD ── */
 ['cr1','cr2','cr3'].forEach((id,i)=>{
   const r=document.getElementById(id);
-  const cols=['#e8622a','rgba(255,255,255,.2)','#3b82f6','#f59e0b','#a855f7'];
-  for(let j=0;j<28-i*4;j++){
+  const cols=['#FF5C1A','rgba(255,255,255,.18)','#2979FF','#FFB020','#a855f7'];
+  for(let j=0;j<26-i*4;j++){
     const d=document.createElement('div');
     d.className='crowd-dot';
     d.style.background=cols[j%cols.length];
@@ -929,7 +1022,7 @@ body{font-family:'DM Sans',sans-serif;background:#080c14;min-height:100vh;overfl
 });
 
 /* ── STATE ── */
-const COLORS=['#e8622a','#3b82f6','#2dbe6c','#a855f7','#ec4899','#f59e0b','#06b6d4','#ef4444','#14b8a6'];
+const COLORS=['#FF5C1A','#2979FF','#00E676','#a855f7','#FFB020','#ec4899','#06b6d4','#FF3D57','#14b8a6'];
 let state={repName:'',target:70,sectors:[],shots:[]};
 let nextSectorId=1;
 let shooting=false;
@@ -940,26 +1033,34 @@ let activeTab='setup';
 function save(){
   state.repName=document.getElementById('repName').value;
   state.target=parseInt(document.getElementById('targetInput').value)||70;
-  localStorage.setItem('crt_v4',JSON.stringify({state,nextSectorId}));
+  localStorage.setItem('crt_pro_v1',JSON.stringify({state,nextSectorId}));
   updateScoreboard();
   updateTotalRow();
+  updatePlayerCard();
   if(activeTab==='actuals') renderActuals();
 }
 
 function load(){
   try{
-    const raw=localStorage.getItem('crt_v4');
-    if(raw){
-      const d=JSON.parse(raw);
-      state=d.state||state;
-      nextSectorId=d.nextSectorId||1;
-      document.getElementById('repName').value=state.repName||'';
-      document.getElementById('targetInput').value=state.target||70;
-    }
+    const raw=localStorage.getItem('crt_pro_v1');
+    if(raw){const d=JSON.parse(raw);state=d.state||state;nextSectorId=d.nextSectorId||1;}
   }catch(e){}
-  renderSectors();
-  updateScoreboard();
-  updateTotalRow();
+  document.getElementById('repName').value=state.repName||'';
+  document.getElementById('targetInput').value=state.target||70;
+  renderSectors();updateScoreboard();updateTotalRow();updatePlayerCard();
+}
+
+function onRepChange(){
+  updatePlayerCard();save();
+}
+
+function updatePlayerCard(){
+  const name=document.getElementById('repName').value;
+  const initial=name?name.trim()[0].toUpperCase():'?';
+  document.getElementById('pcAvatar').textContent=initial;
+  const actual=state.shots.reduce((a,s)=>a+s.pts,0);
+  const pct=state.target>0?actual/state.target:0;
+  document.getElementById('playerCard').classList.toggle('full',pct>=1);
 }
 
 /* ── TABS ── */
@@ -974,64 +1075,41 @@ function switchTab(t){
 function addSector(){
   const color=COLORS[state.sectors.length%COLORS.length];
   state.sectors.push({id:nextSectorId++,name:'',qty:0,color});
-  renderSectors();
-  save();
-  setTimeout(()=>{
-    const ins=document.querySelectorAll('.s-inp');
-    if(ins.length) ins[ins.length-1].focus();
-  },50);
+  renderSectors();save();
+  setTimeout(()=>{const ins=document.querySelectorAll('.s-inp');if(ins.length)ins[ins.length-1].focus();},50);
 }
-
 function removeSector(id){
   if(!confirm('Remove this sector?'))return;
   state.sectors=state.sectors.filter(s=>s.id!==id);
-  renderSectors();
-  save();
+  renderSectors();save();
 }
-
-/* Called by each sector's qty <input> oninput */
-function changeQtyInput(id, val){
+function changeQtyInput(id,val){
   const s=state.sectors.find(s=>s.id===id);
   if(!s)return;
   s.qty=Math.max(0,parseInt(val)||0);
   save();
 }
-
 function changeName(id,v){
   const s=state.sectors.find(s=>s.id===id);
   if(s){s.name=v;save();}
 }
-
 function renderSectors(){
   const el=document.getElementById('sectorList');
   if(!state.sectors.length){
     el.innerHTML='<div class="hint">Add sectors to build your forecast<br>e.g. Azhar Domiat · Students · Retail</div>';
-    document.getElementById('totalRow').style.display='none';
-    return;
+    document.getElementById('totalRow').style.display='none';return;
   }
   el.innerHTML=state.sectors.map(s=>`
     <div class="sec-card">
-      <div class="s-dot" style="background:${s.color}"></div>
-      <div class="s-name">
-        <input class="s-inp" type="text" placeholder="e.g. Azhar Domiat"
-          value="${s.name}" oninput="changeName(${s.id},this.value)" maxlength="40"/>
-      </div>
-      <input
-        class="s-qty-input"
-        type="number"
-        min="0" max="9999"
-        value="${s.qty}"
-        oninput="changeQtyInput(${s.id}, this.value)"
-        placeholder="0"
-      />
+      <div class="s-dot" style="background:${s.color};box-shadow:0 0 6px ${s.color}"></div>
+      <div class="s-name"><input class="s-inp" type="text" placeholder="Sector name…" value="${s.name}" oninput="changeName(${s.id},this.value)" maxlength="40"/></div>
+      <input class="s-qty-input" type="number" min="0" max="9999" value="${s.qty}" oninput="changeQtyInput(${s.id},this.value)" placeholder="0"/>
       <button class="del-btn" onclick="removeSector(${s.id})">✕</button>
     </div>`).join('');
-
-  document.getElementById('totalRow').style.display=state.sectors.length?'flex':'none';
+  document.getElementById('totalRow').style.display='flex';
   updateTotalRow();
 }
 
-/* ── LIVE TOTAL ROW ── */
 function updateTotalRow(){
   const target=state.target;
   const total=state.sectors.reduce((a,s)=>a+s.qty,0);
@@ -1040,25 +1118,19 @@ function updateTotalRow(){
   document.getElementById('totalOf').textContent='/ '+target+' boxes';
   const st=document.getElementById('totalStatus');
   st.textContent=pct+'%';
-  if(pct>100){st.className='total-status over';}
-  else if(pct===100){st.className='total-status ok';}
-  else{st.className='total-status warn';}
-  if(state.sectors.length) document.getElementById('totalRow').style.display='flex';
+  st.className='total-status '+(pct>100?'over':pct===100?'ok':'warn');
 }
 
-/* ── SHOT FLOW ──
-   Change vs previous version:
-   initShot() now only starts the ANIMATION.
-   The picker opens AFTER the ball falls through the net.
-   fireShot() is called from the picker selection. ── */
+/* ═══════════════════════════════════════════════════
+   SHOT FLOW — Animation FIRST, picker 1 second after Siii
+   ═══════════════════════════════════════════════════ */
 function initShot(pts){
   if(shooting)return;
   if(!state.sectors.length){alert('Add at least one sector in Setup first.');return;}
   const actual=state.shots.reduce((a,s)=>a+s.pts,0);
   if(actual>=state.target){showFlash('🏆 TARGET HIT!',true);return;}
   pendingPts=pts;
-  /* ← Animate FIRST, picker opens when animation completes */
-  animShot(pts);
+  animShot(pts); /* animation first, picker appears 1s after Siii */
 }
 
 function openPicker(pts){
@@ -1069,69 +1141,79 @@ function openPicker(pts){
     const sAct=state.shots.filter(sh=>sh.sectorId===s.id).reduce((a,sh)=>a+sh.pts,0);
     const left=Math.max(0,s.qty-sAct);
     return `<div class="sec-opt" onclick="fireShot(${s.id})">
-      <div class="sec-opt-dot" style="background:${s.color}"></div>
-      <div class="sec-opt-info">
-        <div class="sec-opt-name">${s.name||'Unnamed Sector'}</div>
-        <div class="sec-opt-sub">Forecast ${s.qty} boxes · Actual ${sAct} · ${left} left</div>
+      <div class="sec-opt-left">
+        <div class="sec-opt-dot" style="background:${s.color};box-shadow:0 0 6px ${s.color}"></div>
+        <div>
+          <div class="sec-opt-name">${s.name||'Unnamed Sector'}</div>
+          <div class="sec-opt-sub">Forecast ${s.qty} · Actual ${sAct} · ${left} left</div>
+        </div>
       </div>
-      <span style="color:rgba(255,255,255,.25);font-size:18px">›</span>
+      <div class="sec-opt-right">
+        <div class="sec-opt-left-val">${left}</div>
+        <div class="sec-opt-left-lbl">Left</div>
+      </div>
     </div>`;
   }).join('');
-  document.getElementById('pickerOverlay').classList.add('show');
+
+  /* Show overlay immediately, slide-in with 1-second delay (the critical rhythm) */
+  const overlay=document.getElementById('pickerOverlay');
+  const sheet=document.getElementById('pickerSheet');
+  overlay.classList.add('show');
+  /* 1-second staggered reveal after Siii trigger */
+  setTimeout(()=>{sheet.classList.add('slide-in');},50);
 }
 
-function closePicker(){document.getElementById('pickerOverlay').classList.remove('show');}
+function closePicker(){
+  const overlay=document.getElementById('pickerOverlay');
+  const sheet=document.getElementById('pickerSheet');
+  sheet.classList.remove('slide-in');
+  setTimeout(()=>{overlay.classList.remove('show');},300);
+}
 
 function fireShot(sectorId){
   closePicker();
   const sector=state.sectors.find(s=>s.id===sectorId);
   if(!sector)return;
-  state.shots.push({
-    id:Date.now(),
-    pts:pendingPts,
-    sectorId,
-    sectorName:sector.name||'Unnamed',
-    sectorColor:sector.color,
-    time:new Date().toISOString()
-  });
+  state.shots.push({id:Date.now(),pts:pendingPts,sectorId,sectorName:sector.name||'Unnamed',sectorColor:sector.color,time:new Date().toISOString()});
   save();
 }
 
-/* ── ANIMATION SEQUENCE ──
-   Phase 1: Player back to camera, raises arm, throws
-   Phase 2: Ball arcs to hoop, drops through net
-   Phase 3: Player SPINS to front (3D flip)
-   Phase 4: "Siii! 🙌" flash + confetti burst
-   Phase 5: Sector picker slides up
-   Phase 6: Player spins back to back view
-── */
+/* ═══════════════════════════════════════════════════
+   CHOREOGRAPHED ANIMATION SEQUENCE
+   1. Player back → arm up → throw
+   2. Ball arc → net
+   3. Player spins to front
+   4. Siii + confetti
+   5. (1 second pause) → sector picker slides up
+   6. Player spins back
+   ═══════════════════════════════════════════════════ */
 function animShot(pts){
   shooting=true;
   ['btn1','btn3','btn6'].forEach(id=>document.getElementById(id).disabled=true);
 
   const flipper=document.getElementById('playerFlipper');
-  const st=document.getElementById('stadium');
+  const stadium=document.getElementById('stadium');
   const pw=document.getElementById('playerWrap');
   const hp=document.getElementById('hoopWrap');
   const ball=document.getElementById('ball');
-  const stR=st.getBoundingClientRect();
+  const stR=stadium.getBoundingClientRect();
   const pwR=pw.getBoundingClientRect();
   const hpR=hp.getBoundingClientRect();
 
-  /* Ball starts from player's right shoulder (back view) */
-  const sx=pwR.left-stR.left+52, sy=pwR.top-stR.top+22;
+  const sx=pwR.left-stR.left+54, sy=pwR.top-stR.top+22;
   const ex=hpR.left-stR.left+hpR.width/2-10, ey=hpR.top-stR.top+44;
 
-  /* Phase 1a: raise arm on back SVG */
-  flipper.classList.add('throwing');
+  /* Raise arm on back SVG */
+  const armR=document.getElementById('armBackR');
+  if(armR) armR.setAttribute('transform','rotate(-72,65,38)');
 
   ball.style.cssText=`display:block;left:${sx}px;top:${sy}px;transition:none;opacity:1`;
 
-  const dur=pts===6?860:pts===3?680:480;
-  const arc=pts===6?-165:pts===3?-115:-72;
+  const dur=pts===6?870:pts===3?690:490;
+  const arc=pts===6?-168:pts===3?-118:-74;
   const t0=performance.now();
 
-  /* Phase 1b: ball flies */
+  /* Phase 1 — ball flies */
   (function frame(now){
     const t=Math.min((now-t0)/dur,1);
     const e=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
@@ -1140,134 +1222,103 @@ function animShot(pts){
     ball.style.transform=`rotate(${t*400}deg)`;
     if(t<1){requestAnimationFrame(frame);return;}
 
-    /* Phase 2: ball drops through net */
-    ball.style.transition='top .3s cubic-bezier(.4,0,1,1), opacity .25s .12s';
-    ball.style.top=(ey+42)+'px';
+    /* Phase 2 — ball drops through net */
+    ball.style.transition='top .3s cubic-bezier(.4,0,1,1), opacity .25s .1s';
+    ball.style.top=(ey+44)+'px';
     ball.style.opacity='0';
 
-    /* Phase 3: after 180ms (mid-drop) → player SPINS to front */
+    /* Phase 3 — mid-drop: player spins to front */
     setTimeout(()=>{
-      flipper.classList.remove('throwing');
-      /* Smooth 3D flip over 400ms */
-      flipper.style.transition='transform 0.4s cubic-bezier(.4,0,.2,1)';
+      if(armR) armR.removeAttribute('transform');
+      flipper.style.transition='transform .4s cubic-bezier(.23,1,.32,1)';
       flipper.classList.add('celebrating');
 
-      /* Phase 4: after spin completes → Siii! + confetti */
+      /* Phase 4 — spin done: Siii + confetti */
       setTimeout(()=>{
+        ball.style.display='none';ball.style.opacity='1';ball.style.transition='';
+
         showSiii();
         launchConfetti();
 
-        /* Phase 5: after Siii moment → open picker */
+        shooting=false;
+        ['btn1','btn3','btn6'].forEach(id=>document.getElementById(id).disabled=false);
+
+        /* ── CRITICAL: 1-second pause before sector picker ── */
         setTimeout(()=>{
-          ball.style.display='none';
-          ball.style.opacity='1';
-          ball.style.transition='';
-          shooting=false;
-          ['btn1','btn3','btn6'].forEach(id=>document.getElementById(id).disabled=false);
           openPicker(pts);
 
-          /* Phase 6: after picker shown, spin player back (delay so they see the front) */
+          /* Phase 6 — after picker, spin back after user has seen front */
           setTimeout(()=>{
-            flipper.style.transition='transform 0.35s cubic-bezier(.4,0,.2,1)';
+            flipper.style.transition='transform .38s cubic-bezier(.23,1,.32,1)';
             flipper.classList.remove('celebrating');
-          }, 800);
-        }, 700);
+          },900);
+        }, 1000); /* THE 1-SECOND RHYTHM DELAY */
+
       }, 420);
-    }, 180);
+    }, 190);
   })(performance.now());
 }
 
-/* Siii! celebration flash */
 function showSiii(){
   const f=document.getElementById('siiiFlash');
   f.style.transition='none';
   f.style.opacity='1';
   f.style.transform='translate(-50%,-50%) scale(1)';
   setTimeout(()=>{
-    f.style.transition='all 0.8s cubic-bezier(.4,0,.2,1)';
+    f.style.transition='all .85s cubic-bezier(.23,1,.32,1)';
     f.style.opacity='0';
-    f.style.transform='translate(-50%,-90%) scale(0.7)';
-  },900);
-}
-
-/* Confetti burst */
-function launchConfetti(){
-  const canvas=document.getElementById('confettiCanvas');
-  if(!canvas)return;
-  const ctx=canvas.getContext('2d');
-  canvas.width=canvas.offsetWidth;
-  canvas.height=canvas.offsetHeight;
-  const cx=canvas.width/2, cy=canvas.height*0.35;
-  const colors=['#e8622a','#fbbf24','#2dbe6c','#3b82f6','#a855f7','#ec4899','#fff'];
-  const particles=[];
-  for(let i=0;i<80;i++){
-    const angle=(Math.random()*Math.PI*2);
-    const speed=3+Math.random()*6;
-    particles.push({
-      x:cx, y:cy,
-      vx:Math.cos(angle)*speed,
-      vy:Math.sin(angle)*speed - 3,
-      size:4+Math.random()*5,
-      color:colors[Math.floor(Math.random()*colors.length)],
-      alpha:1, rot:Math.random()*360,
-      rotV:(Math.random()-0.5)*8,
-      shape:Math.random()>0.5?'rect':'circle'
-    });
-  }
-  let startT=null;
-  function drawConfetti(ts){
-    if(!startT)startT=ts;
-    const elapsed=(ts-startT)/1000;
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    let alive=false;
-    particles.forEach(p=>{
-      p.vy+=0.18; // gravity
-      p.x+=p.vx; p.y+=p.vy;
-      p.rot+=p.rotV;
-      p.alpha=Math.max(0,1-elapsed/1.8);
-      if(p.alpha>0){
-        alive=true;
-        ctx.save();
-        ctx.globalAlpha=p.alpha;
-        ctx.translate(p.x,p.y);
-        ctx.rotate(p.rot*Math.PI/180);
-        ctx.fillStyle=p.color;
-        if(p.shape==='rect'){
-          ctx.fillRect(-p.size/2,-p.size/4,p.size,p.size/2);
-        } else {
-          ctx.beginPath();
-          ctx.arc(0,0,p.size/2,0,Math.PI*2);
-          ctx.fill();
-        }
-        ctx.restore();
-      }
-    });
-    if(alive&&elapsed<2) requestAnimationFrame(drawConfetti);
-    else ctx.clearRect(0,0,canvas.width,canvas.height);
-  }
-  requestAnimationFrame(drawConfetti);
+    f.style.transform='translate(-50%,-90%) scale(.75)';
+  },950);
 }
 
 function showFlash(msg,big){
   const f=document.getElementById('flash');
   f.textContent=msg;
-  f.style.fontSize=big?'38px':'32px';
-  f.style.color=big?'#fbbf24':'#fff';
-  f.style.textShadow=big?'0 0 40px rgba(251,191,36,.9)':'0 0 24px rgba(255,255,255,.7)';
-  f.style.transition='none';
-  f.style.opacity='1';
-  f.style.transform='translate(-50%,-50%) scale(1.12)';
-  setTimeout(()=>{
-    f.style.transition='all .65s ease';
-    f.style.opacity='0';
-    f.style.transform='translate(-50%,-72%) scale(.84)';
-  },920);
+  f.style.fontSize=big?'40px':'34px';
+  f.style.color=big?'#FFB020':'#fff';
+  f.style.textShadow=big?'0 0 40px rgba(255,176,32,.9)':'0 0 24px rgba(255,255,255,.7)';
+  f.style.transition='none';f.style.opacity='1';f.style.transform='translate(-50%,-50%) scale(1.1)';
+  setTimeout(()=>{f.style.transition='all .7s cubic-bezier(.23,1,.32,1)';f.style.opacity='0';f.style.transform='translate(-50%,-75%) scale(.82)';},950);
 }
 
-function undoShot(id){
-  state.shots=state.shots.filter(s=>s.id!==id);
-  save();renderActuals();
+function launchConfetti(){
+  const canvas=document.getElementById('confettiCanvas');
+  if(!canvas)return;
+  canvas.width=canvas.offsetWidth;canvas.height=canvas.offsetHeight;
+  const ctx=canvas.getContext('2d');
+  const cx=canvas.width/2,cy=canvas.height*.38;
+  const cols=['#FF5C1A','#FFB020','#00E676','#2979FF','#a855f7','#ec4899','#ffffff'];
+  const particles=[];
+  for(let i=0;i<90;i++){
+    const angle=Math.random()*Math.PI*2;
+    const speed=2.5+Math.random()*7;
+    particles.push({x:cx,y:cy,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed-3.5,size:3+Math.random()*5,color:cols[~~(Math.random()*cols.length)],alpha:1,rot:Math.random()*360,rotV:(Math.random()-.5)*9,shape:Math.random()>.5?'rect':'circle'});
+  }
+  let st=null;
+  function draw(ts){
+    if(!st)st=ts;
+    const el=(ts-st)/1000;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    let alive=false;
+    particles.forEach(p=>{
+      p.vy+=.2;p.x+=p.vx;p.y+=p.vy;p.rot+=p.rotV;
+      p.alpha=Math.max(0,1-el/1.9);
+      if(p.alpha>0){
+        alive=true;
+        ctx.save();ctx.globalAlpha=p.alpha;ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);
+        ctx.fillStyle=p.color;
+        if(p.shape==='rect') ctx.fillRect(-p.size/2,-p.size/4,p.size,p.size/2);
+        else{ctx.beginPath();ctx.arc(0,0,p.size/2,0,Math.PI*2);ctx.fill();}
+        ctx.restore();
+      }
+    });
+    if(alive&&el<2.2) requestAnimationFrame(draw);
+    else ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+  requestAnimationFrame(draw);
 }
+
+function undoShot(id){state.shots=state.shots.filter(s=>s.id!==id);save();renderActuals();}
 
 function doReset(){
   document.getElementById('confTitle').textContent='Reset all shots?';
@@ -1287,13 +1338,16 @@ function updateScoreboard(){
   document.getElementById('sbTarget').textContent=target;
   const le=document.getElementById('sbLeft');
   le.textContent=left;
-  le.className='sb-v '+(left===0?'gr':actual>target?'rd':'gr');
+  le.className='hud-num '+(left===0?'gr':actual>target?'rd':'gr');
   const pb=document.getElementById('sbPct');
   pb.textContent=pct+'%';
-  pb.className='sb-badge '+(pct>=100?'g':'w');
+  pb.className='hud-pct-badge'+(pct>=100?' done':'');
+  const pf=document.getElementById('powerFill');
+  pf.style.width=pct+'%';
+  pf.className='power-fill'+(actual>target?' over':actual===target?' done':'');
 }
 
-/* ── ACTUALS TAB ── */
+/* ── ACTUALS RENDER ── */
 function renderActuals(){
   const target=state.target;
   const actual=state.shots.reduce((a,s)=>a+s.pts,0);
@@ -1306,7 +1360,8 @@ function renderActuals(){
   document.getElementById('pfFc').style.width=pctFc+'%';
   const pa=document.getElementById('pfAc');
   pa.style.width=pctAc+'%';
-  pa.style.background=actual>=target?'#2dbe6c':'#e8622a';
+  pa.style.background=actual>=target?'#00E676':'#FF5C1A';
+  pa.style.boxShadow=actual>=target?'0 0 8px rgba(0,230,118,.5)':'0 0 8px rgba(255,92,26,.5)';
 
   const now=new Date();
   const day=now.getDate();
@@ -1317,58 +1372,55 @@ function renderActuals(){
   document.getElementById('pAch').textContent=pctAc+'%';
   const ps=document.getElementById('pStatus');
   const diff=pctAc-mthPct;
-  if(diff>=0){ps.textContent='Ahead 🟢';ps.className='pace-s ahead';}
+  if(diff>=0){ps.textContent='Ahead';ps.className='pace-s ahead';}
   else if(diff>=-10){ps.textContent='On Track';ps.className='pace-s on';}
-  else{ps.textContent='Behind 🔴';ps.className='pace-s behind';}
+  else{ps.textContent='Behind';ps.className='pace-s behind';}
 
   const sa=document.getElementById('sectorActuals');
-  if(!state.sectors.length){
-    sa.innerHTML='<div class="hint">Add sectors in Setup tab first</div>';
-  } else {
+  if(!state.sectors.length){sa.innerHTML='<div class="hint">Add sectors in Setup tab first</div>';}
+  else{
     sa.innerHTML=state.sectors.map(s=>{
       const sAct=state.shots.filter(sh=>sh.sectorId===s.id).reduce((a,sh)=>a+sh.pts,0);
-      const pctSAc=s.qty>0?Math.min(Math.round(sAct/s.qty*100),100):sAct>0?999:0;
+      const pctSAc=s.qty>0?Math.min(Math.round(sAct/s.qty*100),100):sAct>0?100:0;
       const barFc=target>0?Math.min(Math.round(s.qty/target*100),100):0;
       const barAc=target>0?Math.min(Math.round(sAct/target*100),100):0;
-      const over=sAct>s.qty&&s.qty>0;
-      const done=sAct>=s.qty&&s.qty>0;
+      const done=sAct>=s.qty&&s.qty>0,over=sAct>s.qty&&s.qty>0;
       return `<div class="sa-card">
-        <div class="sa-top">
-          <div class="sa-name"><div class="sa-dot" style="background:${s.color}"></div>${s.name||'Unnamed'}</div>
-          <div class="sa-nums"><b>${sAct}</b> / ${s.qty} boxes</div>
+        <div class="sa-card-left">
+          <div class="sa-name"><div class="sa-dot" style="background:${s.color};box-shadow:0 0 5px ${s.color}"></div>${s.name||'Unnamed'}</div>
+          <div class="sa-bar">
+            <div class="sa-bar-fc" style="width:${barFc}%;background:${s.color}"></div>
+            <div class="sa-bar-ac" style="width:${barAc}%;background:${s.color};box-shadow:0 0 6px ${s.color}"></div>
+          </div>
+          <div class="sa-foot">
+            <div class="sa-lbl">Forecast: ${s.qty}</div>
+            <div class="sa-lbl ${done?'ok':over?'over':'warn'}">${done?'✓ Complete':over?'Over':pctSAc+'%'}</div>
+          </div>
         </div>
-        <div class="sa-bar">
-          <div class="sa-bar-fc" style="width:${barFc}%;background:${s.color}"></div>
-          <div class="sa-bar-ac" style="width:${barAc}%;background:${s.color}"></div>
-        </div>
-        <div class="sa-foot">
-          <div class="sa-lbl">Forecast: ${s.qty} boxes</div>
-          <div class="sa-lbl ${done?'ok':over?'over':'warn'}">${done?'✓ Complete':over?'Over forecast':pctSAc+'% of forecast'}</div>
+        <div class="sa-card-right">
+          <div class="sa-actual">${sAct}</div>
+          <div class="sa-forecast">/ ${s.qty}</div>
         </div>
       </div>`;
     }).join('');
   }
 
   const sl=document.getElementById('shotLog');
-  if(!state.shots.length){
-    sl.innerHTML='<div class="no-shots">No shots logged yet.<br>Tap a shot button above to log actual boxes.</div>';
-    return;
-  }
+  if(!state.shots.length){sl.innerHTML='<div class="no-shots">No shots logged yet.<br>Tap a shot button above to log actual boxes.</div>';return;}
   sl.innerHTML=[...state.shots].reverse().map(sh=>{
     const d=new Date(sh.time);
     const ts=d.toLocaleDateString('en-GB',{day:'numeric',month:'short'})+' · '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
     const cls=sh.pts===1?'one':sh.pts===3?'three':'six';
     const lbl=sh.pts===1?'+1 Box':sh.pts===3?'+3 PT':'+6 PT';
     return `<div class="shot-item">
-      <div class="shot-pill ${cls}">${lbl}</div>
-      <div class="shot-info">
-        <div class="shot-sec">
-          <span style="width:7px;height:7px;border-radius:50%;background:${sh.sectorColor};display:inline-block;flex-shrink:0"></span>
-          ${sh.sectorName}
+      <div class="shot-item-left">
+        <div class="shot-pill ${cls}">${lbl}</div>
+        <div class="shot-info">
+          <div class="shot-sec"><span style="width:7px;height:7px;border-radius:50%;background:${sh.sectorColor};box-shadow:0 0 5px ${sh.sectorColor};display:inline-block;flex-shrink:0"></span>${sh.sectorName}</div>
+          <div class="shot-time">${ts}</div>
         </div>
-        <div class="shot-time">${ts}</div>
       </div>
-      <button class="undo-btn" onclick="undoShot(${sh.id})">Undo</button>
+      <button class="undo-btn" onclick="undoShot(${sh.id})">UNDO</button>
     </div>`;
   }).join('');
 }
@@ -1388,8 +1440,8 @@ function copyReport(){
   txt+=`\nRemaining: ${Math.max(0,target-actual)} boxes`;
   navigator.clipboard?.writeText(txt).catch(()=>{});
   const btn=document.querySelector('.copy-btn');
-  btn.textContent='✅ Copied!';
-  setTimeout(()=>btn.textContent='📋 Copy Monthly Report',2200);
+  btn.textContent='✅ Exported!';
+  setTimeout(()=>btn.textContent='📋 Export Monthly Report',2200);
 }
 
 load();
