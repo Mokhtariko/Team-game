@@ -3,176 +3,183 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover"/>
-<title>Court Planner — Target Tracker</title>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,700;1,800;1,900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet"/>
+<title>Court Planner — Championship</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <style>
-/* ═══════════════════════════════════════════════════
-   DESIGN TOKENS — EA Sports FC / Premium HUD
-   ═══════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════
+   CHAMPIONSHIP LIGHT — Design Tokens
+   ═══════════════════════════════════════════════════════════ */
 :root{
-  --neon:#FF5C1A;           /* electric orange */
-  --neon-glow:rgba(255,92,26,.45);
-  --neon-dim:rgba(255,92,26,.15);
-  --neon2:#FFB020;          /* gold accent */
-  --green:#00E676;
-  --green-dim:rgba(0,230,118,.15);
-  --red:#FF3D57;
-  --blue:#2979FF;
-  --bg:#0B0D12;             /* deep charcoal */
-  --bg2:#12151C;
-  --bg3:#1A1E28;
-  --glass:rgba(255,255,255,.04);
-  --glass-border:rgba(255,255,255,.09);
-  --glass-strong:rgba(255,255,255,.07);
-  --text:#FFFFFF;
-  --text2:rgba(255,255,255,.55);
-  --text3:rgba(255,255,255,.28);
-  --font:'Barlow Condensed',sans-serif;
-  --font-body:'Barlow',sans-serif;
+  /* Palette */
+  --navy:       #1A1A2E;
+  --navy2:      #16213E;
+  --navy3:      #0F3460;
+  --orange:     #FF6B2B;
+  --orange-glow:rgba(255,107,43,.40);
+  --orange-dim: rgba(255,107,43,.12);
+  --orange-mid: rgba(255,107,43,.25);
+  --gold:       #FFB830;
+  --green:      #00C853;
+  --green-dim:  rgba(0,200,83,.14);
+  --red:        #FF3D57;
+
+  /* Light Glass Surface */
+  --glass-bg:   rgba(255,255,255,.88);
+  --glass-blur: blur(20px);
+  --glass-border: rgba(210,210,220,.55);
+  --glass-card: rgba(255,255,255,.96);
+  --page-bg:    #F0F2F8;       /* soft periwinkle-white */
+  --page-bg2:   #E8EBF4;
+
+  /* Text */
+  --ink:        #0D1117;
+  --ink2:       #3A4055;
+  --ink3:       #7A8299;
+  --ink4:       rgba(0,0,0,.25);
+
+  /* Font */
+  --font: 'Montserrat', sans-serif;
+
+  /* Radius */
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 22px;
+  --r-xl: 26px;
 }
+
+/* ── RESET ── */
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html{background:var(--bg)}
+html{background:var(--navy)}
 body{
-  font-family:var(--font-body);
-  background:var(--bg);
+  font-family:var(--font);
+  background:var(--page-bg);
   min-height:100vh;
   overflow-x:hidden;
-  color:var(--text);
+  color:var(--ink);
   padding-top:env(safe-area-inset-top);
   padding-left:env(safe-area-inset-left);
   padding-right:env(safe-area-inset-right);
 }
 
-/* ═══════════════════════════════════════════════════
-   STADIUM — NBA Hardwood + Arena Dark
-   ═══════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════
+   STADIUM — NBA Hardwood
+   ═══════════════════════════════════════════════════════════ */
 .stadium{
-  position:relative;width:100%;height:340px;overflow:hidden;
+  position:relative;width:100%;height:345px;overflow:hidden;
   background:
-    radial-gradient(ellipse 90% 55% at 50% 110%, rgba(0,0,0,.7) 0%, transparent 65%),
-    linear-gradient(180deg,rgba(5,3,18,.98) 0%,rgba(8,6,22,.8) 18%,transparent 40%),
-    repeating-linear-gradient(180deg,rgba(0,0,0,0) 0,rgba(0,0,0,0) 16px,rgba(0,0,0,.14) 16px,rgba(0,0,0,.14) 17px),
-    radial-gradient(ellipse 110% 90% at 50% 100%,#c8752a 0%,#a05020 30%,#6e350a 65%,#4a1f04 100%);
+    radial-gradient(ellipse 90% 50% at 50% 115%,rgba(0,0,0,.65) 0%,transparent 65%),
+    linear-gradient(180deg,rgba(10,6,26,.97) 0%,rgba(15,10,34,.78) 20%,transparent 44%),
+    repeating-linear-gradient(180deg,transparent 0,transparent 16px,rgba(0,0,0,.13) 16px,rgba(0,0,0,.13) 17px),
+    radial-gradient(ellipse 110% 85% at 50% 100%,#CA7828 0%,#9C4E18 32%,#6B320A 66%,#461B04 100%);
 }
 .stadium::before{
   content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
-  background:radial-gradient(ellipse 60% 35% at 50% 88%,rgba(255,92,26,.12) 0%,transparent 70%);
+  background:radial-gradient(ellipse 55% 30% at 50% 88%,rgba(255,107,43,.10) 0%,transparent 70%);
 }
 
 /* Crowd */
 .crowd-row{position:absolute;width:100%;display:flex;justify-content:center;gap:3px;z-index:2}
-.crowd-row:nth-child(1){top:3px;opacity:.25}
-.crowd-row:nth-child(2){top:15px;opacity:.38}
+.crowd-row:nth-child(1){top:3px;opacity:.24}
+.crowd-row:nth-child(2){top:15px;opacity:.36}
 .crowd-row:nth-child(3){top:27px;opacity:.5}
 .crowd-dot{width:7px;height:9px;border-radius:50% 50% 40% 40%;animation:bob 1.8s ease-in-out infinite}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 
-/* Arena spotlights */
+/* Spotlights */
 .spotlight{position:absolute;top:0;border-radius:0 0 60px 60px;pointer-events:none;z-index:2}
-.spl{width:80px;height:220px;left:8px;background:linear-gradient(180deg,rgba(255,230,120,.08),transparent);transform:rotate(-18deg)}
-.spc{width:140px;height:240px;left:50%;transform:translateX(-50%);background:linear-gradient(180deg,rgba(255,245,200,.1),transparent)}
-.spr{width:80px;height:220px;right:8px;background:linear-gradient(180deg,rgba(255,230,120,.08),transparent);transform:rotate(18deg)}
+.spl{width:85px;height:225px;left:8px;background:linear-gradient(180deg,rgba(255,230,120,.07),transparent);transform:rotate(-18deg)}
+.spc{width:145px;height:245px;left:50%;transform:translateX(-50%);background:linear-gradient(180deg,rgba(255,245,200,.09),transparent)}
+.spr{width:85px;height:225px;right:8px;background:linear-gradient(180deg,rgba(255,230,120,.07),transparent);transform:rotate(18deg)}
 
-/* Court SVG */
-.court{position:absolute;bottom:0;left:0;right:0;height:230px;z-index:3}
-.court svg{width:100%;height:230px}
+/* Court */
+.court{position:absolute;bottom:0;left:0;right:0;height:232px;z-index:3}
+.court svg{width:100%;height:232px}
 
 /* Hoop */
-.hoop-wrap{position:absolute;top:50px;left:50%;transform:translateX(-50%);z-index:6}
+.hoop-wrap{position:absolute;top:46px;left:50%;transform:translateX(-50%);z-index:6}
 
-/* ═══════════════════════════════════════════════════
-   SCOREBOARD HUD — Slanted edges + Power Meter
-   ═══════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════
+   NAVY HUD SCOREBOARD — Slanted broadcast shape
+   ═══════════════════════════════════════════════════════════ */
 .hud{
   position:absolute;top:6px;left:50%;transform:translateX(-50%);
   z-index:22;width:calc(100% - 20px);max-width:380px;
 }
 .hud-inner{
-  position:relative;
-  background:rgba(8,10,18,.88);
-  border:1px solid rgba(255,92,26,.5);
-  border-radius:4px;
-  padding:8px 14px 6px;
-  backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
-  box-shadow:0 0 0 1px rgba(255,92,26,.15),0 0 24px rgba(255,92,26,.2),inset 0 1px 0 rgba(255,255,255,.06);
-  /* slanted left corner clip */
-  clip-path:polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+  background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%);
+  border:1px solid rgba(255,107,43,.35);
+  border-radius:6px;
+  padding:9px 16px 7px;
+  box-shadow:
+    0 0 0 1px rgba(255,107,43,.12),
+    0 4px 24px rgba(0,0,0,.45),
+    inset 0 1px 0 rgba(255,255,255,.06);
+  clip-path:polygon(10px 0%,100% 0%,calc(100% - 10px) 100%,0% 100%);
 }
 .hud-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.hud-stat{text-align:center;min-width:52px}
+.hud-stat{text-align:center;min-width:56px}
 .hud-num{
-  font-family:var(--font);font-style:italic;font-weight:900;
-  font-size:34px;line-height:1;letter-spacing:-1px;
+  font-weight:800;font-size:34px;line-height:1;letter-spacing:-1px;
 }
-.hud-num.or{color:var(--neon)}
+.hud-num.or{color:var(--orange)}
 .hud-num.gr{color:var(--green)}
 .hud-num.rd{color:var(--red)}
 .hud-num.wh{color:#fff}
-.hud-label{
-  font-family:var(--font);font-size:9px;letter-spacing:2px;
-  text-transform:uppercase;color:var(--text3);margin-top:1px;
-}
-.hud-divider{width:1px;height:40px;background:rgba(255,255,255,.1);flex-shrink:0}
+.hud-label{font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.38);margin-top:2px;font-weight:600}
+.hud-divider{width:1px;height:42px;background:rgba(255,255,255,.1);flex-shrink:0}
 .hud-center{flex:1;text-align:center}
-.hud-pct-badge{
-  font-family:var(--font);font-style:italic;font-size:11px;font-weight:800;
-  padding:2px 8px;border-radius:2px;display:inline-block;margin-bottom:3px;
-  background:var(--neon-dim);color:var(--neon);border:1px solid rgba(255,92,26,.4);
+.hud-pct{
+  font-size:10px;font-weight:800;padding:2px 9px;border-radius:3px;
+  display:inline-block;margin-bottom:2px;letter-spacing:.5px;
+  background:var(--orange-dim);color:var(--orange);border:1px solid var(--orange-mid);
 }
-.hud-pct-badge.done{background:var(--green-dim);color:var(--green);border-color:rgba(0,230,118,.4)}
+.hud-pct.done{background:var(--green-dim);color:var(--green);border-color:rgba(0,200,83,.3)}
 
-/* Power meter bar */
+/* Power meter */
 .power-meter{
-  position:relative;height:4px;
-  background:rgba(255,255,255,.08);
-  border-radius:0;overflow:hidden;
-  margin-top:6px;
+  height:5px;background:rgba(255,255,255,.08);border-radius:0;overflow:hidden;margin-top:7px;position:relative;
 }
 .power-fill{
-  height:100%;border-radius:0;
-  background:linear-gradient(90deg,var(--neon),var(--neon2));
-  box-shadow:0 0 8px var(--neon-glow);
-  transition:width .6s cubic-bezier(.23,1,.32,1);
-  position:relative;
+  height:100%;
+  background:linear-gradient(90deg,var(--orange),var(--gold));
+  box-shadow:0 0 10px var(--orange-glow);
+  transition:width .65s cubic-bezier(.23,1,.32,1);
+  position:relative;border-radius:0;
 }
-.power-fill::after{
-  content:'';position:absolute;right:0;top:0;bottom:0;width:3px;
-  background:#fff;opacity:.8;
-  box-shadow:0 0 6px #fff;
-}
+.power-fill::after{content:'';position:absolute;right:0;top:0;bottom:0;width:4px;background:#fff;opacity:.75;box-shadow:0 0 8px #fff}
 .power-fill.done{background:linear-gradient(90deg,var(--green),#69F0AE)}
 .power-fill.over{background:linear-gradient(90deg,var(--red),#FF8A80)}
 
-/* ═══════════════════════════════════════════════════
-   PLAYER — 3D Flip Card
-   ═══════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════
+   PLAYER — 3D Flip Card (Signature Card frame)
+   ═══════════════════════════════════════════════════════════ */
 .player-wrap{
-  position:absolute;bottom:50px;left:50%;
-  transform:translateX(-50%);z-index:10;
+  position:absolute;bottom:50px;left:50%;transform:translateX(-50%);z-index:10;
   perspective:500px;
 }
+.player-sig-frame{
+  position:relative;
+  padding:3px;border-radius:14px;
+  background:linear-gradient(135deg,rgba(255,107,43,.6),rgba(255,184,48,.4),rgba(255,107,43,.15));
+  box-shadow:0 0 18px rgba(255,107,43,.25);
+}
+.player-sig-frame.glow{box-shadow:0 0 30px rgba(255,107,43,.7),0 0 60px rgba(255,107,43,.3);animation:sigPulse 1.2s ease-in-out infinite}
+@keyframes sigPulse{0%,100%{box-shadow:0 0 24px rgba(255,107,43,.6),0 0 50px rgba(255,107,43,.25)}50%{box-shadow:0 0 36px rgba(255,107,43,.9),0 0 70px rgba(255,107,43,.45)}}
 .player-flipper{
   position:relative;width:72px;height:112px;
-  transform-style:preserve-3d;
+  transform-style:preserve-3d;border-radius:12px;overflow:hidden;
 }
 .player-face{
   position:absolute;top:0;left:0;width:72px;height:112px;
   backface-visibility:hidden;-webkit-backface-visibility:hidden;
 }
-.player-back{
-  transform:rotateY(0deg);
-  filter:drop-shadow(0 8px 20px rgba(255,92,26,.5));
-}
-.player-front{
-  transform:rotateY(180deg);
-  filter:drop-shadow(0 8px 24px rgba(255,92,26,.85));
-}
+.player-back{transform:rotateY(0deg);filter:drop-shadow(0 6px 16px rgba(0,0,0,.4))}
+.player-front{transform:rotateY(180deg);filter:drop-shadow(0 6px 22px rgba(255,107,43,.7))}
 .player-flipper.celebrating{transform:rotateY(180deg)}
 
-/* ═══════════════════════════════════════════════════
-   BALL + FLASH + SIII
-   ═══════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════
+   BALL · FLASH · SIII
+   ═══════════════════════════════════════════════════════════ */
 .ball{
   position:absolute;width:22px;height:22px;border-radius:50%;
   background:radial-gradient(circle at 33% 28%,#ffb347,#c45b10);
@@ -180,542 +187,493 @@ body{
   box-shadow:0 2px 10px rgba(0,0,0,.6);
 }
 .flash{
-  position:absolute;top:44%;left:50%;
-  transform:translate(-50%,-50%);
-  font-family:var(--font);font-style:italic;font-weight:900;font-size:40px;
-  letter-spacing:2px;pointer-events:none;opacity:0;z-index:50;white-space:nowrap;
+  position:absolute;top:44%;left:50%;transform:translate(-50%,-50%);
+  font-weight:800;font-size:36px;pointer-events:none;opacity:0;z-index:50;
+  white-space:nowrap;letter-spacing:1px;
 }
 .siii-flash{
   position:absolute;top:36%;left:50%;
-  transform:translate(-50%,-50%) scale(.6);
-  font-family:var(--font);font-style:italic;font-weight:900;font-size:58px;
-  color:var(--neon2);letter-spacing:4px;
-  text-shadow:0 0 30px rgba(255,176,32,.9),0 0 70px rgba(255,176,32,.4);
+  transform:translate(-50%,-50%) scale(.5);
+  font-weight:900;font-size:56px;
+  color:var(--gold);
+  text-shadow:0 0 28px rgba(255,184,48,.95),0 0 60px rgba(255,184,48,.4);
   pointer-events:none;opacity:0;z-index:52;white-space:nowrap;
+  letter-spacing:3px;
 }
 
-/* ═══════════════════════════════════════════════════
-   CONSOLE SHOT BUTTONS — Tactile + Glossy
-   ═══════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════
+   CONSOLE SHOT BUTTONS — Tactile 3D glossy
+   ═══════════════════════════════════════════════════════════ */
 .shot-btns{
-  position:absolute;bottom:9px;left:50%;
-  transform:translateX(-50%);display:flex;gap:8px;z-index:30;
-  max-width:calc(100% - 16px);
+  position:absolute;bottom:9px;left:50%;transform:translateX(-50%);
+  display:flex;gap:8px;z-index:30;max-width:calc(100% - 16px);
 }
 .shot-btn{
   position:relative;padding:0 16px;height:46px;
-  border:none;border-radius:6px;
-  font-family:var(--font);font-style:italic;font-weight:800;
-  font-size:18px;letter-spacing:.5px;cursor:pointer;
-  white-space:nowrap;
-  display:flex;align-items:center;justify-content:center;gap:6px;
-  transition:transform .08s cubic-bezier(.23,1,.32,1),
-             box-shadow .08s cubic-bezier(.23,1,.32,1);
-  overflow:hidden;
-  min-height:44px;
+  border:none;border-radius:8px;
+  font-family:var(--font);font-weight:800;
+  font-size:15px;letter-spacing:.3px;cursor:pointer;
+  white-space:nowrap;display:flex;align-items:center;gap:6px;
+  transition:transform .08s cubic-bezier(.23,1,.32,1),box-shadow .08s cubic-bezier(.23,1,.32,1);
+  overflow:hidden;min-height:44px;
 }
-/* glossy top shine */
+/* gloss shine */
 .shot-btn::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:50%;
-  background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,0));
-  border-radius:6px 6px 0 0;pointer-events:none;
+  content:'';position:absolute;top:0;left:0;right:0;height:48%;
+  background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0));
+  border-radius:8px 8px 0 0;pointer-events:none;
 }
 .shot-btn:disabled{opacity:.35;cursor:not-allowed}
-.shot-btn:not(:disabled):active{
-  transform:scale(.93) translateY(1px);
-}
+.shot-btn:not(:disabled):active{transform:scale(.92) translateY(2px)}
+
 .shot-btn.one{
-  background:linear-gradient(160deg,#2A3040,#1A1E28);
-  box-shadow:0 4px 0 #10131A,0 6px 18px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.12);
-  color:rgba(255,255,255,.8);
-  border:1px solid rgba(255,255,255,.12);
+  background:linear-gradient(160deg,#2E3650,#1C2138);
+  box-shadow:0 5px 0 #0D1020,0 7px 20px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.1);
+  color:rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.1);
 }
-.shot-btn.one:not(:disabled):active{box-shadow:0 1px 0 #10131A,0 2px 8px rgba(0,0,0,.5)}
+.shot-btn.one:not(:disabled):active{box-shadow:0 1px 0 #0D1020,0 2px 8px rgba(0,0,0,.5)}
 .shot-btn.three{
-  background:linear-gradient(160deg,#1A35B0,#0F2080);
-  box-shadow:0 4px 0 #08104A,0 6px 18px rgba(41,121,255,.35),inset 0 1px 0 rgba(255,255,255,.15);
-  color:#fff;border:1px solid rgba(41,121,255,.4);
+  background:linear-gradient(160deg,#1C48C8,#102090);
+  box-shadow:0 5px 0 #081048,0 7px 20px rgba(28,72,200,.4),inset 0 1px 0 rgba(255,255,255,.14);
+  color:#fff;border:1px solid rgba(100,140,255,.35);
 }
-.shot-btn.three:not(:disabled):active{box-shadow:0 1px 0 #08104A,0 2px 8px rgba(41,121,255,.35)}
+.shot-btn.three:not(:disabled):active{box-shadow:0 1px 0 #081048,0 2px 8px rgba(28,72,200,.4)}
 .shot-btn.six{
-  background:linear-gradient(160deg,#CC3D0A,#8A2200);
-  box-shadow:0 4px 0 #500E00,0 6px 20px var(--neon-glow),inset 0 1px 0 rgba(255,255,255,.18);
-  color:#fff;border:1px solid rgba(255,92,26,.5);
+  background:linear-gradient(160deg,#E85520,#A03010);
+  box-shadow:0 5px 0 #601808,0 7px 22px var(--orange-glow),inset 0 1px 0 rgba(255,255,255,.18);
+  color:#fff;border:1px solid rgba(255,107,43,.45);
 }
-.shot-btn.six:not(:disabled):active{box-shadow:0 1px 0 #500E00,0 2px 10px var(--neon-glow)}
+.shot-btn.six:not(:disabled):active{box-shadow:0 1px 0 #601808,0 2px 10px var(--orange-glow)}
+
 .shot-btn .bdg{
   position:absolute;top:-4px;right:-4px;
-  background:var(--neon);color:#fff;
-  font-family:var(--font);font-style:normal;font-weight:800;font-size:9px;
-  border-radius:3px;padding:1px 4px;letter-spacing:0;
-  box-shadow:0 0 8px var(--neon-glow);
+  background:var(--orange);color:#fff;
+  font-weight:800;font-size:9px;
+  border-radius:4px;padding:1px 5px;letter-spacing:0;
+  box-shadow:0 0 8px var(--orange-glow);
 }
-.shot-btn.three .bdg{background:var(--blue);box-shadow:0 0 8px rgba(41,121,255,.5)}
-.shot-btn.one .bdg{background:#4A5568}
+.shot-btn.three .bdg{background:#1C48C8;box-shadow:0 0 8px rgba(28,72,200,.5)}
+.shot-btn.one .bdg{background:#3A4466;box-shadow:none}
 
-/* ═══════════════════════════════════════════════════
-   SECTOR PICKER — Slide-up Sheet (Dark Glass)
-   ═══════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════
+   SECTOR PICKER — Spring Slide-Up (Light Glass)
+   ═══════════════════════════════════════════════════════════ */
 .overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,.65);
+  position:fixed;inset:0;background:rgba(0,0,0,.38);
   z-index:100;display:none;align-items:flex-end;justify-content:center;
 }
-.overlay.show{display:flex;animation:fadeScrim .2s ease}
-@keyframes fadeScrim{from{opacity:0}to{opacity:1}}
-.picker{
-  background:rgba(14,17,26,.95);
-  border-radius:18px 18px 0 0;
-  border-top:1px solid rgba(255,92,26,.35);
-  border-left:1px solid var(--glass-border);
-  border-right:1px solid var(--glass-border);
-  padding:8px 16px calc(24px + env(safe-area-inset-bottom));
-  width:100%;max-width:480px;max-height:88vh;overflow-y:auto;
-  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
-  box-shadow:0 -8px 40px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.04);
-  /* starts hidden — JS triggers slide */
-  transform:translateY(100%);opacity:0;
-  transition:transform 0s,opacity 0s;
-}
-.picker.slide-in{
-  transform:translateY(0);opacity:1;
-  transition:transform .5s cubic-bezier(.23,1,.32,1),opacity .4s ease;
-}
-.picker-handle{width:36px;height:4px;border-radius:99px;background:rgba(255,255,255,.15);margin:10px auto 16px}
-.picker-title{
-  font-family:var(--font);font-style:italic;font-weight:900;
-  font-size:22px;letter-spacing:.5px;color:#fff;margin-bottom:2px;
-}
-.picker-sub{font-size:12px;color:var(--text2);margin-bottom:12px}
-.picker-badge{
-  display:inline-flex;align-items:center;padding:4px 12px;
-  border-radius:4px;font-family:var(--font);font-style:italic;
-  font-weight:800;font-size:15px;margin-bottom:14px;letter-spacing:.5px;
-}
-.picker-badge.one{background:rgba(255,255,255,.06);color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.1)}
-.picker-badge.three{background:rgba(41,121,255,.15);color:#82B1FF;border:1px solid rgba(41,121,255,.35)}
-.picker-badge.six{background:var(--neon-dim);color:var(--neon);border:1px solid rgba(255,92,26,.4)}
+.overlay.show{display:flex;animation:scrimIn .2s ease}
+@keyframes scrimIn{from{opacity:0}to{opacity:1}}
 
-/* ── Sector options — Broadcast Lower-Third style ── */
+.picker{
+  background:rgba(255,255,255,.96);
+  border-radius:26px 26px 0 0;
+  border-top:1px solid rgba(210,210,220,.6);
+  padding:6px 18px calc(28px + env(safe-area-inset-bottom));
+  width:100%;max-width:500px;max-height:88vh;overflow-y:auto;
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  box-shadow:0 -8px 48px rgba(0,0,0,.14),0 -1px 0 rgba(255,255,255,.9);
+  transform:translateY(110%);opacity:0;
+  transition:none;
+}
+/* Spring entrance — triggered by JS adding class */
+.picker.spring-in{
+  transform:translateY(0);opacity:1;
+  transition:transform .55s cubic-bezier(.34,1.56,.64,1), opacity .35s ease;
+}
+
+.picker-handle{width:40px;height:4px;border-radius:99px;background:rgba(0,0,0,.12);margin:12px auto 18px}
+.picker-title{font-weight:800;font-size:20px;color:var(--ink);margin-bottom:3px;letter-spacing:-.3px}
+.picker-sub{font-size:12px;color:var(--ink3);margin-bottom:13px;font-weight:500}
+.picker-badge{
+  display:inline-flex;align-items:center;padding:5px 13px;
+  border-radius:8px;font-weight:800;font-size:14px;margin-bottom:14px;letter-spacing:.2px;
+}
+.picker-badge.one{background:#F1F4FF;color:#3A4466;border:1px solid #D0D8F0}
+.picker-badge.three{background:#EEF4FF;color:#1C48C8;border:1px solid #BFD0FF}
+.picker-badge.six{background:#FFF2EC;color:#E85520;border:1px solid #FFD0B8}
+
+/* Broadcast Lower-Third sector options */
 .sec-opt{
-  display:flex;align-items:center;gap:0;
-  margin-bottom:8px;cursor:pointer;
-  border-radius:4px;overflow:hidden;
-  border:1px solid rgba(255,255,255,.07);
-  transition:border-color .15s;
-  -webkit-tap-highlight-color:transparent;
+  display:flex;align-items:stretch;margin-bottom:9px;
+  border-radius:12px;overflow:hidden;cursor:pointer;
+  border:1px solid rgba(210,215,230,.7);
+  transition:border-color .15s,transform .1s cubic-bezier(.23,1,.32,1);
+  background:rgba(255,255,255,.92);
 }
-.sec-opt:active{border-color:var(--neon)}
+.sec-opt:active{border-color:var(--orange);transform:scale(.985)}
 .sec-opt-left{
-  display:flex;align-items:center;gap:10px;
-  flex:1;padding:11px 13px;
-  background:rgba(255,255,255,.04);
+  flex:1;display:flex;align-items:center;gap:10px;
+  padding:12px 14px;background:rgba(248,249,255,.9);
 }
-.sec-opt-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.sec-opt-name{font-family:var(--font);font-weight:700;font-size:15px;color:#fff}
-.sec-opt-sub{font-size:10px;color:var(--text3);margin-top:2px;letter-spacing:.3px}
+.sec-opt-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.sec-opt-name{font-weight:700;font-size:14px;color:var(--ink)}
+.sec-opt-sub{font-size:11px;color:var(--ink3);margin-top:2px;font-weight:500}
 .sec-opt-right{
-  padding:0 14px;
-  background:rgba(255,92,26,.12);
-  border-left:1px solid rgba(255,92,26,.25);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  min-width:52px;height:100%;align-self:stretch;
+  min-width:58px;padding:0 14px;
+  background:var(--orange);
+  border-left:none;
 }
-.sec-opt-left-val{font-family:var(--font);font-style:italic;font-weight:900;font-size:22px;color:var(--neon);line-height:1}
-.sec-opt-left-lbl{font-size:9px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-top:1px}
+.sec-opt-val{font-weight:900;font-size:22px;color:#fff;line-height:1}
+.sec-opt-lbl{font-size:9px;color:rgba(255,255,255,.75);letter-spacing:1px;text-transform:uppercase;margin-top:1px;font-weight:600}
 
 .picker-cancel{
-  width:100%;
-  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
-  border-radius:6px;padding:13px;font-size:13px;font-weight:600;
-  color:var(--text2);cursor:pointer;font-family:var(--font-body);margin-top:8px;
+  width:100%;background:rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.08);
+  border-radius:12px;padding:13px;font-size:14px;font-weight:700;
+  color:var(--ink3);cursor:pointer;font-family:var(--font);margin-top:8px;
   transition:background .15s;
 }
-.picker-cancel:active{background:rgba(255,255,255,.09)}
+.picker-cancel:active{background:rgba(0,0,0,.08)}
 
 /* ── CONFIRM ── */
 .conf-overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,.7);
+  position:fixed;inset:0;background:rgba(0,0,0,.4);
   z-index:110;display:none;align-items:center;justify-content:center;padding:20px;
 }
 .conf-overlay.show{display:flex}
 .conf-box{
-  background:rgba(14,17,26,.98);border-radius:12px;
-  border:1px solid rgba(255,92,26,.3);
-  padding:28px 22px;width:100%;max-width:320px;text-align:center;
+  background:var(--glass-card);border-radius:var(--r-xl);
+  border:1px solid rgba(210,215,230,.7);
+  padding:28px 24px;width:100%;max-width:320px;text-align:center;
   backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  box-shadow:0 0 40px rgba(0,0,0,.6);
+  box-shadow:0 20px 60px rgba(0,0,0,.15);
 }
-.conf-title{font-family:var(--font);font-style:italic;font-weight:900;font-size:20px;color:#fff;margin-bottom:8px}
-.conf-sub{font-size:13px;color:var(--text2);margin-bottom:22px;line-height:1.5}
+.conf-title{font-weight:800;font-size:18px;color:var(--ink);margin-bottom:8px}
+.conf-sub{font-size:13px;color:var(--ink3);margin-bottom:22px;line-height:1.55;font-weight:500}
 .conf-btns{display:flex;gap:10px}
-.conf-btn{flex:1;padding:13px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body);border:none}
-.conf-btn.cancel{background:rgba(255,255,255,.07);color:var(--text2);border:1px solid rgba(255,255,255,.1)}
-.conf-btn.danger{background:var(--red);color:#fff;box-shadow:0 0 16px rgba(255,61,87,.35)}
+.conf-btn{flex:1;padding:13px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);border:none}
+.conf-btn.cancel{background:rgba(0,0,0,.05);color:var(--ink3);border:1px solid rgba(0,0,0,.08)}
+.conf-btn.danger{background:var(--red);color:#fff;box-shadow:0 4px 16px rgba(255,61,87,.3)}
 
-/* ═══════════════════════════════════════════════════
-   PANEL — Dark Glassmorphism
-   ═══════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════
+   PANEL — Championship Light Glassmorphism
+   ═══════════════════════════════════════════════════════════ */
 .stadium-bridge{
-  height:22px;
-  background:linear-gradient(180deg,transparent,var(--bg2));
+  height:24px;
+  background:linear-gradient(180deg,rgba(15,8,30,0) 0%,var(--page-bg) 100%);
 }
 .panel{
-  background:var(--bg2);
-  padding:16px 14px calc(50px + env(safe-area-inset-bottom));
+  background:var(--page-bg);
+  padding:14px 14px calc(54px + env(safe-area-inset-bottom));
 }
 
 /* ── Tabs ── */
 .tabs{
   display:flex;gap:3px;
-  background:rgba(255,255,255,.04);
-  border:1px solid var(--glass-border);
-  border-radius:6px;padding:3px;margin-bottom:18px;
+  background:rgba(0,0,0,.06);
+  border:1px solid rgba(0,0,0,.06);
+  border-radius:14px;padding:3px;margin-bottom:18px;
 }
 .tab{
-  flex:1;text-align:center;padding:9px 4px;border-radius:4px;
-  font-family:var(--font);font-style:italic;font-weight:700;font-size:14px;
-  letter-spacing:.5px;cursor:pointer;color:var(--text3);
-  transition:all .2s cubic-bezier(.23,1,.32,1);
-  text-transform:uppercase;
+  flex:1;text-align:center;padding:10px 4px;border-radius:11px;
+  font-weight:700;font-size:13px;cursor:pointer;
+  color:var(--ink3);transition:all .25s cubic-bezier(.23,1,.32,1);
+  letter-spacing:.2px;
 }
 .tab.active{
-  background:var(--neon);color:#fff;
-  box-shadow:0 0 12px var(--neon-glow);
+  background:#fff;color:var(--ink);
+  box-shadow:0 2px 8px rgba(0,0,0,.1),0 0 0 .5px rgba(0,0,0,.06);
 }
 .tab-pane{display:none}
 .tab-pane.active{display:block}
 
-/* ── PLAYER CARD — Rep info container ── */
+/* ── Player / Rep Card — Signature Card ── */
 .player-card{
   position:relative;overflow:hidden;
-  background:linear-gradient(135deg,rgba(255,92,26,.08) 0%,rgba(255,176,32,.04) 50%,rgba(255,255,255,.03) 100%);
-  border:1px solid rgba(255,92,26,.25);
-  border-radius:8px;padding:14px 16px;margin-bottom:14px;
-  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  background:var(--glass-card);
+  border:1px solid var(--glass-border);
+  border-radius:var(--r-xl);
+  padding:16px 18px;margin-bottom:16px;
+  backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
+  box-shadow:0 4px 20px rgba(0,0,0,.07),inset 0 1px 0 rgba(255,255,255,.9);
 }
-/* progress-reactive glow border */
 .player-card::before{
-  content:'';position:absolute;inset:-1px;
-  border-radius:9px;
-  background:linear-gradient(135deg,var(--neon),var(--neon2),transparent,transparent);
-  z-index:-1;opacity:.4;
-  transition:opacity .4s;
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--orange),var(--gold));
+  border-radius:var(--r-xl) var(--r-xl) 0 0;
+  box-shadow:0 0 12px var(--orange-glow);
 }
-.player-card.full::before{opacity:1;animation:glowPulse 1.5s ease-in-out infinite}
-@keyframes glowPulse{0%,100%{opacity:.6}50%{opacity:1}}
 .pc-row{display:flex;align-items:center;gap:14px}
 .pc-avatar{
-  width:44px;height:44px;border-radius:50%;
-  background:linear-gradient(135deg,var(--neon),var(--neon2));
+  width:48px;height:48px;border-radius:14px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--orange),var(--gold));
   display:flex;align-items:center;justify-content:center;
-  font-family:var(--font);font-style:italic;font-weight:900;font-size:20px;color:#fff;
-  flex-shrink:0;box-shadow:0 0 14px var(--neon-glow);
+  font-weight:900;font-size:22px;color:#fff;
+  box-shadow:0 4px 14px var(--orange-glow);
 }
 .pc-info{flex:1;min-width:0}
 .pc-name-input{
-  font-family:var(--font);font-style:italic;font-weight:900;font-size:20px;
-  color:#fff;background:transparent;border:none;outline:none;
-  width:100%;letter-spacing:.5px;
+  font-weight:800;font-size:20px;color:var(--ink);
+  background:transparent;border:none;outline:none;
+  width:100%;letter-spacing:-.2px;font-family:var(--font);
 }
-.pc-name-input::placeholder{color:var(--text3);font-weight:700}
-.pc-sub{font-size:11px;color:var(--text3);margin-top:2px;letter-spacing:.5px;text-transform:uppercase}
-.pc-target-row{display:flex;align-items:center;gap:10px;margin-top:10px}
-.pc-target-label{font-family:var(--font);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);white-space:nowrap}
+.pc-name-input::placeholder{color:var(--ink4);font-weight:600}
+.pc-sub{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-top:2px}
+.pc-target-row{display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(0,0,0,.06)}
+.pc-target-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);white-space:nowrap}
 .pc-target-input{
-  font-family:var(--font);font-style:italic;font-weight:900;font-size:22px;
-  color:var(--neon);background:rgba(255,92,26,.07);
-  border:1px solid rgba(255,92,26,.25);border-radius:4px;
-  padding:4px 10px;outline:none;width:90px;text-align:center;
+  font-weight:900;font-size:24px;color:var(--orange);
+  background:var(--orange-dim);border:1px solid var(--orange-mid);
+  border-radius:10px;padding:5px 12px;outline:none;width:90px;text-align:center;
   -moz-appearance:textfield;transition:border-color .2s,box-shadow .2s;
+  font-family:var(--font);
 }
 .pc-target-input::-webkit-outer-spin-button,.pc-target-input::-webkit-inner-spin-button{-webkit-appearance:none}
-.pc-target-input:focus{border-color:var(--neon);box-shadow:0 0 0 3px var(--neon-dim)}
-.pc-target-unit{font-family:var(--font);font-size:12px;color:var(--text3);letter-spacing:1px;text-transform:uppercase}
+.pc-target-input:focus{border-color:var(--orange);box-shadow:0 0 0 3px var(--orange-dim)}
+.pc-target-unit{font-size:12px;font-weight:600;color:var(--ink3);letter-spacing:.5px;text-transform:uppercase}
 
-/* ── Section header ── */
-.sec-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.sec-title{
-  font-family:var(--font);font-style:italic;font-weight:800;
-  font-size:16px;letter-spacing:.5px;color:#fff;text-transform:uppercase;
-}
+/* ── Sector section ── */
+.sec-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px}
+.sec-title{font-weight:800;font-size:16px;color:var(--ink);letter-spacing:-.2px}
 .add-btn{
-  background:var(--neon);color:#fff;border:none;border-radius:4px;
-  padding:9px 14px;font-family:var(--font);font-style:italic;font-weight:800;
-  font-size:13px;letter-spacing:.5px;cursor:pointer;text-transform:uppercase;
-  box-shadow:0 0 12px var(--neon-glow);transition:opacity .15s,transform .1s;
-  min-height:40px;
+  background:var(--orange);color:#fff;border:none;border-radius:10px;
+  padding:10px 16px;font-family:var(--font);font-weight:700;font-size:13px;
+  cursor:pointer;letter-spacing:.2px;
+  box-shadow:0 4px 14px var(--orange-glow);transition:opacity .15s,transform .1s;
+  min-height:44px;
 }
-.add-btn:active{opacity:.85;transform:scale(.96)}
+.add-btn:active{opacity:.88;transform:scale(.96)}
 
-/* ── Sector Card — glass ── */
+/* ── Sector Cards — Light Glass ── */
 .sec-card{
-  background:var(--glass-strong);border-radius:6px;
+  background:var(--glass-card);
   border:1px solid var(--glass-border);
-  padding:10px 12px;margin-bottom:7px;
-  display:flex;align-items:center;gap:8px;
-  animation:fadeUp .25s cubic-bezier(.23,1,.32,1);
-  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-radius:var(--r-md);
+  padding:11px 14px;margin-bottom:8px;
+  display:flex;align-items:center;gap:10px;
+  backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
+  box-shadow:0 2px 10px rgba(0,0,0,.05),inset 0 1px 0 rgba(255,255,255,.9);
+  animation:fadeUp .25s cubic-bezier(.34,1.56,.64,1);
 }
-@keyframes fadeUp{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
-.s-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;box-shadow:0 0 6px currentColor}
+@keyframes fadeUp{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.s-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
 .s-name{flex:1;min-width:0}
 .s-inp{
-  border:none;background:transparent;
-  font-family:var(--font);font-weight:600;font-size:14px;color:#fff;
-  width:100%;outline:none;height:22px;padding:0;letter-spacing:.3px;
+  border:none;background:transparent;font-family:var(--font);
+  font-weight:600;font-size:14px;color:var(--ink);
+  width:100%;outline:none;height:22px;padding:0;
 }
-.s-inp::placeholder{color:var(--text3)}
+.s-inp::placeholder{color:var(--ink4)}
 .s-qty-input{
-  width:58px;height:40px;
-  border:1px solid rgba(255,92,26,.25);border-radius:4px;
-  background:rgba(255,92,26,.08);
-  color:var(--neon);font-family:var(--font);font-style:italic;font-weight:900;
-  font-size:20px;text-align:center;outline:none;
-  -moz-appearance:textfield;flex-shrink:0;
-  transition:border-color .2s,box-shadow .2s;min-height:44px;
+  width:62px;height:44px;
+  border:1px solid rgba(0,0,0,.1);border-radius:10px;
+  background:var(--page-bg);
+  color:var(--orange);font-family:var(--font);font-weight:900;
+  font-size:20px;text-align:center;outline:none;-moz-appearance:textfield;
+  transition:border-color .2s,box-shadow .2s;flex-shrink:0;
 }
 .s-qty-input::-webkit-outer-spin-button,.s-qty-input::-webkit-inner-spin-button{-webkit-appearance:none}
-.s-qty-input:focus{border-color:var(--neon);box-shadow:0 0 0 2px var(--neon-dim)}
+.s-qty-input:focus{border-color:var(--orange);box-shadow:0 0 0 3px var(--orange-dim)}
 .del-btn{
-  width:36px;height:36px;border-radius:4px;border:1px solid rgba(255,61,87,.2);
-  background:rgba(255,61,87,.08);cursor:pointer;color:var(--red);
-  display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;
-  transition:background .15s;min-height:44px;width:44px;
+  width:40px;height:40px;border-radius:10px;
+  border:1px solid rgba(255,61,87,.2);background:rgba(255,61,87,.06);
+  cursor:pointer;color:var(--red);
+  display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;
+  font-weight:700;transition:background .15s;
 }
-.del-btn:active{background:rgba(255,61,87,.2)}
+.del-btn:active{background:rgba(255,61,87,.15)}
 
-/* ── TOTAL ROW — broadcast lower-third ── */
+/* ── Total Row — Broadcast Lower-Third ── */
 .total-row{
-  display:flex;align-items:stretch;
-  border-radius:4px;overflow:hidden;
-  border:1px solid rgba(255,92,26,.3);
-  margin-top:4px;margin-bottom:14px;
-  display:none;
+  display:flex;align-items:stretch;border-radius:var(--r-md);overflow:hidden;
+  border:1px solid var(--glass-border);margin-top:6px;margin-bottom:14px;
+  background:var(--glass-card);display:none;
+  box-shadow:0 2px 10px rgba(0,0,0,.05);
 }
 .total-left{
-  flex:1;padding:10px 13px;
-  background:rgba(255,92,26,.05);
+  flex:1;padding:11px 14px;background:rgba(248,249,255,.8);
   display:flex;align-items:center;gap:10px;
 }
-.total-label{
-  font-family:var(--font);font-size:11px;letter-spacing:2px;
-  text-transform:uppercase;color:var(--text3);
-}
+.total-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ink3)}
+.total-status{font-weight:800;font-size:12px;padding:3px 9px;border-radius:6px;letter-spacing:.3px}
+.total-status.ok{background:#E8FFF2;color:var(--green)}
+.total-status.warn{background:#FFF2EC;color:var(--orange)}
+.total-status.over{background:#FFECEE;color:var(--red)}
 .total-right{
-  padding:0 14px;background:rgba(255,92,26,.15);
-  border-left:1px solid rgba(255,92,26,.3);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  min-width:80px;
+  padding:0 16px;background:var(--orange);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:80px;
 }
-.total-value{
-  font-family:var(--font);font-style:italic;font-weight:900;
-  font-size:26px;color:var(--neon);line-height:1;
-}
-.total-of{font-size:10px;color:var(--text3);margin-top:1px;letter-spacing:.5px}
-.total-status{
-  font-family:var(--font);font-style:italic;font-weight:800;
-  font-size:12px;padding:2px 8px;border-radius:3px;margin-left:8px;letter-spacing:.5px;
-}
-.total-status.ok{background:var(--green-dim);color:var(--green)}
-.total-status.warn{background:var(--neon-dim);color:var(--neon)}
-.total-status.over{background:rgba(255,61,87,.15);color:var(--red)}
+.total-value{font-weight:900;font-size:26px;color:#fff;line-height:1}
+.total-of{font-size:10px;color:rgba(255,255,255,.7);margin-top:1px;font-weight:600;letter-spacing:.3px}
 
 .hint{
-  text-align:center;padding:20px;color:var(--text3);font-size:12px;
-  background:var(--glass);border-radius:6px;
-  border:1px dashed rgba(255,255,255,.08);line-height:1.7;
+  text-align:center;padding:20px;color:var(--ink3);font-size:12px;
+  background:rgba(255,255,255,.6);border-radius:var(--r-md);
+  border:1px dashed rgba(0,0,0,.1);line-height:1.7;font-weight:500;
 }
 
-/* ── ACTUALS TAB ── */
-
-/* Dual progress — glass card */
+/* ═══════════════════════════════════════════════════════════
+   ACTUALS TAB
+   ═══════════════════════════════════════════════════════════ */
 .dual-prog{
-  background:var(--glass-strong);border:1px solid var(--glass-border);
-  border-radius:8px;padding:14px;margin-bottom:12px;
-  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  background:var(--glass-card);border:1px solid var(--glass-border);
+  border-radius:var(--r-lg);padding:16px;margin-bottom:12px;
+  backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
+  box-shadow:0 2px 12px rgba(0,0,0,.06),inset 0 1px 0 rgba(255,255,255,.9);
 }
-.dp-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
-.dp-lbl{
-  font-family:var(--font);font-size:11px;font-weight:700;letter-spacing:1.5px;
-  text-transform:uppercase;color:var(--text3);display:flex;align-items:center;gap:7px;
-}
+.dp-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.dp-lbl{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:7px}
 .dp-lbl span{width:7px;height:7px;border-radius:50%;display:inline-block}
-.dp-val{font-family:var(--font);font-style:italic;font-weight:800;font-size:16px;color:#fff}
-.prog-track{background:rgba(255,255,255,.06);border-radius:0;height:6px;overflow:hidden;margin-bottom:12px}
-.prog-fill{height:100%;transition:width .5s cubic-bezier(.23,1,.32,1)}
+.dp-val{font-weight:800;font-size:15px;color:var(--ink)}
+.prog-track{background:rgba(0,0,0,.07);border-radius:99px;height:7px;overflow:hidden;margin-bottom:12px}
+.prog-fill{height:100%;border-radius:99px;transition:width .55s cubic-bezier(.23,1,.32,1)}
 
-/* Pace cards */
 .pace-row{display:flex;gap:8px;margin-bottom:12px}
 .pace-card{
-  flex:1;background:var(--glass-strong);border:1px solid var(--glass-border);
-  border-radius:6px;padding:10px 8px;text-align:center;
-  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  flex:1;background:var(--glass-card);border:1px solid var(--glass-border);
+  border-radius:var(--r-md);padding:12px 8px;text-align:center;
+  backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
+  box-shadow:0 2px 8px rgba(0,0,0,.05),inset 0 1px 0 rgba(255,255,255,.9);
 }
-.pace-v{
-  font-family:var(--font);font-style:italic;font-weight:900;
-  font-size:22px;line-height:1;color:#fff;
-}
-.pace-l{
-  font-family:var(--font);font-size:9px;letter-spacing:1.5px;
-  color:var(--text3);margin-top:3px;text-transform:uppercase;
-}
-.pace-s{
-  font-family:var(--font);font-style:italic;font-weight:800;
-  font-size:10px;margin-top:4px;padding:2px 7px;border-radius:2px;display:inline-block;
-  letter-spacing:.5px;
-}
-.pace-s.ahead{background:var(--green-dim);color:var(--green)}
-.pace-s.behind{background:rgba(255,61,87,.12);color:var(--red)}
-.pace-s.on{background:var(--neon-dim);color:var(--neon)}
+.pace-v{font-weight:800;font-size:22px;line-height:1;color:var(--ink)}
+.pace-l{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-top:3px}
+.pace-s{font-weight:800;font-size:10px;margin-top:5px;padding:3px 8px;border-radius:6px;display:inline-block;letter-spacing:.3px}
+.pace-s.ahead{background:#E8FFF2;color:var(--green)}
+.pace-s.behind{background:#FFECEE;color:var(--red)}
+.pace-s.on{background:#FFF2EC;color:var(--orange)}
 
-/* Sector actuals — Broadcast Lower-Third */
-.sa-title{
-  font-family:var(--font);font-style:italic;font-weight:800;font-size:16px;
-  text-transform:uppercase;letter-spacing:.5px;color:#fff;margin-bottom:10px;
-}
+/* Sector Actuals — Broadcast Lower-Third (light) */
+.sa-title{font-weight:800;font-size:16px;color:var(--ink);margin-bottom:10px;letter-spacing:-.2px}
 .sa-card{
-  display:flex;align-items:stretch;border-radius:4px;overflow:hidden;
-  border:1px solid var(--glass-border);margin-bottom:8px;
+  display:flex;align-items:stretch;border-radius:var(--r-md);overflow:hidden;
+  border:1px solid var(--glass-border);margin-bottom:9px;
+  box-shadow:0 2px 8px rgba(0,0,0,.05);
 }
 .sa-card-left{
-  flex:1;padding:10px 12px;
-  background:var(--glass-strong);
+  flex:1;padding:11px 14px;
+  background:rgba(255,255,255,.95);
 }
 .sa-card-right{
-  padding:0 14px;
-  background:rgba(255,255,255,.04);
-  border-left:1px solid var(--glass-border);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  min-width:62px;
+  padding:0 15px;
+  background:var(--orange);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:64px;
 }
-.sa-name{display:flex;align-items:center;gap:7px;font-family:var(--font);font-weight:700;font-size:14px;color:#fff;margin-bottom:6px}
+.sa-name{display:flex;align-items:center;gap:7px;font-weight:700;font-size:14px;color:var(--ink);margin-bottom:7px}
 .sa-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.sa-bar{position:relative;height:5px;background:rgba(255,255,255,.06);overflow:hidden;margin-bottom:4px;border-radius:0}
-.sa-bar-fc{position:absolute;top:0;left:0;height:100%;opacity:.25}
-.sa-bar-ac{position:absolute;top:0;left:0;height:100%;transition:width .4s cubic-bezier(.23,1,.32,1)}
+.sa-bar{position:relative;height:5px;background:rgba(0,0,0,.07);overflow:hidden;margin-bottom:5px;border-radius:99px}
+.sa-bar-fc{position:absolute;top:0;left:0;height:100%;border-radius:99px;opacity:.25}
+.sa-bar-ac{position:absolute;top:0;left:0;height:100%;border-radius:99px;transition:width .45s cubic-bezier(.23,1,.32,1)}
 .sa-foot{display:flex;justify-content:space-between}
-.sa-lbl{font-size:10px;color:var(--text3);letter-spacing:.3px}
-.sa-lbl.ok{color:var(--green)}.sa-lbl.warn{color:var(--neon)}.sa-lbl.over{color:var(--red)}
-.sa-actual{
-  font-family:var(--font);font-style:italic;font-weight:900;
-  font-size:24px;color:var(--neon);line-height:1;
-}
-.sa-forecast{font-size:10px;color:var(--text3);letter-spacing:.5px;margin-top:1px}
+.sa-lbl{font-size:10px;color:var(--ink3);font-weight:600;letter-spacing:.2px}
+.sa-lbl.ok{color:var(--green)}.sa-lbl.warn{color:var(--orange)}.sa-lbl.over{color:var(--red)}
+.sa-actual{font-weight:900;font-size:24px;color:#fff;line-height:1}
+.sa-forecast{font-size:10px;color:rgba(255,255,255,.7);font-weight:600;margin-top:1px}
 
 /* Shot log */
 .log-head{display:flex;justify-content:space-between;align-items:center;margin-top:14px;margin-bottom:10px}
-.log-title{font-family:var(--font);font-style:italic;font-weight:800;font-size:16px;text-transform:uppercase;color:#fff}
+.log-title{font-weight:800;font-size:16px;color:var(--ink);letter-spacing:-.2px}
 .reset-btn{
-  background:rgba(255,61,87,.1);border:1px solid rgba(255,61,87,.25);
-  border-radius:4px;padding:6px 12px;font-size:11px;font-weight:700;
-  color:var(--red);cursor:pointer;font-family:var(--font);letter-spacing:.5px;
+  background:rgba(255,61,87,.08);border:1px solid rgba(255,61,87,.2);
+  border-radius:8px;padding:6px 13px;font-size:12px;font-weight:700;
+  color:var(--red);cursor:pointer;font-family:var(--font);letter-spacing:.2px;
 }
-.reset-btn:active{background:rgba(255,61,87,.2)}
+.reset-btn:active{background:rgba(255,61,87,.16)}
 
 .shot-item{
-  display:flex;align-items:stretch;border-radius:4px;overflow:hidden;
-  border:1px solid var(--glass-border);margin-bottom:7px;
-  animation:fadeUp .2s cubic-bezier(.23,1,.32,1);
+  display:flex;align-items:stretch;border-radius:var(--r-md);overflow:hidden;
+  border:1px solid var(--glass-border);margin-bottom:8px;
+  box-shadow:0 2px 8px rgba(0,0,0,.05);
+  animation:fadeUp .2s cubic-bezier(.34,1.2,.64,1);
 }
 .shot-item-left{
-  flex:1;display:flex;align-items:center;gap:10px;padding:10px 12px;
-  background:var(--glass-strong);
+  flex:1;display:flex;align-items:center;gap:10px;padding:10px 13px;
+  background:rgba(255,255,255,.95);
 }
 .shot-pill{
-  font-family:var(--font);font-style:italic;font-weight:900;
-  font-size:13px;padding:4px 9px;border-radius:3px;flex-shrink:0;min-width:46px;text-align:center;
-  letter-spacing:.5px;
+  font-weight:800;font-size:12px;padding:4px 10px;border-radius:7px;
+  flex-shrink:0;min-width:48px;text-align:center;letter-spacing:.2px;
 }
-.shot-pill.one{background:rgba(255,255,255,.07);color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.12)}
-.shot-pill.three{background:rgba(41,121,255,.15);color:#82B1FF;border:1px solid rgba(41,121,255,.3)}
-.shot-pill.six{background:var(--neon-dim);color:var(--neon);border:1px solid rgba(255,92,26,.35)}
+.shot-pill.one{background:#F0F3FF;color:#3A4466;border:1px solid #D0D8F0}
+.shot-pill.three{background:#EEF3FF;color:#1C48C8;border:1px solid #C0D0FF}
+.shot-pill.six{background:#FFF2EC;color:#E85520;border:1px solid #FFCDB8}
 .shot-info{flex:1;min-width:0}
-.shot-sec{font-family:var(--font);font-weight:700;font-size:14px;color:#fff;display:flex;align-items:center;gap:6px}
-.shot-time{font-size:10px;color:var(--text3);margin-top:2px;letter-spacing:.3px}
+.shot-sec{font-weight:700;font-size:14px;color:var(--ink);display:flex;align-items:center;gap:6px}
+.shot-time{font-size:10px;color:var(--ink3);margin-top:2px;font-weight:500}
 .undo-btn{
-  padding:0 14px;background:rgba(255,255,255,.04);border:none;
-  border-left:1px solid var(--glass-border);
-  font-size:11px;font-weight:700;color:var(--text3);cursor:pointer;
-  font-family:var(--font);letter-spacing:.5px;
-  display:flex;align-items:center;justify-content:center;
-  transition:background .15s;min-width:52px;
+  padding:0 14px;background:rgba(0,0,0,.04);border:none;
+  border-left:1px solid rgba(0,0,0,.07);
+  font-size:11px;font-weight:800;color:var(--ink3);
+  cursor:pointer;font-family:var(--font);letter-spacing:.5px;
+  display:flex;align-items:center;justify-content:center;min-width:54px;
+  transition:background .15s;
 }
-.undo-btn:active{background:rgba(255,255,255,.08);color:#fff}
+.undo-btn:active{background:rgba(0,0,0,.09);color:var(--ink)}
 
 .no-shots{
-  text-align:center;padding:24px;color:var(--text3);font-size:12px;
-  line-height:1.8;background:var(--glass);border-radius:6px;
-  border:1px dashed rgba(255,255,255,.08);
+  text-align:center;padding:24px;color:var(--ink3);font-size:12px;
+  line-height:1.8;background:rgba(255,255,255,.6);border-radius:var(--r-md);
+  border:1px dashed rgba(0,0,0,.1);font-weight:500;
 }
 .copy-btn{
   width:100%;
-  background:linear-gradient(135deg,rgba(255,92,26,.2),rgba(255,176,32,.1));
-  border:1px solid rgba(255,92,26,.35);border-radius:6px;
-  padding:14px;font-family:var(--font);font-style:italic;font-weight:800;
-  font-size:15px;letter-spacing:.5px;color:var(--neon);cursor:pointer;
-  margin-top:16px;text-transform:uppercase;
-  transition:background .2s,box-shadow .2s;
-  box-shadow:0 0 12px rgba(255,92,26,.08);
+  background:linear-gradient(135deg,var(--orange),var(--gold));
+  border:none;border-radius:var(--r-md);
+  padding:15px;font-family:var(--font);font-weight:800;
+  font-size:15px;letter-spacing:.3px;color:#fff;cursor:pointer;
+  margin-top:16px;
+  box-shadow:0 6px 20px var(--orange-glow);
+  transition:opacity .15s,transform .1s;
 }
-.copy-btn:active{background:rgba(255,92,26,.25);box-shadow:0 0 20px var(--neon-glow)}
+.copy-btn:active{opacity:.9;transform:scale(.98)}
 
-/* ═══════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════
    RESPONSIVE
-   ═══════════════════════════════════════════════════ */
+   ═══════════════════════════════════════════════════════════ */
 @media(max-width:375px){
-  .stadium{height:282px}
-  .hoop-wrap{top:42px}
-  .player-wrap{bottom:42px}
-  .player-face,.player-flipper{width:56px;height:90px}
+  .stadium{height:284px}
+  .hoop-wrap{top:40px}
+  .player-wrap{bottom:40px}
+  .player-flipper{width:58px;height:92px}
+  .player-face{width:58px;height:92px}
   .hud-num{font-size:26px}
-  .shot-btn{padding:0 10px;font-size:15px}
+  .shot-btn{padding:0 10px;font-size:13px;height:42px}
   .panel{padding-left:12px;padding-right:12px}
 }
-@media(min-width:376px) and (max-width:430px){.stadium{height:316px}}
+@media(min-width:376px) and (max-width:430px){.stadium{height:318px}}
 @media(min-width:431px) and (max-width:480px){
-  .stadium{height:332px}
-  .player-face,.player-flipper{width:76px;height:118px}
-  .shot-btn{font-size:20px}
+  .stadium{height:334px}
+  .player-flipper,.player-face{width:76px;height:120px}
+  .shot-btn{font-size:17px}
 }
 @media(min-width:768px){
   body{max-width:780px;margin:0 auto}
-  .stadium{height:420px;border-radius:0 0 20px 20px}
-  .court svg,.court{height:280px}
-  .hoop-wrap{top:64px}
-  .hoop-wrap svg{width:110px;height:102px}
+  .stadium{height:428px;border-radius:0 0 20px 20px}
+  .court,.court svg{height:284px}
+  .hoop-wrap{top:62px}
+  .hoop-wrap svg{width:112px;height:106px}
   .player-wrap{bottom:64px}
-  .player-face,.player-flipper{width:86px;height:136px}
-  .hud-num{font-size:42px}
-  .shot-btn{height:54px;font-size:24px}
+  .player-flipper,.player-face{width:86px;height:136px}
+  .hud-num{font-size:40px}
+  .shot-btn{height:54px;font-size:20px}
   .panel{padding:24px 28px calc(80px + env(safe-area-inset-bottom))}
   #tab-setup,#tab-actuals{max-width:680px;margin:0 auto}
-  .sa-actual{font-size:28px}
 }
 @media(min-width:1024px){
   body{max-width:900px}
-  .stadium{height:460px}
-  .court svg,.court{height:310px}
+  .stadium{height:462px}
+  .court,.court svg{height:312px}
   .hoop-wrap{top:72px}
   .player-wrap{bottom:76px}
-  .player-face,.player-flipper{width:98px;height:154px}
+  .player-flipper,.player-face{width:98px;height:154px}
   .hud-num{font-size:48px}
 }
 @media(max-height:500px) and (orientation:landscape){
-  .stadium{height:220px}
-  .court svg,.court{height:160px}
+  .stadium{height:224px}
+  .court,.court svg{height:162px}
   .hoop-wrap{top:28px}
   .player-wrap{bottom:30px}
-  .player-face,.player-flipper{width:50px;height:80px}
+  .player-flipper,.player-face{width:50px;height:80px}
   .hud-num{font-size:22px}
-  .shot-btn{height:38px;font-size:15px;padding:0 10px}
+  .shot-btn{height:38px;font-size:13px;padding:0 10px}
 }
 </style>
 </head>
 <body>
 
-<!-- ══════════════════════════════════════════════════
+<!-- ════════════════════════════════════════════
      STADIUM
-     ══════════════════════════════════════════════════ -->
+     ════════════════════════════════════════════ -->
 <div class="stadium" id="stadium">
   <div class="crowd-row" id="cr1"></div>
   <div class="crowd-row" id="cr2"></div>
@@ -724,62 +682,79 @@ body{
   <div class="spotlight spc"></div>
   <div class="spotlight spr"></div>
 
-  <!-- NBA COURT -->
+  <!-- NBA Court — official lines -->
   <div class="court">
-    <svg viewBox="0 0 400 230" preserveAspectRatio="xMidYMax meet">
-      <rect width="400" height="230" fill="rgba(170,80,15,.07)"/>
-      <line x1="0" y1="225" x2="400" y2="225" stroke="rgba(255,255,255,.5)" stroke-width="2.5"/>
-      <line x1="2" y1="0" x2="2" y2="230" stroke="rgba(255,255,255,.2)" stroke-width="1.5"/>
-      <line x1="398" y1="0" x2="398" y2="230" stroke="rgba(255,255,255,.2)" stroke-width="1.5"/>
-      <line x1="0" y1="200" x2="400" y2="200" stroke="rgba(255,255,255,.18)" stroke-width="1.5"/>
-      <ellipse cx="200" cy="200" rx="42" ry="11" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="1.5"/>
-      <rect x="140" y="74" width="120" height="151" fill="rgba(30,58,138,.2)" stroke="rgba(255,255,255,.3)" stroke-width="2"/>
-      <line x1="140" y1="118" x2="260" y2="118" stroke="rgba(255,255,255,.12)" stroke-width="1" stroke-dasharray="4 4"/>
-      <line x1="140" y1="150" x2="260" y2="150" stroke="rgba(255,255,255,.12)" stroke-width="1" stroke-dasharray="4 4"/>
-      <line x1="140" y1="182" x2="260" y2="182" stroke="rgba(255,255,255,.12)" stroke-width="1" stroke-dasharray="4 4"/>
-      <line x1="118" y1="118" x2="140" y2="118" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
-      <line x1="118" y1="140" x2="140" y2="140" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
-      <line x1="118" y1="162" x2="140" y2="162" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
-      <line x1="118" y1="184" x2="140" y2="184" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
-      <line x1="260" y1="118" x2="282" y2="118" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
-      <line x1="260" y1="140" x2="282" y2="140" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
-      <line x1="260" y1="162" x2="282" y2="162" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
-      <line x1="260" y1="184" x2="282" y2="184" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
-      <ellipse cx="200" cy="74" rx="46" ry="12" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="1.8"/>
-      <path d="M154 74 A46 12 0 0 1 246 74" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="1.8" stroke-dasharray="5 4"/>
-      <line x1="30" y1="130" x2="30" y2="225" stroke="rgba(255,255,255,.34)" stroke-width="2"/>
-      <line x1="370" y1="130" x2="370" y2="225" stroke="rgba(255,255,255,.34)" stroke-width="2"/>
-      <path d="M30 130 Q200 -14 370 130" fill="none" stroke="rgba(255,255,255,.34)" stroke-width="2"/>
-      <path d="M172 225 A28 10 0 0 1 228 225" fill="none" stroke="rgba(255,255,255,.24)" stroke-width="1.5"/>
-      <path d="M4 100 Q200 -30 396 100" fill="none" stroke="rgba(255,92,26,.4)" stroke-width="2" stroke-dasharray="8 5"/>
-      <line x1="0" y1="28" x2="400" y2="28" stroke="rgba(0,0,0,.12)" stroke-width="1"/>
-      <line x1="0" y1="55" x2="400" y2="55" stroke="rgba(0,0,0,.12)" stroke-width="1"/>
-      <line x1="0" y1="82" x2="400" y2="82" stroke="rgba(0,0,0,.12)" stroke-width="1"/>
-      <line x1="0" y1="109" x2="400" y2="109" stroke="rgba(0,0,0,.12)" stroke-width="1"/>
-      <line x1="0" y1="136" x2="400" y2="136" stroke="rgba(0,0,0,.12)" stroke-width="1"/>
-      <line x1="0" y1="163" x2="400" y2="163" stroke="rgba(0,0,0,.12)" stroke-width="1"/>
-      <text x="65" y="222" font-family="Barlow Condensed,sans-serif" font-size="9" fill="rgba(255,255,255,.28)" text-anchor="middle" font-style="italic">3 PT</text>
-      <text x="20" y="112" font-family="Barlow Condensed,sans-serif" font-size="9" fill="rgba(255,92,26,.5)" text-anchor="middle" font-style="italic">6PT</text>
+    <svg viewBox="0 0 400 232" preserveAspectRatio="xMidYMax meet">
+      <rect width="400" height="232" fill="rgba(160,75,10,.06)"/>
+      <line x1="0" y1="228" x2="400" y2="228" stroke="rgba(255,255,255,.52)" stroke-width="2.5"/>
+      <line x1="2" y1="0" x2="2" y2="232" stroke="rgba(255,255,255,.2)" stroke-width="1.5"/>
+      <line x1="398" y1="0" x2="398" y2="232" stroke="rgba(255,255,255,.2)" stroke-width="1.5"/>
+      <line x1="0" y1="202" x2="400" y2="202" stroke="rgba(255,255,255,.18)" stroke-width="1.5"/>
+      <ellipse cx="200" cy="202" rx="42" ry="11" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="1.5"/>
+      <!-- Paint -->
+      <rect x="140" y="72" width="120" height="156" fill="rgba(30,58,138,.18)" stroke="rgba(255,255,255,.32)" stroke-width="2"/>
+      <line x1="140" y1="116" x2="260" y2="116" stroke="rgba(255,255,255,.11)" stroke-width="1" stroke-dasharray="4 4"/>
+      <line x1="140" y1="148" x2="260" y2="148" stroke="rgba(255,255,255,.11)" stroke-width="1" stroke-dasharray="4 4"/>
+      <line x1="140" y1="180" x2="260" y2="180" stroke="rgba(255,255,255,.11)" stroke-width="1" stroke-dasharray="4 4"/>
+      <line x1="118" y1="116" x2="140" y2="116" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
+      <line x1="118" y1="138" x2="140" y2="138" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
+      <line x1="118" y1="160" x2="140" y2="160" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
+      <line x1="118" y1="182" x2="140" y2="182" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
+      <line x1="260" y1="116" x2="282" y2="116" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
+      <line x1="260" y1="138" x2="282" y2="138" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
+      <line x1="260" y1="160" x2="282" y2="160" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
+      <line x1="260" y1="182" x2="282" y2="182" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
+      <!-- FT circle -->
+      <ellipse cx="200" cy="72" rx="46" ry="12" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1.8"/>
+      <path d="M154 72 A46 12 0 0 1 246 72" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1.8" stroke-dasharray="5 4"/>
+      <!-- 3pt arc -->
+      <line x1="30" y1="128" x2="30" y2="228" stroke="rgba(255,255,255,.36)" stroke-width="2"/>
+      <line x1="370" y1="128" x2="370" y2="228" stroke="rgba(255,255,255,.36)" stroke-width="2"/>
+      <path d="M30 128 Q200 -16 370 128" fill="none" stroke="rgba(255,255,255,.36)" stroke-width="2"/>
+      <!-- Restricted arc -->
+      <path d="M172 228 A28 10 0 0 1 228 228" fill="none" stroke="rgba(255,255,255,.24)" stroke-width="1.5"/>
+      <!-- 6pt zone — orange brand marker -->
+      <path d="M4 98 Q200 -32 396 98" fill="none" stroke="rgba(255,107,43,.42)" stroke-width="2" stroke-dasharray="8 5"/>
+      <!-- Wood grain -->
+      <line x1="0" y1="28" x2="400" y2="28" stroke="rgba(0,0,0,.11)" stroke-width="1"/>
+      <line x1="0" y1="54" x2="400" y2="54" stroke="rgba(0,0,0,.11)" stroke-width="1"/>
+      <line x1="0" y1="80" x2="400" y2="80" stroke="rgba(0,0,0,.11)" stroke-width="1"/>
+      <line x1="0" y1="106" x2="400" y2="106" stroke="rgba(0,0,0,.11)" stroke-width="1"/>
+      <line x1="0" y1="132" x2="400" y2="132" stroke="rgba(0,0,0,.11)" stroke-width="1"/>
+      <line x1="0" y1="158" x2="400" y2="158" stroke="rgba(0,0,0,.11)" stroke-width="1"/>
+      <text x="65" y="225" font-family="Montserrat,sans-serif" font-size="9" font-weight="700" fill="rgba(255,255,255,.3)" text-anchor="middle">3 PT</text>
+      <text x="20" y="110" font-family="Montserrat,sans-serif" font-size="9" font-weight="700" fill="rgba(255,107,43,.55)" text-anchor="middle">6PT</text>
     </svg>
   </div>
 
-  <!-- HOOP -->
+  <!-- HOOP — Larger net -->
   <div class="hoop-wrap" id="hoopWrap">
-    <svg viewBox="0 0 90 82" width="88" height="82">
-      <rect x="18" y="0" width="54" height="28" rx="2" fill="#ddd" stroke="#999" stroke-width="1.5"/>
-      <rect x="26" y="5" width="38" height="18" rx="1" fill="none" stroke="#FF5C1A" stroke-width="1.5"/>
-      <rect x="43" y="28" width="5" height="18" fill="#444"/>
-      <ellipse cx="45" cy="50" rx="18" ry="4.5" fill="none" stroke="#FF5C1A" stroke-width="3"/>
-      <line x1="29" y1="52" x2="33" y2="68" stroke="rgba(255,255,255,.4)" stroke-width=".9"/>
-      <line x1="36" y1="52" x2="38" y2="70" stroke="rgba(255,255,255,.4)" stroke-width=".9"/>
-      <line x1="43" y1="52" x2="43" y2="71" stroke="rgba(255,255,255,.4)" stroke-width=".9"/>
-      <line x1="50" y1="52" x2="49" y2="70" stroke="rgba(255,255,255,.4)" stroke-width=".9"/>
-      <line x1="57" y1="52" x2="55" y2="68" stroke="rgba(255,255,255,.4)" stroke-width=".9"/>
-      <path d="M33 68 Q38 72 43 71 Q48 72 55 68" fill="none" stroke="rgba(255,255,255,.35)" stroke-width=".9"/>
+    <svg viewBox="0 0 110 105" width="108" height="105">
+      <!-- Backboard -->
+      <rect x="18" y="0" width="74" height="34" rx="3" fill="#EBEBEB" stroke="#AAAAAA" stroke-width="1.5"/>
+      <rect x="30" y="6" width="50" height="22" rx="2" fill="none" stroke="#FF6B2B" stroke-width="1.5"/>
+      <!-- Pole -->
+      <rect x="51" y="34" width="8" height="20" fill="#555"/>
+      <!-- Rim — wider -->
+      <ellipse cx="55" cy="60" rx="26" ry="6" fill="none" stroke="#FF6B2B" stroke-width="3.5"/>
+      <!-- Net — taller and denser -->
+      <line x1="32" y1="63" x2="37" y2="88" stroke="rgba(255,255,255,.5)" stroke-width="1.1"/>
+      <line x1="40" y1="63" x2="43" y2="91" stroke="rgba(255,255,255,.5)" stroke-width="1.1"/>
+      <line x1="48" y1="63" x2="49" y2="93" stroke="rgba(255,255,255,.5)" stroke-width="1.1"/>
+      <line x1="56" y1="63" x2="56" y2="93" stroke="rgba(255,255,255,.5)" stroke-width="1.1"/>
+      <line x1="64" y1="63" x2="63" y2="93" stroke="rgba(255,255,255,.5)" stroke-width="1.1"/>
+      <line x1="72" y1="63" x2="69" y2="91" stroke="rgba(255,255,255,.5)" stroke-width="1.1"/>
+      <line x1="79" y1="63" x2="75" y2="88" stroke="rgba(255,255,255,.5)" stroke-width="1.1"/>
+      <!-- Horizontal net bands -->
+      <path d="M34 70 Q55 73 77 70" fill="none" stroke="rgba(255,255,255,.32)" stroke-width="1"/>
+      <path d="M35 78 Q55 81 76 78" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="1"/>
+      <path d="M37 86 Q55 88 74 86" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="1"/>
+      <!-- Bottom of net -->
+      <path d="M37 88 Q46 95 55 93 Q64 95 75 88" fill="none" stroke="rgba(255,255,255,.38)" stroke-width="1.2"/>
     </svg>
   </div>
 
-  <!-- HUD SCOREBOARD -->
+  <!-- HUD SCOREBOARD — Deep Navy -->
   <div class="hud">
     <div class="hud-inner">
       <div class="hud-top">
@@ -789,7 +764,7 @@ body{
         </div>
         <div class="hud-divider"></div>
         <div class="hud-stat hud-center">
-          <div class="hud-pct-badge" id="sbPct">0%</div>
+          <div class="hud-pct" id="sbPct">0%</div>
           <div class="hud-num wh" id="sbTarget">70</div>
           <div class="hud-label">Target</div>
         </div>
@@ -805,73 +780,120 @@ body{
     </div>
   </div>
 
-  <!-- PLAYER — 3D flip -->
+  <!-- PLAYER — 3D Flip with Signature Frame -->
   <div class="player-wrap" id="playerWrap">
-    <div class="player-flipper" id="playerFlipper">
-      <!-- BACK (default — faces hoop) -->
-      <svg class="player-face player-back" id="playerBack" viewBox="0 0 72 112">
-        <ellipse cx="36" cy="109" rx="22" ry="4" fill="rgba(0,0,0,.45)"/>
-        <rect x="14" y="96" width="16" height="10" rx="4" fill="#111"/>
-        <rect x="42" y="96" width="16" height="10" rx="4" fill="#111"/>
-        <rect x="14" y="98" width="16" height="5" rx="2" fill="#FF5C1A" opacity=".65"/>
-        <rect x="42" y="98" width="16" height="5" rx="2" fill="#FF5C1A" opacity=".65"/>
-        <rect x="18" y="66" width="13" height="34" rx="6" fill="#12257a"/>
-        <rect x="41" y="66" width="13" height="34" rx="6" fill="#12257a"/>
-        <rect x="13" y="58" width="46" height="18" rx="8" fill="#12257a"/>
-        <rect x="11" y="33" width="50" height="30" rx="9" fill="#C94D18"/>
-        <rect x="11" y="51" width="50" height="3" fill="rgba(0,0,0,.15)" rx="1"/>
-        <text x="36" y="55" text-anchor="middle" font-family="Barlow Condensed" font-style="italic" font-weight="900" font-size="14" fill="rgba(255,255,255,.9)">10</text>
-        <rect x="1" y="36" width="12" height="23" rx="5" fill="#a86030" id="armBackL"/>
-        <rect x="59" y="36" width="12" height="23" rx="5" fill="#a86030" id="armBackR"/>
-        <rect x="29" y="27" width="14" height="11" rx="5" fill="#a86030"/>
-        <ellipse cx="36" cy="20" rx="17" ry="19" fill="#a86030"/>
-        <ellipse cx="36" cy="4" rx="17" ry="9" fill="#111"/>
-        <rect x="19" y="4" width="34" height="10" fill="#111" rx="3"/>
-        <rect x="19" y="12" width="34" height="6" rx="2" fill="#FF5C1A" opacity=".9"/>
-        <ellipse cx="19" cy="22" rx="3" ry="4" fill="#a86030"/>
-        <ellipse cx="53" cy="22" rx="3" ry="4" fill="#a86030"/>
-      </svg>
+    <div class="player-sig-frame" id="playerSigFrame">
+      <div class="player-flipper" id="playerFlipper">
 
-      <!-- FRONT (celebration — spins to face after goal) -->
-      <svg class="player-face player-front" id="playerFront" viewBox="0 0 72 112">
-        <ellipse cx="36" cy="109" rx="24" ry="4" fill="rgba(0,0,0,.45)"/>
-        <rect x="13" y="96" width="16" height="10" rx="4" fill="#111"/>
-        <rect x="43" y="96" width="16" height="10" rx="4" fill="#111"/>
-        <rect x="13" y="98" width="16" height="5" rx="2" fill="#FF5C1A" opacity=".7"/>
-        <rect x="43" y="98" width="16" height="5" rx="2" fill="#FF5C1A" opacity=".7"/>
-        <rect x="15" y="66" width="13" height="34" rx="6" fill="#1a3a8f" transform="rotate(-5,21,83)"/>
-        <rect x="44" y="66" width="13" height="34" rx="6" fill="#1a3a8f" transform="rotate(5,50,83)"/>
-        <rect x="11" y="58" width="50" height="18" rx="8" fill="#1a3a8f"/>
-        <rect x="10" y="33" width="52" height="30" rx="9" fill="#FF5C1A"/>
-        <rect x="10" y="51" width="52" height="3" fill="rgba(255,255,255,.12)" rx="1"/>
-        <text x="36" y="55" text-anchor="middle" font-family="Barlow Condensed" font-style="italic" font-weight="900" font-size="14" fill="#fff">10</text>
-        <text x="36" y="42" text-anchor="middle" font-size="11" fill="rgba(255,255,255,.8)">★</text>
-        <!-- arms raised in celebration -->
-        <rect x="-4" y="16" width="14" height="26" rx="6" fill="#c0784a" transform="rotate(42,3,29)"/>
-        <rect x="62" y="16" width="14" height="26" rx="6" fill="#c0784a" transform="rotate(-42,69,29)"/>
-        <ellipse cx="-3" cy="16" rx="7" ry="6" fill="#c0784a"/>
-        <ellipse cx="75" cy="16" rx="7" ry="6" fill="#c0784a"/>
-        <rect x="28" y="26" width="16" height="13" rx="6" fill="#c0784a"/>
-        <ellipse cx="36" cy="20" rx="18" ry="19" fill="#c0784a"/>
-        <ellipse cx="36" cy="4" rx="18" ry="9" fill="#111"/>
-        <rect x="18" y="4" width="36" height="10" fill="#111" rx="3"/>
-        <rect x="18" y="12" width="36" height="6" rx="2" fill="#FF5C1A" opacity=".9"/>
-        <!-- excited eyes -->
-        <ellipse cx="26" cy="21" rx="4.5" ry="5" fill="#fff"/>
-        <ellipse cx="46" cy="21" rx="4.5" ry="5" fill="#fff"/>
-        <ellipse cx="27" cy="22" rx="2.5" ry="2.8" fill="#1a0a00"/>
-        <ellipse cx="47" cy="22" rx="2.5" ry="2.8" fill="#1a0a00"/>
-        <ellipse cx="26.5" cy="20" rx="1.1" ry="1.1" fill="#fff"/>
-        <ellipse cx="46.5" cy="20" rx="1.1" ry="1.1" fill="#fff"/>
-        <!-- raised eyebrows -->
-        <path d="M21 14 Q26 11 31 13" fill="none" stroke="#1a0a00" stroke-width="2" stroke-linecap="round"/>
-        <path d="M41 13 Q46 11 51 14" fill="none" stroke="#1a0a00" stroke-width="2" stroke-linecap="round"/>
-        <!-- big open smile -->
-        <path d="M22 29 Q36 40 50 29" fill="#7a2e00"/>
-        <path d="M24 29 Q36 38 48 29" fill="#fff"/>
-        <path d="M27 29 Q36 35 45 29" fill="#f0c0a0"/>
-        <ellipse cx="36" cy="36" rx="5" ry="3" fill="#e05050"/>
-      </svg>
+        <!-- BACK VIEW — default, faces hoop -->
+        <svg class="player-face player-back" id="playerBack" viewBox="0 0 72 112">
+          <defs>
+            <radialGradient id="skinG" cx="50%" cy="40%" r="55%">
+              <stop offset="0%" stop-color="#D4895A"/>
+              <stop offset="100%" stop-color="#B06838"/>
+            </radialGradient>
+            <radialGradient id="jerseyG_back" cx="50%" cy="30%" r="70%">
+              <stop offset="0%" stop-color="#E8702A"/>
+              <stop offset="100%" stop-color="#B84A10"/>
+            </radialGradient>
+          </defs>
+          <ellipse cx="36" cy="109" rx="22" ry="4" fill="rgba(0,0,0,.4)"/>
+          <!-- Shoes -->
+          <rect x="14" y="95" width="16" height="11" rx="5" fill="#1A1A2E"/>
+          <rect x="42" y="95" width="16" height="11" rx="5" fill="#1A1A2E"/>
+          <rect x="14" y="98" width="16" height="5" rx="2.5" fill="#FF6B2B" opacity=".7"/>
+          <rect x="42" y="98" width="16" height="5" rx="2.5" fill="#FF6B2B" opacity=".7"/>
+          <!-- Legs -->
+          <rect x="17" y="64" width="14" height="35" rx="7" fill="#0F3460"/>
+          <rect x="41" y="64" width="14" height="35" rx="7" fill="#0F3460"/>
+          <!-- Shorts -->
+          <rect x="12" y="57" width="48" height="20" rx="9" fill="#0F3460"/>
+          <!-- Jersey back -->
+          <rect x="10" y="32" width="52" height="30" rx="10" fill="url(#jerseyG_back)"/>
+          <rect x="10" y="50" width="52" height="4" rx="2" fill="rgba(0,0,0,.12)"/>
+          <!-- Number on back -->
+          <text x="36" y="55" text-anchor="middle" font-family="Montserrat" font-weight="900" font-size="15" fill="rgba(255,255,255,.95)">10</text>
+          <!-- Arms back -->
+          <rect x="1" y="34" width="12" height="25" rx="6" fill="url(#skinG)" id="armBackL"/>
+          <rect x="59" y="34" width="12" height="25" rx="6" fill="url(#skinG)" id="armBackR"/>
+          <!-- Neck back -->
+          <rect x="28" y="26" width="16" height="12" rx="7" fill="url(#skinG)"/>
+          <!-- Head back — rounded, hair, headband -->
+          <ellipse cx="36" cy="20" rx="18" ry="19" fill="url(#skinG)"/>
+          <!-- Hair -->
+          <ellipse cx="36" cy="4" rx="18" ry="9" fill="#111"/>
+          <rect x="18" y="3" width="36" height="12" rx="4" fill="#111"/>
+          <!-- Headband -->
+          <rect x="18" y="13" width="36" height="7" rx="3" fill="#FF6B2B" opacity=".92"/>
+          <!-- Ears -->
+          <ellipse cx="18" cy="22" rx="3.5" ry="4.5" fill="url(#skinG)"/>
+          <ellipse cx="54" cy="22" rx="3.5" ry="4.5" fill="url(#skinG)"/>
+        </svg>
+
+        <!-- FRONT VIEW — celebration -->
+        <svg class="player-face player-front" id="playerFront" viewBox="0 0 72 112">
+          <defs>
+            <radialGradient id="skinGF" cx="50%" cy="35%" r="60%">
+              <stop offset="0%" stop-color="#D8926A"/>
+              <stop offset="100%" stop-color="#B86C3C"/>
+            </radialGradient>
+            <radialGradient id="jerseyGF" cx="50%" cy="25%" r="75%">
+              <stop offset="0%" stop-color="#FF7A3A"/>
+              <stop offset="100%" stop-color="#CC4A10"/>
+            </radialGradient>
+            <radialGradient id="eyeGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#4A90E2"/>
+              <stop offset="100%" stop-color="#1A4A8A"/>
+            </radialGradient>
+          </defs>
+          <ellipse cx="36" cy="109" rx="24" ry="4.5" fill="rgba(0,0,0,.42)"/>
+          <!-- Shoes -->
+          <rect x="12" y="95" width="17" height="11" rx="5" fill="#1A1A2E"/>
+          <rect x="43" y="95" width="17" height="11" rx="5" fill="#1A1A2E"/>
+          <rect x="12" y="98" width="17" height="5" rx="2.5" fill="#FF6B2B" opacity=".75"/>
+          <rect x="43" y="98" width="17" height="5" rx="2.5" fill="#FF6B2B" opacity=".75"/>
+          <!-- Legs — spread celebration -->
+          <rect x="13" y="64" width="14" height="34" rx="7" fill="#1A3A8F" transform="rotate(-6,20,81)"/>
+          <rect x="45" y="64" width="14" height="34" rx="7" fill="#1A3A8F" transform="rotate(6,52,81)"/>
+          <!-- Shorts -->
+          <rect x="10" y="57" width="52" height="20" rx="9" fill="#1A3A8F"/>
+          <!-- Jersey front -->
+          <rect x="9" y="31" width="54" height="31" rx="10" fill="url(#jerseyGF)"/>
+          <rect x="9" y="50" width="54" height="4" rx="2" fill="rgba(255,255,255,.12)"/>
+          <text x="36" y="56" text-anchor="middle" font-family="Montserrat" font-weight="900" font-size="15" fill="#fff">10</text>
+          <text x="36" y="42" text-anchor="middle" font-size="12" fill="rgba(255,255,255,.85)">★</text>
+          <!-- Arms raised in celebration -->
+          <rect x="-6" y="14" width="15" height="28" rx="7" fill="url(#skinGF)" transform="rotate(45,2,28)"/>
+          <rect x="63" y="14" width="15" height="28" rx="7" fill="url(#skinGF)" transform="rotate(-45,70,28)"/>
+          <!-- Fists -->
+          <ellipse cx="-4" cy="14" rx="8" ry="7" fill="url(#skinGF)"/>
+          <ellipse cx="76" cy="14" rx="8" ry="7" fill="url(#skinGF)"/>
+          <!-- Neck -->
+          <rect x="27" y="25" width="18" height="13" rx="7" fill="url(#skinGF)"/>
+          <!-- Head -->
+          <ellipse cx="36" cy="19" rx="19" ry="20" fill="url(#skinGF)"/>
+          <!-- Hair -->
+          <ellipse cx="36" cy="3" rx="19" ry="10" fill="#111"/>
+          <rect x="17" y="3" width="38" height="12" rx="4" fill="#111"/>
+          <!-- Headband -->
+          <rect x="17" y="12" width="38" height="7" rx="3" fill="#FF6B2B" opacity=".94"/>
+          <!-- Eyes — wide excited -->
+          <ellipse cx="25" cy="21" rx="5" ry="5.5" fill="#fff"/>
+          <ellipse cx="47" cy="21" rx="5" ry="5.5" fill="#fff"/>
+          <ellipse cx="25.8" cy="22" rx="2.8" ry="3" fill="url(#eyeGlow)"/>
+          <ellipse cx="47.8" cy="22" rx="2.8" ry="3" fill="url(#eyeGlow)"/>
+          <ellipse cx="26.5" cy="21" rx="1.2" ry="1.2" fill="#fff"/>
+          <ellipse cx="48.5" cy="21" rx="1.2" ry="1.2" fill="#fff"/>
+          <!-- Raised eyebrows excited -->
+          <path d="M20 13 Q25 10 30 12" fill="none" stroke="#5C2800" stroke-width="2" stroke-linecap="round"/>
+          <path d="M42 12 Q47 10 52 13" fill="none" stroke="#5C2800" stroke-width="2" stroke-linecap="round"/>
+          <!-- Open smile with teeth -->
+          <path d="M20 30 Q36 43 52 30" fill="#6B2E00"/>
+          <path d="M22 30 Q36 41 50 30" fill="#fff"/>
+          <path d="M26 30 Q36 37 46 30" fill="#F0B090"/>
+          <ellipse cx="36" cy="38" rx="5.5" ry="3.5" fill="#E05050"/>
+        </svg>
+      </div>
     </div>
   </div>
 
@@ -888,7 +910,7 @@ body{
   </div>
 </div>
 
-<!-- SECTOR PICKER — slide-up sheet -->
+<!-- SECTOR PICKER — Spring slide-up -->
 <div class="overlay" id="pickerOverlay">
   <div class="picker" id="pickerSheet">
     <div class="picker-handle"></div>
@@ -912,7 +934,7 @@ body{
   </div>
 </div>
 
-<!-- PANEL -->
+<!-- PANEL — Championship Light -->
 <div class="stadium-bridge"></div>
 <div class="panel">
   <div class="tabs">
@@ -920,10 +942,9 @@ body{
     <div class="tab" onclick="switchTab('actuals')">🏀 Actuals</div>
   </div>
 
-  <!-- ── SETUP TAB ── -->
+  <!-- SETUP -->
   <div class="tab-pane active" id="tab-setup">
-
-    <!-- Player Card -->
+    <!-- Player / Rep Signature Card -->
     <div class="player-card" id="playerCard">
       <div class="pc-row">
         <div class="pc-avatar" id="pcAvatar">?</div>
@@ -960,45 +981,40 @@ body{
     <button class="copy-btn" onclick="copyReport()">📋 Export Monthly Report</button>
   </div>
 
-  <!-- ── ACTUALS TAB ── -->
+  <!-- ACTUALS -->
   <div class="tab-pane" id="tab-actuals">
-
-    <!-- Dual progress -->
     <div class="dual-prog">
       <div class="dp-row">
-        <div class="dp-lbl"><span style="background:rgba(255,255,255,.3)"></span>Forecast</div>
+        <div class="dp-lbl"><span style="background:rgba(0,0,0,.25)"></span>Forecast</div>
         <div class="dp-val" id="dpFc">0 / 70</div>
       </div>
-      <div class="prog-track"><div class="prog-fill" id="pfFc" style="width:0%;background:rgba(255,255,255,.3)"></div></div>
+      <div class="prog-track"><div class="prog-fill" id="pfFc" style="width:0%;background:rgba(0,0,0,.2)"></div></div>
       <div class="dp-row">
-        <div class="dp-lbl"><span style="background:#FF5C1A"></span>Actual</div>
-        <div class="dp-val" id="dpAc" style="color:var(--neon)">0 / 70</div>
+        <div class="dp-lbl"><span style="background:#FF6B2B"></span>Actual</div>
+        <div class="dp-val" id="dpAc" style="color:var(--orange)">0 / 70</div>
       </div>
-      <div class="prog-track"><div class="prog-fill" id="pfAc" style="width:0%;background:#FF5C1A"></div></div>
+      <div class="prog-track"><div class="prog-fill" id="pfAc" style="width:0%;background:#FF6B2B"></div></div>
     </div>
 
-    <!-- Pace -->
     <div class="pace-row">
       <div class="pace-card">
         <div class="pace-v" id="pDay">—</div>
         <div class="pace-l">Day / Month</div>
       </div>
       <div class="pace-card">
-        <div class="pace-v" id="pMth" style="color:var(--text2)">—%</div>
+        <div class="pace-v" id="pMth" style="color:var(--ink3)">—%</div>
         <div class="pace-l">Month Gone</div>
       </div>
       <div class="pace-card">
-        <div class="pace-v" id="pAch" style="color:var(--neon)">0%</div>
+        <div class="pace-v" id="pAch" style="color:var(--orange)">0%</div>
         <div class="pace-l">Target Hit</div>
         <div class="pace-s on" id="pStatus">On Track</div>
       </div>
     </div>
 
-    <!-- Sector Actuals -->
     <div class="sa-title">Sector Performance</div>
     <div id="sectorActuals"><div class="hint">Add sectors in Setup tab first</div></div>
 
-    <!-- Shot Log -->
     <div class="log-head">
       <div class="log-title">Shot Log</div>
       <button class="reset-btn" onclick="doReset()">↺ Reset</button>
@@ -1011,7 +1027,7 @@ body{
 /* ── CROWD ── */
 ['cr1','cr2','cr3'].forEach((id,i)=>{
   const r=document.getElementById(id);
-  const cols=['#FF5C1A','rgba(255,255,255,.18)','#2979FF','#FFB020','#a855f7'];
+  const cols=['#FF6B2B','rgba(255,255,255,.2)','#1C48C8','#FFB830','#a855f7'];
   for(let j=0;j<26-i*4;j++){
     const d=document.createElement('div');
     d.className='crowd-dot';
@@ -1022,7 +1038,7 @@ body{
 });
 
 /* ── STATE ── */
-const COLORS=['#FF5C1A','#2979FF','#00E676','#a855f7','#FFB020','#ec4899','#06b6d4','#FF3D57','#14b8a6'];
+const COLORS=['#FF6B2B','#1C48C8','#00C853','#a855f7','#FFB830','#ec4899','#06b6d4','#FF3D57','#14b8a6'];
 let state={repName:'',target:70,sectors:[],shots:[]};
 let nextSectorId=1;
 let shooting=false;
@@ -1033,16 +1049,14 @@ let activeTab='setup';
 function save(){
   state.repName=document.getElementById('repName').value;
   state.target=parseInt(document.getElementById('targetInput').value)||70;
-  localStorage.setItem('crt_pro_v1',JSON.stringify({state,nextSectorId}));
-  updateScoreboard();
-  updateTotalRow();
-  updatePlayerCard();
+  localStorage.setItem('crt_champ_v1',JSON.stringify({state,nextSectorId}));
+  updateScoreboard();updateTotalRow();updatePlayerCard();
   if(activeTab==='actuals') renderActuals();
 }
 
 function load(){
   try{
-    const raw=localStorage.getItem('crt_pro_v1');
+    const raw=localStorage.getItem('crt_champ_v1');
     if(raw){const d=JSON.parse(raw);state=d.state||state;nextSectorId=d.nextSectorId||1;}
   }catch(e){}
   document.getElementById('repName').value=state.repName||'';
@@ -1050,17 +1064,13 @@ function load(){
   renderSectors();updateScoreboard();updateTotalRow();updatePlayerCard();
 }
 
-function onRepChange(){
-  updatePlayerCard();save();
-}
+function onRepChange(){updatePlayerCard();save();}
 
 function updatePlayerCard(){
   const name=document.getElementById('repName').value;
-  const initial=name?name.trim()[0].toUpperCase():'?';
-  document.getElementById('pcAvatar').textContent=initial;
+  document.getElementById('pcAvatar').textContent=name?name.trim()[0].toUpperCase():'?';
   const actual=state.shots.reduce((a,s)=>a+s.pts,0);
-  const pct=state.target>0?actual/state.target:0;
-  document.getElementById('playerCard').classList.toggle('full',pct>=1);
+  document.getElementById('playerSigFrame').classList.toggle('glow',actual>=state.target&&state.target>0);
 }
 
 /* ── TABS ── */
@@ -1086,8 +1096,7 @@ function removeSector(id){
 function changeQtyInput(id,val){
   const s=state.sectors.find(s=>s.id===id);
   if(!s)return;
-  s.qty=Math.max(0,parseInt(val)||0);
-  save();
+  s.qty=Math.max(0,parseInt(val)||0);save();
 }
 function changeName(id,v){
   const s=state.sectors.find(s=>s.id===id);
@@ -1101,7 +1110,7 @@ function renderSectors(){
   }
   el.innerHTML=state.sectors.map(s=>`
     <div class="sec-card">
-      <div class="s-dot" style="background:${s.color};box-shadow:0 0 6px ${s.color}"></div>
+      <div class="s-dot" style="background:${s.color}"></div>
       <div class="s-name"><input class="s-inp" type="text" placeholder="Sector name…" value="${s.name}" oninput="changeName(${s.id},this.value)" maxlength="40"/></div>
       <input class="s-qty-input" type="number" min="0" max="9999" value="${s.qty}" oninput="changeQtyInput(${s.id},this.value)" placeholder="0"/>
       <button class="del-btn" onclick="removeSector(${s.id})">✕</button>
@@ -1121,16 +1130,16 @@ function updateTotalRow(){
   st.className='total-status '+(pct>100?'over':pct===100?'ok':'warn');
 }
 
-/* ═══════════════════════════════════════════════════
-   SHOT FLOW — Animation FIRST, picker 1 second after Siii
-   ═══════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════
+   SHOT FLOW — Ball first, then 1-second delay before picker
+   ═══════════════════════════════════════════════════════════ */
 function initShot(pts){
   if(shooting)return;
   if(!state.sectors.length){alert('Add at least one sector in Setup first.');return;}
   const actual=state.shots.reduce((a,s)=>a+s.pts,0);
   if(actual>=state.target){showFlash('🏆 TARGET HIT!',true);return;}
   pendingPts=pts;
-  animShot(pts); /* animation first, picker appears 1s after Siii */
+  animShot(pts);
 }
 
 function openPicker(pts){
@@ -1142,32 +1151,32 @@ function openPicker(pts){
     const left=Math.max(0,s.qty-sAct);
     return `<div class="sec-opt" onclick="fireShot(${s.id})">
       <div class="sec-opt-left">
-        <div class="sec-opt-dot" style="background:${s.color};box-shadow:0 0 6px ${s.color}"></div>
+        <div class="sec-opt-dot" style="background:${s.color}"></div>
         <div>
           <div class="sec-opt-name">${s.name||'Unnamed Sector'}</div>
           <div class="sec-opt-sub">Forecast ${s.qty} · Actual ${sAct} · ${left} left</div>
         </div>
       </div>
       <div class="sec-opt-right">
-        <div class="sec-opt-left-val">${left}</div>
-        <div class="sec-opt-left-lbl">Left</div>
+        <div class="sec-opt-val">${left}</div>
+        <div class="sec-opt-lbl">Left</div>
       </div>
     </div>`;
   }).join('');
 
-  /* Show overlay immediately, slide-in with 1-second delay (the critical rhythm) */
   const overlay=document.getElementById('pickerOverlay');
   const sheet=document.getElementById('pickerSheet');
+  sheet.classList.remove('spring-in');
   overlay.classList.add('show');
-  /* 1-second staggered reveal after Siii trigger */
-  setTimeout(()=>{sheet.classList.add('slide-in');},50);
+  /* Spring entrance after tiny paint frame */
+  requestAnimationFrame(()=>requestAnimationFrame(()=>sheet.classList.add('spring-in')));
 }
 
 function closePicker(){
   const overlay=document.getElementById('pickerOverlay');
   const sheet=document.getElementById('pickerSheet');
-  sheet.classList.remove('slide-in');
-  setTimeout(()=>{overlay.classList.remove('show');},300);
+  sheet.classList.remove('spring-in');
+  setTimeout(()=>overlay.classList.remove('show'),350);
 }
 
 function fireShot(sectorId){
@@ -1178,15 +1187,16 @@ function fireShot(sectorId){
   save();
 }
 
-/* ═══════════════════════════════════════════════════
-   CHOREOGRAPHED ANIMATION SEQUENCE
-   1. Player back → arm up → throw
-   2. Ball arc → net
-   3. Player spins to front
-   4. Siii + confetti
-   5. (1 second pause) → sector picker slides up
-   6. Player spins back
-   ═══════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════
+   CHOREOGRAPHED ANIMATION — Full sequence
+   Phase 1: Ball flies (player faces hoop)
+   Phase 2: Ball drops through net
+   Phase 3: Player flips to front (3D spin)
+   Phase 4: Siii! + confetti
+   ── 1 SECOND PAUSE ──
+   Phase 5: Sector picker spring-slides up
+   Phase 6: Player spins back after selection
+   ═══════════════════════════════════════════════════════════ */
 function animShot(pts){
   shooting=true;
   ['btn1','btn3','btn6'].forEach(id=>document.getElementById(id).disabled=true);
@@ -1201,7 +1211,7 @@ function animShot(pts){
   const hpR=hp.getBoundingClientRect();
 
   const sx=pwR.left-stR.left+54, sy=pwR.top-stR.top+22;
-  const ex=hpR.left-stR.left+hpR.width/2-10, ey=hpR.top-stR.top+44;
+  const ex=hpR.left-stR.left+hpR.width/2-11, ey=hpR.top-stR.top+56;
 
   /* Raise arm on back SVG */
   const armR=document.getElementById('armBackR');
@@ -1209,11 +1219,11 @@ function animShot(pts){
 
   ball.style.cssText=`display:block;left:${sx}px;top:${sy}px;transition:none;opacity:1`;
 
-  const dur=pts===6?870:pts===3?690:490;
-  const arc=pts===6?-168:pts===3?-118:-74;
+  const dur=pts===6?875:pts===3?695:495;
+  const arc=pts===6?-170:pts===3?-120:-76;
   const t0=performance.now();
 
-  /* Phase 1 — ball flies */
+  /* Phase 1 — ball arc */
   (function frame(now){
     const t=Math.min((now-t0)/dur,1);
     const e=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
@@ -1223,39 +1233,37 @@ function animShot(pts){
     if(t<1){requestAnimationFrame(frame);return;}
 
     /* Phase 2 — ball drops through net */
-    ball.style.transition='top .3s cubic-bezier(.4,0,1,1), opacity .25s .1s';
-    ball.style.top=(ey+44)+'px';
+    ball.style.transition='top .32s cubic-bezier(.4,0,1,1), opacity .26s .12s';
+    ball.style.top=(ey+48)+'px';
     ball.style.opacity='0';
 
-    /* Phase 3 — mid-drop: player spins to front */
+    /* Phase 3 — player spins to front */
     setTimeout(()=>{
       if(armR) armR.removeAttribute('transform');
-      flipper.style.transition='transform .4s cubic-bezier(.23,1,.32,1)';
+      flipper.style.transition='transform .42s cubic-bezier(.23,1,.32,1)';
       flipper.classList.add('celebrating');
 
-      /* Phase 4 — spin done: Siii + confetti */
+      /* Phase 4 — Siii + confetti */
       setTimeout(()=>{
         ball.style.display='none';ball.style.opacity='1';ball.style.transition='';
-
         showSiii();
         launchConfetti();
-
         shooting=false;
         ['btn1','btn3','btn6'].forEach(id=>document.getElementById(id).disabled=false);
 
-        /* ── CRITICAL: 1-second pause before sector picker ── */
+        /* ═══ MANDATORY 1-SECOND PAUSE ═══ */
         setTimeout(()=>{
           openPicker(pts);
 
-          /* Phase 6 — after picker, spin back after user has seen front */
+          /* Spin back after rep makes selection */
           setTimeout(()=>{
             flipper.style.transition='transform .38s cubic-bezier(.23,1,.32,1)';
             flipper.classList.remove('celebrating');
-          },900);
-        }, 1000); /* THE 1-SECOND RHYTHM DELAY */
+          }, 1000);
+        }, 1000); /* THE CRITICAL 1-SECOND RHYTHM DELAY */
 
-      }, 420);
-    }, 190);
+      }, 440);
+    }, 195);
   })(performance.now());
 }
 
@@ -1265,20 +1273,20 @@ function showSiii(){
   f.style.opacity='1';
   f.style.transform='translate(-50%,-50%) scale(1)';
   setTimeout(()=>{
-    f.style.transition='all .85s cubic-bezier(.23,1,.32,1)';
+    f.style.transition='all .9s cubic-bezier(.23,1,.32,1)';
     f.style.opacity='0';
-    f.style.transform='translate(-50%,-90%) scale(.75)';
-  },950);
+    f.style.transform='translate(-50%,-92%) scale(.72)';
+  },980);
 }
 
 function showFlash(msg,big){
   const f=document.getElementById('flash');
   f.textContent=msg;
-  f.style.fontSize=big?'40px':'34px';
-  f.style.color=big?'#FFB020':'#fff';
-  f.style.textShadow=big?'0 0 40px rgba(255,176,32,.9)':'0 0 24px rgba(255,255,255,.7)';
+  f.style.fontSize=big?'38px':'32px';
+  f.style.color=big?'#FFB830':'#fff';
+  f.style.textShadow=big?'0 0 36px rgba(255,184,48,.9)':'0 0 22px rgba(255,255,255,.7)';
   f.style.transition='none';f.style.opacity='1';f.style.transform='translate(-50%,-50%) scale(1.1)';
-  setTimeout(()=>{f.style.transition='all .7s cubic-bezier(.23,1,.32,1)';f.style.opacity='0';f.style.transform='translate(-50%,-75%) scale(.82)';},950);
+  setTimeout(()=>{f.style.transition='all .7s cubic-bezier(.23,1,.32,1)';f.style.opacity='0';f.style.transform='translate(-50%,-76%) scale(.82)';},980);
 }
 
 function launchConfetti(){
@@ -1287,39 +1295,30 @@ function launchConfetti(){
   canvas.width=canvas.offsetWidth;canvas.height=canvas.offsetHeight;
   const ctx=canvas.getContext('2d');
   const cx=canvas.width/2,cy=canvas.height*.38;
-  const cols=['#FF5C1A','#FFB020','#00E676','#2979FF','#a855f7','#ec4899','#ffffff'];
-  const particles=[];
-  for(let i=0;i<90;i++){
+  const cols=['#FF6B2B','#FFB830','#00C853','#1C48C8','#a855f7','#ec4899','#ffffff'];
+  const parts=[];
+  for(let i=0;i<88;i++){
     const angle=Math.random()*Math.PI*2;
-    const speed=2.5+Math.random()*7;
-    particles.push({x:cx,y:cy,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed-3.5,size:3+Math.random()*5,color:cols[~~(Math.random()*cols.length)],alpha:1,rot:Math.random()*360,rotV:(Math.random()-.5)*9,shape:Math.random()>.5?'rect':'circle'});
+    const spd=2.5+Math.random()*7;
+    parts.push({x:cx,y:cy,vx:Math.cos(angle)*spd,vy:Math.sin(angle)*spd-3.5,size:3+Math.random()*5,color:cols[~~(Math.random()*cols.length)],alpha:1,rot:Math.random()*360,rotV:(Math.random()-.5)*9,shape:Math.random()>.5?'rect':'circle'});
   }
   let st=null;
   function draw(ts){
-    if(!st)st=ts;
-    const el=(ts-st)/1000;
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    let alive=false;
-    particles.forEach(p=>{
-      p.vy+=.2;p.x+=p.vx;p.y+=p.vy;p.rot+=p.rotV;
-      p.alpha=Math.max(0,1-el/1.9);
-      if(p.alpha>0){
-        alive=true;
-        ctx.save();ctx.globalAlpha=p.alpha;ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);
-        ctx.fillStyle=p.color;
-        if(p.shape==='rect') ctx.fillRect(-p.size/2,-p.size/4,p.size,p.size/2);
+    if(!st)st=ts;const el=(ts-st)/1000;ctx.clearRect(0,0,canvas.width,canvas.height);let alive=false;
+    parts.forEach(p=>{
+      p.vy+=.2;p.x+=p.vx;p.y+=p.vy;p.rot+=p.rotV;p.alpha=Math.max(0,1-el/1.9);
+      if(p.alpha>0){alive=true;ctx.save();ctx.globalAlpha=p.alpha;ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);ctx.fillStyle=p.color;
+        if(p.shape==='rect')ctx.fillRect(-p.size/2,-p.size/4,p.size,p.size/2);
         else{ctx.beginPath();ctx.arc(0,0,p.size/2,0,Math.PI*2);ctx.fill();}
-        ctx.restore();
-      }
+        ctx.restore();}
     });
-    if(alive&&el<2.2) requestAnimationFrame(draw);
-    else ctx.clearRect(0,0,canvas.width,canvas.height);
+    if(alive&&el<2.2)requestAnimationFrame(draw);else ctx.clearRect(0,0,canvas.width,canvas.height);
   }
   requestAnimationFrame(draw);
 }
 
+/* ── UNDO / RESET ── */
 function undoShot(id){state.shots=state.shots.filter(s=>s.id!==id);save();renderActuals();}
-
 function doReset(){
   document.getElementById('confTitle').textContent='Reset all shots?';
   document.getElementById('confSub').textContent='This clears your full shot history. Sector forecast stays intact.';
@@ -1341,13 +1340,13 @@ function updateScoreboard(){
   le.className='hud-num '+(left===0?'gr':actual>target?'rd':'gr');
   const pb=document.getElementById('sbPct');
   pb.textContent=pct+'%';
-  pb.className='hud-pct-badge'+(pct>=100?' done':'');
+  pb.className='hud-pct'+(pct>=100?' done':'');
   const pf=document.getElementById('powerFill');
   pf.style.width=pct+'%';
   pf.className='power-fill'+(actual>target?' over':actual===target?' done':'');
 }
 
-/* ── ACTUALS RENDER ── */
+/* ── ACTUALS ── */
 function renderActuals(){
   const target=state.target;
   const actual=state.shots.reduce((a,s)=>a+s.pts,0);
@@ -1360,8 +1359,7 @@ function renderActuals(){
   document.getElementById('pfFc').style.width=pctFc+'%';
   const pa=document.getElementById('pfAc');
   pa.style.width=pctAc+'%';
-  pa.style.background=actual>=target?'#00E676':'#FF5C1A';
-  pa.style.boxShadow=actual>=target?'0 0 8px rgba(0,230,118,.5)':'0 0 8px rgba(255,92,26,.5)';
+  pa.style.background=actual>=target?'#00C853':'#FF6B2B';
 
   const now=new Date();
   const day=now.getDate();
@@ -1387,10 +1385,10 @@ function renderActuals(){
       const done=sAct>=s.qty&&s.qty>0,over=sAct>s.qty&&s.qty>0;
       return `<div class="sa-card">
         <div class="sa-card-left">
-          <div class="sa-name"><div class="sa-dot" style="background:${s.color};box-shadow:0 0 5px ${s.color}"></div>${s.name||'Unnamed'}</div>
+          <div class="sa-name"><div class="sa-dot" style="background:${s.color}"></div>${s.name||'Unnamed'}</div>
           <div class="sa-bar">
             <div class="sa-bar-fc" style="width:${barFc}%;background:${s.color}"></div>
-            <div class="sa-bar-ac" style="width:${barAc}%;background:${s.color};box-shadow:0 0 6px ${s.color}"></div>
+            <div class="sa-bar-ac" style="width:${barAc}%;background:${s.color}"></div>
           </div>
           <div class="sa-foot">
             <div class="sa-lbl">Forecast: ${s.qty}</div>
@@ -1416,7 +1414,7 @@ function renderActuals(){
       <div class="shot-item-left">
         <div class="shot-pill ${cls}">${lbl}</div>
         <div class="shot-info">
-          <div class="shot-sec"><span style="width:7px;height:7px;border-radius:50%;background:${sh.sectorColor};box-shadow:0 0 5px ${sh.sectorColor};display:inline-block;flex-shrink:0"></span>${sh.sectorName}</div>
+          <div class="shot-sec"><span style="width:7px;height:7px;border-radius:50%;background:${sh.sectorColor};display:inline-block;flex-shrink:0"></span>${sh.sectorName}</div>
           <div class="shot-time">${ts}</div>
         </div>
       </div>
