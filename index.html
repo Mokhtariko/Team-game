@@ -66,6 +66,7 @@ body{
    ═══════════════════════════════════════════════════════════ */
 .stadium{
   position:relative;width:100%;height:420px;overflow:hidden;
+  transition:height .5s cubic-bezier(.23,1,.32,1);
   /* Cinematic dark arena — deep navy/charcoal base */
   background:
     /* Court surface — warm hardwood with perspective */
@@ -154,8 +155,69 @@ body{
 .court{position:absolute;bottom:0;left:0;right:0;height:250px;z-index:3}
 .court svg{width:100%;height:250px}
 
+/* ── FULL-PAGE STADIUM MODE ── */
+.stadium.expanded{
+  height:100dvh;
+  height:100vh; /* fallback */
+}
+/* Panel slides out below when stadium expands */
+.panel-wrap{
+  transition:transform .5s cubic-bezier(.23,1,.32,1), opacity .4s ease;
+  transform:translateY(0);opacity:1;
+}
+.panel-wrap.hidden{
+  transform:translateY(60px);opacity:0;pointer-events:none;
+}
+.stadium-bridge{
+  height:24px;
+  background:linear-gradient(180deg,rgba(15,8,30,0) 0%,var(--page-bg) 100%);
+  transition:opacity .4s ease;
+}
+.stadium-bridge.hidden{opacity:0;pointer-events:none;}
+
+/* Collapse hint — small tab above shot buttons */
+.court-hint{
+  position:absolute;bottom:64px;left:50%;transform:translateX(-50%);
+  font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  color:rgba(255,255,255,.35);z-index:30;white-space:nowrap;
+  pointer-events:none;
+  animation:hintPulse 2.5s ease-in-out infinite;
+}
+@keyframes hintPulse{0%,100%{opacity:.35}50%{opacity:.7}}
+/* Hide hint when expanded (user already sees full court) */
+.stadium.expanded .court-hint{display:none}
+
+/* In expanded mode, player is bigger and more centered */
+.stadium.expanded .player-wrap{bottom:80px}
+.stadium.expanded .player-flipper,
+.stadium.expanded .player-face{width:72px;height:114px}
+.stadium.expanded .hoop-wrap{top:48px}
+.stadium.expanded .hoop-wrap svg{width:158px;height:158px}
+
+/* Shot buttons bigger in expanded mode */
+.stadium.expanded .shot-btn{height:56px;font-size:18px;padding:0 20px}
+.stadium.expanded .shot-btns{bottom:14px;gap:12px}
+
+/* In expanded mode, HUD gets more breathing room */
+.stadium.expanded .hud-num{font-size:48px}
+.stadium.expanded .hud{top:8px}
+
+/* Collapse button — visible in expanded mode */
+.collapse-btn{
+  position:absolute;bottom:88px;right:16px;
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);
+  color:rgba(255,255,255,.6);font-size:16px;
+  display:none;align-items:center;justify-content:center;
+  cursor:pointer;z-index:31;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  transition:background .2s;
+}
+.stadium.expanded .collapse-btn{display:flex}
+.collapse-btn:active{background:rgba(255,255,255,.22)}
+
 /* Hoop */
-.hoop-wrap{position:absolute;top:38px;left:50%;transform:translateX(-50%);z-index:6}
+.hoop-wrap{position:absolute;top:38px;left:50%;transform:translateX(-50%);z-index:18;transition:transform .2s}
 
 /* ═══════════════════════════════════════════════════════════
    NAVY HUD SCOREBOARD — Slanted broadcast shape
@@ -240,10 +302,23 @@ body{
    BALL · FLASH · SIII
    ═══════════════════════════════════════════════════════════ */
 .ball{
-  position:absolute;width:22px;height:22px;border-radius:50%;
-  background:radial-gradient(circle at 33% 28%,#ffb347,#c45b10);
-  border:1.5px solid #7a3500;z-index:16;pointer-events:none;display:none;
-  box-shadow:0 2px 10px rgba(0,0,0,.6);
+  position:absolute;width:32px;height:32px;border-radius:50%;
+  background:radial-gradient(circle at 33% 28%,#FFB84A,#E06818,#A83800);
+  border:2px solid #6A2000;z-index:16;pointer-events:none;display:none;
+  box-shadow:0 4px 16px rgba(0,0,0,.7),inset 0 -2px 6px rgba(0,0,0,.3);
+}
+/* Ball seam lines drawn with ::before and ::after */
+.ball::before{
+  content:'';position:absolute;inset:0;border-radius:50%;
+  border-top:1.5px solid rgba(80,20,0,.5);
+  border-bottom:1.5px solid rgba(80,20,0,.5);
+  transform:rotate(20deg);
+}
+.ball::after{
+  content:'';position:absolute;inset:0;border-radius:50%;
+  border-left:1.5px solid rgba(80,20,0,.4);
+  border-right:1.5px solid rgba(80,20,0,.4);
+  transform:rotate(20deg) scaleX(.5);
 }
 .flash{
   position:absolute;top:44%;left:50%;transform:translate(-50%,-50%);
@@ -706,11 +781,14 @@ body{
   .stadium{height:300px}
   .hoop-wrap{top:40px}
   .player-wrap{bottom:40px}
-  .player-flipper{width:58px;height:92px}
-  .player-face{width:58px;height:92px}
-  .hud-num{font-size:30px}
+  .player-flipper{width:50px;height:82px}
+  .player-face{width:50px;height:82px}
+  .hud-num{font-size:28px}
   .shot-btn{padding:0 10px;font-size:13px;height:42px}
   .panel{padding-left:12px;padding-right:12px}
+  .stadium.expanded .player-flipper,.stadium.expanded .player-face{width:62px;height:98px}
+  .stadium.expanded .shot-btn{height:50px;font-size:16px}
+  .stadium.expanded .hud-num{font-size:38px}
 }
 @media(min-width:376px) and (max-width:430px){.stadium{height:318px}}
 @media(min-width:431px) and (max-width:480px){
@@ -1324,6 +1402,10 @@ body{
   <div class="siii-flash" id="siiiFlash">Siiiiii! 🙌</div>
   <canvas id="confettiCanvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:12;"></canvas>
 
+  <!-- Expand hint -->
+  <div class="court-hint" id="courtHint">▼ Tap to score</div>
+  <!-- Collapse button (visible in full-page mode) -->
+  <button class="collapse-btn" id="collapseBtn" onclick="collapseStadium()" title="Exit full screen">✕</button>
   <!-- CONSOLE SHOT BUTTONS -->
   <div class="shot-btns">
     <button class="shot-btn one"   id="btn1" onclick="initShot(1)"><span class="bdg">+1</span>📦 1 BOX</button>
@@ -1357,7 +1439,8 @@ body{
 </div>
 
 <!-- PANEL — Championship Light -->
-<div class="stadium-bridge"></div>
+<div class="panel-wrap" id="panelWrap">
+<div class="stadium-bridge" id="stadiumBridge"></div>
 <div class="panel">
   <div class="tabs">
     <div class="tab active" onclick="switchTab('setup')">📋 Setup</div>
@@ -1444,6 +1527,7 @@ body{
     <div id="shotLog"><div class="no-shots">No shots logged yet.<br>Tap a shot button above to log actual boxes.</div></div>
   </div>
 </div>
+</div><!-- /panel-wrap -->
 
 <script>
 /* ── CROWD — bokeh style ── */
@@ -1619,84 +1703,136 @@ function fireShot(sectorId){
   save();
 }
 
+/* ── STADIUM EXPAND / COLLAPSE ── */
+function expandStadium(){
+  document.getElementById('stadium').classList.add('expanded');
+  document.getElementById('panelWrap').classList.add('hidden');
+  document.getElementById('stadiumBridge').classList.add('hidden');
+}
+function collapseStadium(){
+  document.getElementById('stadium').classList.remove('expanded');
+  document.getElementById('panelWrap').classList.remove('hidden');
+  document.getElementById('stadiumBridge').classList.remove('hidden');
+}
+
 /* ═══════════════════════════════════════════════════════════
    CHOREOGRAPHED ANIMATION — Full sequence
-   Phase 1: Ball flies (player faces hoop)
-   Phase 2: Ball drops through net
+   Phase 0: Stadium expands to full page
+   Phase 1: Ball flies arc to hoop
+   Phase 2: Ball enters net — VISIBLE inside net, pauses
    Phase 3: Player flips to front (3D spin)
    Phase 4: Siii! + confetti
    ── 1 SECOND PAUSE ──
-   Phase 5: Sector picker spring-slides up
-   Phase 6: Player spins back after selection
+   Phase 5: Sector picker slides up
+   Phase 6: Player spins back, stadium collapses
    ═══════════════════════════════════════════════════════════ */
 function animShot(pts){
   shooting=true;
   ['btn1','btn3','btn6'].forEach(id=>document.getElementById(id).disabled=true);
 
-  const flipper=document.getElementById('playerFlipper');
-  const stadium=document.getElementById('stadium');
-  const pw=document.getElementById('playerWrap');
-  const hp=document.getElementById('hoopWrap');
-  const ball=document.getElementById('ball');
-  const stR=stadium.getBoundingClientRect();
-  const pwR=pw.getBoundingClientRect();
-  const hpR=hp.getBoundingClientRect();
+  /* Phase 0 — expand stadium to full page */
+  expandStadium();
 
-  const sx=pwR.left-stR.left+54, sy=pwR.top-stR.top+22;
-  const ex=hpR.left-stR.left+hpR.width/2-11, ey=hpR.top-stR.top+56;
+  /* Small delay for expansion to settle before reading positions */
+  setTimeout(()=>{
 
-  /* Raise arm on back SVG */
-  const armR=document.getElementById('armBackR');
-  if(armR) armR.setAttribute('transform','rotate(-72,65,38)');
+    const flipper=document.getElementById('playerFlipper');
+    const stadium=document.getElementById('stadium');
+    const pw=document.getElementById('playerWrap');
+    const hp=document.getElementById('hoopWrap');
+    const ball=document.getElementById('ball');
+    const stR=stadium.getBoundingClientRect();
+    const pwR=pw.getBoundingClientRect();
+    const hpR=hp.getBoundingClientRect();
 
-  ball.style.cssText=`display:block;left:${sx}px;top:${sy}px;transition:none;opacity:1`;
+    /* Ball starts from player's right shoulder area */
+    const sx=pwR.left-stR.left+pwR.width*.8;
+    const sy=pwR.top-stR.top+pwR.height*.22;
 
-  const dur=pts===6?875:pts===3?695:495;
-  const arc=pts===6?-170:pts===3?-120:-76;
-  const t0=performance.now();
+    /* Ball ends INSIDE the net — rim center, at net mid-depth */
+    /* hpR is the hoop SVG bounding box — net center is at ~58% from top */
+    const ex=hpR.left-stR.left+hpR.width*.5-16; /* center of rim */
+    const ey=hpR.top-stR.top+hpR.height*.58;    /* inside the net strands */
 
-  /* Phase 1 — ball arc */
-  (function frame(now){
-    const t=Math.min((now-t0)/dur,1);
-    const e=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
-    ball.style.left=((1-e)*sx+e*ex)+'px';
-    ball.style.top=((1-e)*sy+e*ey+Math.sin(t*Math.PI)*arc)+'px';
-    ball.style.transform=`rotate(${t*400}deg)`;
-    if(t<1){requestAnimationFrame(frame);return;}
+    /* Raise arm on back SVG */
+    const armR=document.getElementById('armBackR');
+    if(armR) armR.setAttribute('transform','rotate(-72,65,38)');
 
-    /* Phase 2 — ball drops through net */
-    ball.style.transition='top .32s cubic-bezier(.4,0,1,1), opacity .26s .12s';
-    ball.style.top=(ey+48)+'px';
-    ball.style.opacity='0';
+    ball.style.cssText=`display:block;left:${sx}px;top:${sy}px;transition:none;opacity:1`;ball.style.zIndex='20';
 
-    /* Phase 3 — player spins to front */
-    setTimeout(()=>{
-      if(armR) armR.removeAttribute('transform');
-      flipper.style.transition='transform .42s cubic-bezier(.23,1,.32,1)';
-      flipper.classList.add('celebrating');
+    const dur=pts===6?900:pts===3?720:520;
+    const arc=pts===6?-200:pts===3?-150:-100;
+    const t0=performance.now();
 
-      /* Phase 4 — Siii + confetti */
+    /* Phase 1 — ball arc toward rim */
+    (function frame(now){
+      const t=Math.min((now-t0)/dur,1);
+      const e=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+      ball.style.left=((1-e)*sx+e*ex)+'px';
+      ball.style.top=((1-e)*sy+e*ey+Math.sin(t*Math.PI)*arc)+'px';
+      ball.style.transform=`rotate(${t*400}deg)`;
+      if(t<1){requestAnimationFrame(frame);return;}
+
+      /* Phase 2 — ball ENTERS net — drop short distance through net */
+      /* Ball is now AT the rim — drop it into the net visually */
+      ball.style.zIndex='14'; /* go behind net strands (net is z-index:18) */
+      ball.style.transition='top .35s cubic-bezier(.6,0,.8,1), width .2s ease, height .2s ease';
+      ball.style.top=(ey+22)+'px';    /* drops inside net strands */
+      ball.style.width='26px';         /* slightly squishes as it hits net */
+      ball.style.height='26px';
+
+      /* Net shake effect — CSS class on hoop */
+      const hoop=document.getElementById('hoopWrap');
+      hoop.style.transition='transform .12s';
+      hoop.style.transform='translateX(-50%) rotate(-.8deg)';
       setTimeout(()=>{
-        ball.style.display='none';ball.style.opacity='1';ball.style.transition='';
-        showSiii();
-        launchConfetti();
-        shooting=false;
-        ['btn1','btn3','btn6'].forEach(id=>document.getElementById(id).disabled=false);
-
-        /* ═══ MANDATORY 1-SECOND PAUSE ═══ */
+        hoop.style.transform='translateX(-50%) rotate(.8deg)';
         setTimeout(()=>{
-          openPicker(pts);
+          hoop.style.transform='translateX(-50%) rotate(0deg)';
+        },80);
+      },80);
 
-          /* Spin back after rep makes selection */
+      /* Phase 2b — ball sits in net for a moment, THEN fades */
+      setTimeout(()=>{
+        ball.style.transition='opacity .4s ease';
+        ball.style.opacity='0';
+      }, 320); /* visible in net for 320ms */
+
+      /* Phase 3 — player spins to front */
+      setTimeout(()=>{
+        if(armR) armR.removeAttribute('transform');
+        flipper.style.transition='transform .42s cubic-bezier(.23,1,.32,1)';
+        flipper.classList.add('celebrating');
+
+        /* Phase 4 — Siii + confetti */
+        setTimeout(()=>{
+          ball.style.display='none';
+          ball.style.opacity='1';
+          ball.style.transition='';
+          ball.style.width='';
+          ball.style.height='';
+          showSiii();
+          launchConfetti();
+          shooting=false;
+          ['btn1','btn3','btn6'].forEach(id=>document.getElementById(id).disabled=false);
+
+          /* ═══ MANDATORY 1-SECOND PAUSE then sector picker ═══ */
           setTimeout(()=>{
-            flipper.style.transition='transform .38s cubic-bezier(.23,1,.32,1)';
-            flipper.classList.remove('celebrating');
-          }, 1000);
-        }, 1000); /* THE CRITICAL 1-SECOND RHYTHM DELAY */
+            openPicker(pts);
 
-      }, 440);
-    }, 195);
-  })(performance.now());
+            /* Spin back + collapse stadium when picker closes */
+            setTimeout(()=>{
+              flipper.style.transition='transform .38s cubic-bezier(.23,1,.32,1)';
+              flipper.classList.remove('celebrating');
+              collapseStadium();
+            }, 1000);
+          }, 1000);
+
+        }, 440);
+      }, 250);
+    })(performance.now());
+
+  }, 120); /* wait for stadium expand transition to begin */
 }
 
 function showSiii(){
